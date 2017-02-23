@@ -1,0 +1,5 @@
+.idea
+*.pyc
+.cache
+build
+pyKCIPT.egg-info
