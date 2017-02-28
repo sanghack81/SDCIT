@@ -281,3 +281,27 @@ def adj_KCIPT(kx, ky, kz, B, b=10000, M=10000, variance_reduced=True):
     # print(MMD00, MMD0Y, MMD0Z, MMDYY, MMDZZ, sep=',')
 
     return p_value_of(corrected, outer_null, approxmation=True) if M > 0 else float('nan'), corrected, unbiased_nulls, outer_null
+
+
+def original_kcipt(x, y, z, seed=None, mateng=None):
+    import matlab.engine
+
+    if mateng is None:
+        mateng = matlab.engine.start_matlab()
+        dir_at = os.path.expanduser('~/Dropbox/research/2014 rcm/workspace/python/KCIPT2017/kcipt/original')
+        mateng.addpath(mateng.genpath(dir_at))
+
+        if seed is not None:
+            mateng.RandStream.setGlobalStream(mateng.RandStream('mcg16807', 'Seed', seed))
+
+        statsitic, null = mateng.kcipt(x, y, z, mateng.rbf(mateng.median_pdist(x)), mateng.rbf(mateng.median_pdist(y)), mateng.rbf(mateng.median_pdist(z)),
+                                       {'distance': 'regression', 'null_estimate': 'gamma', 'bootstrap_samples': 1000, 'kernel': 'supplied', 'split': 1}, nargout=2)
+        mateng.quit()
+
+        return statsitic, null
+    else:
+        if seed is not None:
+            mateng.RandStream.setGlobalStream(mateng.RandStream('mcg16807', 'Seed', seed))
+        statsitic, null = mateng.kcipt(x, y, z, mateng.rbf(mateng.median_pdist(x)), mateng.rbf(mateng.median_pdist(y)), mateng.rbf(mateng.median_pdist(z)),
+                                       {'distance': 'regression', 'null_estimate': 'gamma', 'bootstrap_samples': 1000, 'kernel': 'supplied', 'split': 1}, nargout=2)
+        return statistic, null

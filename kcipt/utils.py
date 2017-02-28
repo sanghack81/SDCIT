@@ -168,7 +168,7 @@ def split(n):
 
 
 def split_1_to_r(n, ratio):
-    selector = np.random.choice(n, n // (1 + ratio), False)  # choose n from 2n
+    selector = np.random.choice(n, int(n / (1 + ratio)), False)  # choose n from 2n
     other = np.array(list(set(range(n)) - set(selector)))
     np.random.shuffle(other)
     return selector, other
@@ -229,20 +229,27 @@ def mmd_and_k(kx, ky, kz, idx1, idx2, Pidx1, Pidx2, type1=None, type2=None):
     return mmd, new_k
 
 
-def data_gen_old(n, seed, slope=0.0):
+def normalize(x):
+    return (x - np.mean(x)) / np.std(x)
+
+
+def data_gen_old(n, seed, slope=0.0, skip_kernel=False):
     np.random.seed(seed)
 
-    z = randn(n, 1)
-    y = z + 0.3 * randn(n, 1)
-    x = z + 0.3 * randn(n, 1) + slope * y
+    z = normalize(randn(n, 1))
+    y = normalize(z + 0.3 * randn(n, 1))
+    x = normalize(z + 0.3 * randn(n, 1) + slope * y)
 
-    kx = auto_rbf_kernel(x)
-    ky = auto_rbf_kernel(y)
-    kz = auto_rbf_kernel(z)
-    return kx, ky, kz, x, y, z
+    if skip_kernel:
+        return x, y, z
+    else:
+        kx = auto_rbf_kernel(x)
+        ky = auto_rbf_kernel(y)
+        kz = auto_rbf_kernel(z)
+        return kx, ky, kz, x, y, z
 
 
-def data_gen_other(n, seed, slope=0.0, slope_xz=1.0, slope_yz=1.0):
+def data_gen_other(n, seed, slope=0.0, slope_xz=1.0, slope_yz=1.0, skip_kernel=False):
     # X --> Z --> Y
     # X <-- Z --> Y
     np.random.seed(seed)
@@ -251,13 +258,16 @@ def data_gen_other(n, seed, slope=0.0, slope_xz=1.0, slope_yz=1.0):
     x = slope_xz * z ** 2 + 0.4 * randn(n, 1)
     y = slope_yz * np.cos(z) + slope * np.sqrt(np.abs(x)) + 0.2 * randn(n, 1)
 
-    kx = auto_rbf_kernel(x)
-    ky = auto_rbf_kernel(y)
-    kz = auto_rbf_kernel(z)
-    return kx, ky, kz, x, y, z
+    if skip_kernel:
+        return x, y, z
+    else:
+        kx = auto_rbf_kernel(x)
+        ky = auto_rbf_kernel(y)
+        kz = auto_rbf_kernel(z)
+        return kx, ky, kz, x, y, z
 
 
-def data_gen_one(n, seed, slope=0.0, slope_xz=1.0, slope_yz=1.0):
+def data_gen_one(n, seed, slope=0.0, slope_xz=1.0, slope_yz=1.0, skip_kernel=False):
     # X --> Z --> Y
     # X <-- Z --> Y
     np.random.seed(seed)
@@ -265,8 +275,10 @@ def data_gen_one(n, seed, slope=0.0, slope_xz=1.0, slope_yz=1.0):
     z = randn(n, 1)
     y = slope_yz * z ** 2 + 0.4 * randn(n, 1)
     x = slope_xz * np.cos(z) + slope * np.sqrt(np.abs(y)) + 0.2 * randn(n, 1)
-
-    kx = auto_rbf_kernel(x)
-    ky = auto_rbf_kernel(y)
-    kz = auto_rbf_kernel(z)
-    return kx, ky, kz, x, y, z
+    if skip_kernel:
+        return x, y, z
+    else:
+        kx = auto_rbf_kernel(x)
+        ky = auto_rbf_kernel(y)
+        kz = auto_rbf_kernel(z)
+        return kx, ky, kz, x, y, z

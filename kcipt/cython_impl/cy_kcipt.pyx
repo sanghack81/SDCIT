@@ -92,6 +92,16 @@ def cy_bootstrap_single_null(int seed,
                              ):
     bootstrap_single_null(seed, B, b, M, &inner_null[0], &outer_null[0])
 
+# @cython.boundscheck(False)
+# @cython.wraparound(False)
+# def cy_bootstrap_null(int seed,
+#                              int B,
+#                              int b,
+#                              int M,
+#                              np.ndarray[double, ndim=1, mode="c"] inner_null,
+#                              np.ndarray[double, ndim=1, mode="c"] outer_null,
+#                              ):
+#     bootstrap_null(seed, B, b, M, &inner_null[0], &outer_null[0])
 
 
 @cython.boundscheck(False)

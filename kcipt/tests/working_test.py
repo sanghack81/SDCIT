@@ -20,23 +20,41 @@ if __name__ == '__main__':
                 mmd3 = one_shot_KCIPT(kx, ky, kz, with_null=False)  # not twiced!!!!
                 print(np.mean(ms), m3, m1, m2, mmd3, sep=',', file=f)
     else:
+        kx, ky, kz, _, _, _ = data_gen_one(50, 0, 0.0)
+        _, _, _, onull = c_adj_KCIPT(kx, ky, kz, K2D(kz), 100, 10000, 10000)
         import seaborn as sns
         import pandas as pd
 
-        palette = sns.color_palette('Set1', 5)
-        sns.set(palette=palette)
         data = pd.read_csv('testout22.csv', names=['KCIPT', 'ADJ-ONCE', 'DOUBLE-ADJ', 'PY-DOUBLE-ADJ', 'ONESHOT'])
-        sns.distplot(data['KCIPT'], hist=False, label='KCIPT')
-        sns.distplot(data['ADJ-ONCE'], hist=False, label='ADJ-ONCE')
-        sns.distplot(data['DOUBLE-ADJ'], hist=False, label='DOUBLE-ADJ')
-        sns.distplot(data['PY-DOUBLE-ADJ'], hist=False, label='PY-DOUBLE-ADJ')
-        sns.distplot(data['ONESHOT'], hist=False, label='ONESHOT')
 
-        sns.plt.plot([np.mean(data['KCIPT']), np.mean(data['KCIPT'])], [0, 50], c=palette[0], alpha=0.5)
-        sns.plt.plot([np.mean(data['ADJ-ONCE']), np.mean(data['ADJ-ONCE'])], [0, 50], c=palette[1], alpha=0.5)
-        sns.plt.plot([np.mean(data['DOUBLE-ADJ']), np.mean(data['DOUBLE-ADJ'])], [0, 50], c=palette[2], alpha=0.5)
-        sns.plt.plot([np.mean(data['PY-DOUBLE-ADJ']), np.mean(data['PY-DOUBLE-ADJ'])], [0, 50], c=palette[3], alpha=0.5)
-        sns.plt.plot([np.mean(data['ONESHOT']), np.mean(data['ONESHOT'])], [0, 50], c=palette[4], alpha=0.5)
+        for i in range(4):
+            palette = sns.color_palette('Set1', 5)
+            sns.set(palette=palette)
+            if i >= 0:
+                sns.distplot(data['KCIPT'], hist=False, label='KCIPT')
+            if i >= 1:
+                sns.distplot(data['ADJ-ONCE'], hist=False, label='ADJ-ONCE')
+            if i >= 2:
+                sns.distplot(data['DOUBLE-ADJ'], hist=False, label='DOUBLE-ADJ')
+            if i >= 3:
+                sns.distplot(data['ONESHOT'], hist=False, label='ONESHOT')
+            sns.distplot(onull, hist=False, label='null', color=palette[4])
 
-        sns.plt.savefig('testout22.pdf')
-        sns.plt.close()
+            if i >= 0:
+                sns.plt.plot([np.median(data['KCIPT']), np.median(data['KCIPT'])], [0, 50], c=palette[0], alpha=0.5)
+            if i >= 1:
+                sns.plt.plot([np.median(data['ADJ-ONCE']), np.median(data['ADJ-ONCE'])], [0, 50], c=palette[1], alpha=0.5)
+            if i >= 2:
+                sns.plt.plot([np.median(data['DOUBLE-ADJ']), np.median(data['DOUBLE-ADJ'])], [0, 50], c=palette[2], alpha=0.5)
+            if i >= 3:
+                sns.plt.plot([np.median(data['ONESHOT']), np.median(data['ONESHOT'])], [0, 50], c=palette[3], alpha=0.5)
+
+            sns.plt.legend()
+            sns.plt.axes().set_xlim([-0.015, 0.015])
+            sns.plt.axes().set_ylim([-5, 750])
+            sns.plt.axes().set_xlabel('MMD')
+            sns.plt.axes().set_ylabel('density')
+            # sns.plt.title('data generated from null hypothesis, different MMD estimates plotted')
+            sns.plt.title('')
+            sns.plt.savefig('testout22_{}.pdf'.format(i))
+            sns.plt.close()
