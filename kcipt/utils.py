@@ -5,6 +5,23 @@ from numpy.matlib import repmat
 from numpy.random import choice, randn
 from scipy.stats import expon
 from sklearn.metrics import pairwise_distances
+from sklearn.metrics import euclidean_distances
+import numpy.ma as ma
+
+def median_heuristic(x, y, z):
+    dx = euclidean_distances(x, squared=True)
+    dy = euclidean_distances(y, squared=True)
+    dz = euclidean_distances(z, squared=True)
+
+    mx = ma.median(ma.array(dx, mask=np.triu(np.ones(dx.shape), 0)))
+    my = ma.median(ma.array(dy, mask=np.triu(np.ones(dy.shape), 0)))
+    mz = ma.median(ma.array(dz, mask=np.triu(np.ones(dz.shape), 0)))
+
+    kx = exp(-0.5 * dx / mx)
+    ky = exp(-0.5 * dy / my)
+    kz = exp(-0.5 * dz / mz)
+    return kx, ky, kz
+
 
 
 def safe_iter(iterable, sort=False):

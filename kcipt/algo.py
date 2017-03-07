@@ -6,9 +6,11 @@ from kcipt.permutation import blossom_permutation
 from kcipt.utils import *
 
 
-def permuted(idx, K):
+def permuted(idx, K=None, D=None):
+    assert K is not None or D is not None
     Pidx = idx.copy()
-    D = K2D(K)
+    if D is None:
+        D = K2D(K)
     rows, cols = np.nonzero(blossom_permutation(D))
     Pidx[rows] = idx[cols]
     return Pidx

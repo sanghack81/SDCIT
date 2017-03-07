@@ -1,12 +1,22 @@
+import heapq
 import warnings
 from itertools import chain
 
 import numpy as np
+from kcipt.blossom_v.cy_blossom_v import cy_blossom_v, cy_post_2_2_2_to_3_3, cy_post_2_3_to_5
 from numpy import zeros, allclose, ix_, diag
 from numpy.random import randint
 
-from kcipt.blossom_v.cy_blossom_v import cy_blossom_v, cy_post_2_2_2_to_3_3, cy_post_2_3_to_5
 from kcipt.utils import safe_iter
+
+
+def greedy_permutation(D):
+    # choose their best
+    n = len(D)
+    distheap = heapq.heapify([(D[i, j], i, j) for i in range(n) for j in range(i + 1, n)])
+    distheap
+
+
 
 
 def _sample_integer_except(n: int, exclude: int) -> int:
