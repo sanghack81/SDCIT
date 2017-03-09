@@ -5,6 +5,7 @@ import time
 from os.path import exists
 
 import scipy.io
+import scipy.stats
 from joblib import Parallel
 from joblib import delayed
 from tqdm import tqdm
@@ -36,10 +37,25 @@ def tonp(xxx):
 def test_chaotic(independent, gamma, trial, N, B=25, n_jobs=1):
     np.random.seed(trial)
 
-    # if exists('pykcipt_chaotic.csv'):
-    #     for line in open('pykcipt_chaotic.csv', 'r'):
-    #         if line.startswith('{},{},{},{},'.format(independent, gamma, trial, N)):
-    #             return None
+    mat_load = scipy.io.loadmat(os.path.expanduser('~/kcipt_data/{}_{}_{}_{}_chaotic.mat'.format(gamma, trial, independent, N)), squeeze_me=True, struct_as_record=False)
+    data = mat_load['data']
+    if independent:
+        X = data.Xt1
+        Y = data.Yt
+        Z = data.Xt[:, 0:2]
+    else:
+        X = data.Yt1
+        Y = data.Xt
+        Z = data.Yt[:, 0: 2]
+
+    kx, ky, kz = toK(X, Y, Z)
+    Dz = K2D(kz)
+    pval, mmds, inner_null, _ = c_KCIPT(kx, ky, kz, Dz, B, 200, 10000, n_jobs)
+    return (independent, gamma, trial, N, np.mean(mmds), pval, B)
+
+
+def test_chaotic_1470(independent, gamma, trial, N, B, n_jobs):
+    np.random.seed(trial)
 
     mat_load = scipy.io.loadmat(os.path.expanduser('~/kcipt_data/{}_{}_{}_{}_chaotic.mat'.format(gamma, trial, independent, N)), squeeze_me=True, struct_as_record=False)
     data = mat_load['data']
@@ -54,7 +70,9 @@ def test_chaotic(independent, gamma, trial, N, B=25, n_jobs=1):
 
     kx, ky, kz = toK(X, Y, Z)
     Dz = K2D(kz)
-    pval, mmds, _, _ = c_KCIPT(kx, ky, kz, Dz, B, 200, 10000, n_jobs)
+    _, mmds, inner_null, _ = c_KCIPT(kx, ky, kz, Dz, B, 100, 0, n_jobs)
+    inner_null = np.squeeze(inner_null)
+    pval = scipy.stats.norm.sf(mmds.mean(), 0, inner_null.std() / np.sqrt(B))
     return (independent, gamma, trial, N, np.mean(mmds), pval, B)
 
 
@@ -118,12 +136,42 @@ if __name__ == '__main__':
                         if out is not None:
                             print(*out, sep=',', file=f, flush=True)
     #
-    if True:
+    if False:
         if multiprocessing.cpu_count() == 32:
             independent, gamma, N = 0, '0.0', 400
             print(independent, gamma, N)
             outs = [test_chaotic(independent, gamma, trial, N, 1470, 32) for trial in trange(300)]
             with open('pykcipt_chaotic_1470.csv', 'a') as f:
+                for out in outs:
+                    if out is not None:
+                        print(*out, sep=',', file=f, flush=True)
+
+    if False:
+        if multiprocessing.cpu_count() == 32:
+            independent, gamma, N = 0, '0.0', 400
+            print(independent, gamma, N)
+            outs = [test_chaotic(independent, gamma, trial, N, 5000, 32) for trial in trange(300)]
+            with open('pykcipt_chaotic_5000.csv', 'a') as f:
+                for out in outs:
+                    if out is not None:
+                        print(*out, sep=',', file=f, flush=True)
+
+    if False:
+        if multiprocessing.cpu_count() == 32:
+            for independent, gamma, N in tqdm(list(itertools.product([0, 1], ['0.0', '0.1', '0.2', '0.3', '0.4', '0.5'], [200, 400]))):
+                print(independent, gamma, N)
+                outs = [test_chaotic_1470(independent, gamma, trial, N, 1470, 32) for trial in range(300)]
+                with open('kcipt_chaotic_1470_full.csv', 'a') as f:
+                    for out in outs:
+                        if out is not None:
+                            print(*out, sep=',', file=f, flush=True)
+                time.sleep(5)
+    if True:
+        if multiprocessing.cpu_count() == 32:
+            independent, gamma, N = 0, '0.0', 400
+            print(independent, gamma, N)
+            outs = [test_chaotic(independent, gamma, trial, N, 20000, 16) for trial in trange(300)]
+            with open('kcipt_chaotic_20000.csv', 'a') as f:
                 for out in outs:
                     if out is not None:
                         print(*out, sep=',', file=f, flush=True)
