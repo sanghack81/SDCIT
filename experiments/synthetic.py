@@ -4,6 +4,10 @@ from numpy.random import rand, randn
 
 
 def henon(seed, n, gamma, independence, noise_dim=2, noise_std=0.5):
+    """Python implementation of Chaotic Time Series used in Doran et al. (2014) A Permutation-based Kernel Conditional Independence Test
+
+    It is not compatible to the MATLAB implementation by Doran et al. (2014) due to the use of differenct random number generator.
+    """
     np.random.seed(seed)
 
     # 2N x (2 + noise_dim)
@@ -44,6 +48,8 @@ def normalize(X):
 
 
 def zhang2012(seed, N, dimensions, the_case, independent=True):
+    """Python implementation of Postnonlinear noise model"""
+
     np.random.seed(seed)
 
     assert dimensions > 0
@@ -282,49 +288,3 @@ def symmetric_zhang2012(seed, N, dimensions, the_case, independent=True):
     Y += ff
 
     return X, Y, Z
-
-
-if __name__ == '__main__':
-    for strindep, indep in [('indep', True), ('dep', False)]:
-        X, Y, Z = zhang2012(0, 400, 1, 1, indep)
-        import seaborn as sns
-        import matplotlib.pyplot as plt
-
-        paper_rc = {'lines.linewidth': 1, 'lines.markersize': 2}
-        sns.set_context("paper", rc=paper_rc)
-        sns.set(style='white', font_scale=1.4)
-        plt.figure(figsize=[3, 3])
-        plt.rc('text', usetex=True)
-        plt.rc('text.latex', preamble=r'\usepackage{cmbright}')
-
-        # zzz = Z[:, 0]
-        # zzz01 = (zzz - zzz.min()) / (zzz.max() - zzz.min())
-        plt.scatter(Z[:, 0], Y[:, 0], s=20, alpha=0.5)
-        plt.scatter(Z[:, 0], X[:, 0], s=20, alpha=0.5)
-        sns.despine()
-
-        if indep:
-            plt.axes().set_xlim([-2.5, 2.5])
-            plt.axes().set_ylim([-3, 3])
-        else:
-            plt.axes().set_xlim([-2.5, 2.5])
-            plt.axes().set_ylim([-3, 3])
-        plt.savefig('zhang_400_{}.pdf'.format(strindep))
-        plt.close()
-
-
-        # for dimm in range(1, 6):
-        #     for indep in [True, False]:
-        #         for the_case in [1, 2]:
-        #             X, Y, Z = zhang2012(0, 200, dimm, the_case, indep)
-        #             print(X.shape, Y.shape, Z.shape)
-        #
-        # x, y, z = henon(0, 1000, 0.5, True)
-        # x, y, z = henon(0, 1000, 0.3, False)
-        # print(x.shape, y.shape, z.shape)
-        # import seaborn as sns
-        # import matplotlib.pyplot as plt
-        #
-        # sns.set()
-        # plt.scatter(xt[:, 0], yt[:, 0], s=3, alpha=0.5)
-        # plt.savefig('chaotic.pdf')

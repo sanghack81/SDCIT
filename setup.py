@@ -72,7 +72,7 @@ setup(
     ext_modules=[
         blossom_v_extension,
         new_extension
-    ],
+    ], requires=['numpy']
 
 )
 # source activate tensorflow

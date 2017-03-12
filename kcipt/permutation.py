@@ -1,20 +1,29 @@
-import heapq
-import warnings
 from itertools import chain
 
 import numpy as np
-from kcipt.blossom_v.cy_blossom_v import cy_blossom_v, cy_post_2_2_2_to_3_3, cy_post_2_3_to_5
 from numpy import zeros, allclose, ix_, diag
 from numpy.random import randint
 
-from kcipt.utils import safe_iter
+from kcipt.blossom_v.cy_blossom_v import cy_blossom_v, cy_post_2_2_2_to_3_3, cy_post_2_3_to_5
+from kcipt.utils import safe_iter, K2D
 
 
-def greedy_permutation(D):
-    # choose their best
-    n = len(D)
-    distheap = heapq.heapify([(D[i, j], i, j) for i in range(n) for j in range(i + 1, n)])
-    distheap
+def permuted(idx, K=None, D=None):
+    assert K is not None or D is not None
+    Pidx = idx.copy()
+    if D is None:
+        D = K2D(K)
+    rows, cols = np.nonzero(blossom_permutation(D))
+    Pidx[rows] = idx[cols]
+    return Pidx
+
+
+def slim_permuted(idx, K=None, D=None, with_post=True):
+    assert K is not None or D is not None
+    if D is None:
+        D = K2D(K)
+    perm_vector = slim_blossom_permutation(D, with_post)
+    return idx[perm_vector]
 
 
 def _sample_integer_except(n: int, exclude: int) -> int:
@@ -123,12 +132,10 @@ def _all_ones(x):
     return allclose(x, 1, rtol=0, atol=0)
 
 
-def blossom_permutation(D, with_post=True, with_linprog=False, verbose=False, **unused_options):
+def blossom_permutation(D, with_post=True):
     """A permutation matrix, which first initialized by minimum-cost perfect matching using Blossom V algorithm.
 
     """
-    if unused_options:
-        print('ignored: {}'.format(unused_options))
     _validate_distance_matrix(D)
 
     n = len(D)
@@ -141,9 +148,6 @@ def blossom_permutation(D, with_post=True, with_linprog=False, verbose=False, **
         return _perm_to_P([1, 0])
     if n == 3:
         return _perm_to_P([1, 2, 0])
-
-    if with_linprog and not with_post:
-        warnings.warn('with linprog is only valid with post enabled.')
 
     p2s = []
     p3s = []
