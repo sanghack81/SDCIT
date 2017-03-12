@@ -15,25 +15,6 @@ from kcipt.algo import c_KCIPT
 from kcipt.utils import *
 
 
-def toK(x, y, z):
-    dx = euclidean_distances(x, squared=True)
-    dy = euclidean_distances(y, squared=True)
-    dz = euclidean_distances(z, squared=True)
-
-    mx = ma.median(ma.array(dx, mask=np.triu(np.ones(dx.shape), 0)))
-    my = ma.median(ma.array(dy, mask=np.triu(np.ones(dy.shape), 0)))
-    mz = ma.median(ma.array(dz, mask=np.triu(np.ones(dz.shape), 0)))
-
-    kx = exp(-0.5 * dx / mx)
-    ky = exp(-0.5 * dy / my)
-    kz = exp(-0.5 * dz / mz)
-    return kx, ky, kz
-
-
-def tonp(xxx):
-    np.array(xxx)
-
-
 def test_chaotic(independent, gamma, trial, N, B=25, n_jobs=1):
     np.random.seed(trial)
 
@@ -48,7 +29,7 @@ def test_chaotic(independent, gamma, trial, N, B=25, n_jobs=1):
         Y = data.Xt
         Z = data.Yt[:, 0: 2]
 
-    kx, ky, kz = toK(X, Y, Z)
+    kx, ky, kz = median_heuristic(X, Y, Z)
     Dz = K2D(kz)
     pval, mmds, inner_null, _ = c_KCIPT(kx, ky, kz, Dz, B, 200, 10000, n_jobs)
     return (independent, gamma, trial, N, np.mean(mmds), pval, B)
@@ -79,8 +60,8 @@ def test_chaotic_1470(independent, gamma, trial, N, B, n_jobs):
 def test_postnonlinear(independent, noise, trial, N, B=25):
     np.random.seed(trial)
 
-    # if exists('pykcipt_postnonlinear.csv'):
-    #     for line in open('pykcipt_postnonlinear.csv', 'r'):
+    # if exists('kcipt_postnonlinear.csv'):
+    #     for line in open('kcipt_postnonlinear.csv', 'r'):
     #         if line.startswith('{},{},{},{},'.format(independent, noise, trial, N)):
     #             return None
 
@@ -113,7 +94,7 @@ if __name__ == '__main__':
             for independent, gamma, N in tqdm(list(itertools.product([0, 1], ['0.0', '0.1', '0.2', '0.3', '0.4', '0.5'], [200, 400]))):
                 print(independent, gamma, N)
                 outs = Parallel(-5)(delayed(test_chaotic)(independent, gamma, trial, N) for trial in range(300))
-                with open('pykcipt_chaotic.csv', 'a') as f:
+                with open('kcipt_chaotic.csv', 'a') as f:
                     for out in outs:
                         if out is not None:
                             print(*out, sep=',', file=f, flush=True)
@@ -122,7 +103,7 @@ if __name__ == '__main__':
             for noise, independent, N in tqdm(list(itertools.product(range(5), [0, 1], [200, 400]))):
                 print(noise, independent, N)
                 outs = Parallel(-5)(delayed(test_postnonlinear)(independent, noise, trial, N) for trial in range(300))
-                with open('pykcipt_postnonlinear.csv', 'a') as f:
+                with open('kcipt_postnonlinear.csv', 'a') as f:
                     for out in outs:
                         if out is not None:
                             print(*out, sep=',', file=f, flush=True)
@@ -131,7 +112,7 @@ if __name__ == '__main__':
             for noise, independent, N in tqdm(list(itertools.product([9, 19, 49], [0, 1], [400]))):
                 print(noise, independent, N)
                 outs = Parallel(-5)(delayed(test_postnonlinear)(independent, noise, trial, N) for trial in range(300))
-                with open('pykcipt_postnonlinear.csv', 'a') as f:
+                with open('kcipt_postnonlinear.csv', 'a') as f:
                     for out in outs:
                         if out is not None:
                             print(*out, sep=',', file=f, flush=True)
@@ -141,7 +122,7 @@ if __name__ == '__main__':
             independent, gamma, N = 0, '0.0', 400
             print(independent, gamma, N)
             outs = [test_chaotic(independent, gamma, trial, N, 1470, 32) for trial in trange(300)]
-            with open('pykcipt_chaotic_1470.csv', 'a') as f:
+            with open('kcipt_chaotic_1470.csv', 'a') as f:
                 for out in outs:
                     if out is not None:
                         print(*out, sep=',', file=f, flush=True)
@@ -151,7 +132,7 @@ if __name__ == '__main__':
             independent, gamma, N = 0, '0.0', 400
             print(independent, gamma, N)
             outs = [test_chaotic(independent, gamma, trial, N, 5000, 32) for trial in trange(300)]
-            with open('pykcipt_chaotic_5000.csv', 'a') as f:
+            with open('kcipt_chaotic_5000.csv', 'a') as f:
                 for out in outs:
                     if out is not None:
                         print(*out, sep=',', file=f, flush=True)

@@ -58,13 +58,13 @@ new_extension = Extension("kcipt.cython_impl.cy_kcipt",
                           )
 
 setup(
-    name='pyKCIPT',
+    name='SDCIT',
     packages=['kcipt'],
     version='0.1',
-    description='Python Kernel Conditional Independence Permutation Test',
+    description='Self-Discrepancy Conditional Independence Test',
     author='Sanghack Lee',
     author_email='sanghack.lee@gmail.com',
-    url='https://github.com/sanghack81/pyKCIPT',
+    url='https://github.com/sanghack81/SDCIT',
     keywords=['independence test', 'conditional independence', 'machine learning', 'statistical test'],
     classifiers=[],
 

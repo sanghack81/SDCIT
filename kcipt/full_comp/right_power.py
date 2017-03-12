@@ -73,11 +73,16 @@ if __name__ == '__main__':
     df_sdcit = df_sdcit[df_sdcit['independent'] == 0]
     df_sdcit = df_sdcit[df_sdcit['gamma'] == 0.0]
     assert len(df_sdcit) == 300
+    xs_lee = np.linspace(2 * lee_null.min(), 2 * lee_null.max(), 1000)
+    ys_lee = gamma.pdf(xs_lee, *gamma.fit(lee_null))
+
+    xs_B = np.linspace(2 * outer_null_B.min(), 2 * outer_null_B.max(), 1000)
+    ys_B = gamma.pdf(xs_B, *gamma.fit(outer_null_B))
+
+    factor_20000 = np.sqrt(20000/1470)
+    ys_20000 = gamma.pdf(xs_B, *gamma.fit(outer_null_B/factor_20000))
 
     if False:
-        xs_lee = np.linspace(2 * lee_null.min(), 2 * lee_null.max(), 1000)
-        ys_lee = gamma.pdf(xs_lee, *gamma.fit(lee_null))
-
         sns.set(style='white', font_scale=1.2)
         paper_rc = {'lines.linewidth': 0.8, 'lines.markersize': 2, 'patch.linewidth': 1}
         sns.set_context("paper", rc=paper_rc)
@@ -89,8 +94,6 @@ if __name__ == '__main__':
         ##################################
         ax = fig.add_subplot(2, 2, 1, adjustable='box')
 
-        xs_B = np.linspace(2 * outer_null_B.min(), 2 * outer_null_B.max(), 1000)
-        ys_B = gamma.pdf(xs_B, *gamma.fit(outer_null_B))
         xs_T = np.linspace(2 * distr_boot.min(), 2 * distr_boot.max(), 1000)
         ys_T = gamma.pdf(xs_T, *gamma.fit(distr_boot))
 
@@ -150,7 +153,7 @@ if __name__ == '__main__':
     ###############################################
     ###############################################
     ###############################################
-    if True:
+    if False:
         sns.set(style='white', font_scale=1.2)
         paper_rc = {'lines.linewidth': 0.8, 'lines.markersize': 2, 'patch.linewidth': 1}
         sns.set_context("paper", rc=paper_rc)
@@ -161,7 +164,6 @@ if __name__ == '__main__':
         ##################################
         ax = fig.add_subplot(1, 2, 1, adjustable='box')
         sns.distplot(df5000['statistic'], hist=True, bins=20, kde=False, color=cp[cps['KCIPT']], label='5000')
-        sns.distplot(df20000['statistic'], hist=True, bins=20, kde=False, color=cp[cps['KCIPT']], label='20000')
         plt.legend()
         plt.gca().set_xlabel('MMD')
         plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
@@ -171,7 +173,6 @@ if __name__ == '__main__':
         ##
         ax = fig.add_subplot(1, 2, 2, adjustable='box')
         sns.distplot(df5000['pvalue'], hist=True, bins=20, kde=False, color=cp[cps['KCIPT']], norm_hist=True, label='5000')
-        sns.distplot(df20000['pvalue'], hist=True, bins=20, kde=False, color=cp[cps['KCIPT']], norm_hist=True, label='20000')
         plt.gca().set_xlabel('p-value')
         # plt.gca().set_ylabel('density')
         plt.gcf().subplots_adjust(wspace=0.3, hspace=0.3)
@@ -180,4 +181,36 @@ if __name__ == '__main__':
         plt.savefig('kcipt_5000_ps.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
         plt.close()
 
-        print(scipy.stats.kstest(df5000['pvalue'], 'uniform'))
+
+    if True:
+        sns.set(style='white', font_scale=1.2)
+        paper_rc = {'lines.linewidth': 0.8, 'lines.markersize': 2, 'patch.linewidth': 1}
+        sns.set_context("paper", rc=paper_rc)
+        # fig = plt.figure(figsize=[4, 3])
+        plt.rc('text', usetex=True)
+        plt.rc('text.latex', preamble=r'\usepackage{cmbright}')
+        fig = plt.figure(figsize=[5, 2])
+        ##################################
+        ax = fig.add_subplot(1, 2, 1, adjustable='box')
+        plt.plot(xs_lee, ys_lee, label='SDCIT null', lw=1.5, color=cp[cps['SDCIT']])
+        plt.plot(xs_B, ys_20000, label='KCIPT null', lw=1.5, color=cp[cps['KCIPT']])
+        # sns.distplot(df5000['statistic'], hist=True, bins=20, kde=False, color=cp[cps['KCIPT']], label='5000')
+        sns.distplot(df20000['statistic'], hist=True, bins=20, kde=False, norm_hist=True, color=cp[cps['KCIPT']], label='KCIPT TS')
+        plt.legend(loc=1)
+        plt.gca().set_xlabel('MMD')
+        plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
+        plt.gca().set_ylabel('density')
+        plt.gca().set_xlim([-0.0003, 0.0005])
+        plt.setp(plt.gca(), 'yticklabels', [])
+        ##
+        ax = fig.add_subplot(1, 2, 2, adjustable='box')
+        sns.distplot(df20000['pvalue'], hist=True, bins=20, kde=False, color=cp[cps['KCIPT']], norm_hist=True, label='KCIPT p')
+        sns.distplot([p_value_of(ss, lee_null) for ss in df20000['statistic']], hist=True, bins=20, kde=False, color='k', norm_hist=True, label='KCIPT p on SDCIT null')
+
+        plt.gca().set_xlabel('p-value')
+        # plt.gca().set_ylabel('density')
+        plt.gcf().subplots_adjust(wspace=0.3, hspace=0.3)
+        plt.legend(loc=0)
+        sns.despine()
+        plt.savefig('kcipt_20000_ps.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+        plt.close()

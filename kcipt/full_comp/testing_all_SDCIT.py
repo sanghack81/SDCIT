@@ -8,27 +8,9 @@ from joblib import Parallel
 from joblib import delayed
 from tqdm import tqdm
 
-from kcipt.twoshot import lee_KCIPT
+from kcipt.sdcit import SDCIT
 from kcipt.utils import *
 
-
-def toK(x, y, z):
-    dx = euclidean_distances(x, squared=True)
-    dy = euclidean_distances(y, squared=True)
-    dz = euclidean_distances(z, squared=True)
-
-    mx = ma.median(ma.array(dx, mask=np.triu(np.ones(dx.shape), 0)))
-    my = ma.median(ma.array(dy, mask=np.triu(np.ones(dy.shape), 0)))
-    mz = ma.median(ma.array(dz, mask=np.triu(np.ones(dz.shape), 0)))
-
-    kx = exp(-0.5 * dx / mx)
-    ky = exp(-0.5 * dy / my)
-    kz = exp(-0.5 * dz / mz)
-    return kx, ky, kz
-
-
-def tonp(xxx):
-    np.array(xxx)
 
 
 def test_chaotic(independent, gamma, trial, N):
@@ -45,9 +27,9 @@ def test_chaotic(independent, gamma, trial, N):
         Y = data.Xt
         Z = data.Yt[:, 0: 2]
 
-    kx, ky, kz = toK(X, Y, Z)
+    kx, ky, kz = median_heuristic(X, Y, Z)
 
-    mmd, pval = lee_KCIPT(kx, ky, kz, size_of_null_sample=1000, reserve_perm=True)
+    mmd, pval = SDCIT(kx, ky, kz, size_of_null_sample=1000, reserve_perm=True)
     return (independent, gamma, trial, N, mmd, pval)
 
 
@@ -73,7 +55,7 @@ def test_postnonlinear(independent, noise, trial, N):
     mat_load = scipy.io.loadmat(dist_mat_file, squeeze_me=True, struct_as_record=False)
     Dz = np.array(mat_load['D'])
 
-    mmd, pval = lee_KCIPT(kx, ky, kz, Dz, size_of_null_sample=1000, reserve_perm=True)
+    mmd, pval = SDCIT(kx, ky, kz, Dz, size_of_null_sample=1000, reserve_perm=True)
     return (independent, noise, trial, N, mmd, pval)
 
 

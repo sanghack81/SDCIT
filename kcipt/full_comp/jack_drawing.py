@@ -20,18 +20,20 @@ names = {('CHSIC', 'chaotic'): names_chsic_chaotic,
          ('KCIT', 'chaotic'): names_kcit_chaotic,
          ('KCIT', 'postnonlinear'): names_kcit_postnonlinear,
          ('SDCIT', 'chaotic'): names_lee_chaotic,
+         ('JACK', 'chaotic'): names_lee_chaotic,
          ('SDCIT', 'postnonlinear'): names_lee_postnonlinear,
+         ('JACK', 'postnonlinear'): names_lee_postnonlinear,
          # ('adj_kcipt', 'chaotic'): names_adj_kcipt_chaotic,
          # ('adj_kcipt', 'postnonlinear'): names_adj_kcipt_postnonlinear,
          ('KCIPT', 'chaotic'): names_pykcipt_chaotic,
          ('KCIPT', 'postnonlinear'): names_pykcipt_postnonlinear,
          }
 
-pvalue_column = {'CHSIC': 'pvalue', 'KCIT': 'boot_p_value', 'SDCIT': 'pvalue', 'adj_kcipt': 'pvalue', 'KCIPT': 'pvalue'}
+pvalue_column = {'CHSIC': 'pvalue', 'KCIT': 'boot_p_value', 'SDCIT': 'pvalue', 'adj_kcipt': 'pvalue', 'KCIPT': 'pvalue', 'JACK': 'pvalue'}
 
 cp = sns.color_palette('Set1', 5)
-cps = {'CHSIC': 3, 'KCIT': 2, 'SDCIT': 0, 'adj_kcipt': 4, 'KCIPT': 1}
-all_algos = ['SDCIT', 'KCIT', 'KCIPT', 'CHSIC']
+cps = {'CHSIC': 3, 'KCIT': 2, 'SDCIT': 0, 'JACK': 4, 'KCIPT': 1}
+all_algos = ['SDCIT', 'KCIT', 'JACK']
 
 
 def aupc(pvals):
@@ -85,7 +87,7 @@ def draw_aupc_chaotic():
     plt.axes().set_ylim([0.45, 1.05])
     # plt.title('Chaotic series')
     sns.despine()
-    plt.savefig('{}_aupc.pdf'.format(data), transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('JACK_{}_aupc.pdf'.format(data), transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -116,7 +118,7 @@ def draw_calib_chaotic():
     plt.axes().set_yticks([0.1, 0.2, 0.3])
     # plt.title('Chaotic series -- independent')
     sns.despine()
-    plt.savefig('chaotic_calib.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('JACK_chaotic_calib.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -128,8 +130,6 @@ def draw_Type_I_error_chaotic():
         for k, gdf in pd.groupby(df, by=['independent', 'gamma', 'N']):
             if float(k[0]) == 1:
                 calib_data.append([algo, float(k[1]), int(k[2]), np.mean(gdf[pvalue_column[algo]] <= 0.05)])
-    [print(xxx) for xxx in calib_data]
-    exit(0)
     df = pd.DataFrame(calib_data, columns=['algo', 'gamma', 'N', 'D'])
     df['gamma'] = df['gamma'].astype(float)
     df['N'] = df['N'].map(int)
@@ -145,7 +145,7 @@ def draw_Type_I_error_chaotic():
     plt.axes().set_xticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5])
     plt.axes().set_ylabel('Type I error')
     sns.despine()
-    plt.savefig('chaotic_type_I.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('JACK_chaotic_type_I.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -182,7 +182,7 @@ def draw_aupc_postnonlinear():
     plt.axes().set_ylim([0.45, 1.05])
     # plt.title('Postnonlinear')
     sns.despine()
-    plt.savefig('postnonlinear_aupc.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('JACK_postnonlinear_aupc.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -219,7 +219,7 @@ def draw_aupc_postnonlinear_highdim():
     plt.xticks([1, 5, 10, 20, 50], [1, 5, 10, 20, 50])
     # plt.title('Postnonlinear')
     sns.despine()
-    plt.savefig('postnonlinear_aupc_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('JACK_postnonlinear_aupc_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -252,7 +252,7 @@ def draw_calib_postnonlinear():
     plt.axes().set_yticks([0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
     # plt.title('Postnonlinear')
     sns.despine()
-    plt.savefig('postnonlinear_calib.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('JACK_postnonlinear_calib.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -295,7 +295,7 @@ def draw_calib_postnonlinear_highdim():
     plt.axes().set_yticks([0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
     # plt.title('Postnonlinear')
     sns.despine()
-    plt.savefig('postnonlinear_calib_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('JACK_postnonlinear_calib_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -329,7 +329,7 @@ def draw_type_I_postnonlinear_highdim():
     plt.axes().legend(handles[::-1], labels[::-1])
     # plt.title('Postnonlinear')
     sns.despine()
-    plt.savefig('postnonlinear_type_I_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('JACK_postnonlinear_type_I_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -366,11 +366,11 @@ if __name__ == '__main__':
     # report_other()
     # draw_Type_I_error_chaotic()
     # draw_type_I_postnonlinear_highdim()
-    # draw_aupc_chaotic()
-    # draw_calib_chaotic()
+    draw_aupc_chaotic()
+    draw_calib_chaotic()
     # # #
-    # draw_aupc_postnonlinear()
-    # draw_calib_postnonlinear()
+    draw_aupc_postnonlinear()
+    draw_calib_postnonlinear()
     # # #
-    # draw_aupc_postnonlinear_highdim()
-    # draw_calib_postnonlinear_highdim()
+    draw_aupc_postnonlinear_highdim()
+    draw_calib_postnonlinear_highdim()

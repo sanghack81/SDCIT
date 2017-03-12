@@ -17,8 +17,6 @@ def greedy_permutation(D):
     distheap
 
 
-
-
 def _sample_integer_except(n: int, exclude: int) -> int:
     """Sample an integer between 0 (inclusive) and n (exclusive) except the given value"""
     if n <= 0:
@@ -189,6 +187,50 @@ def blossom_permutation(D, with_post=True, with_linprog=False, verbose=False, **
 
     assert is_valid_P(perm)
     return perm
+
+
+def slim_blossom_permutation(D, with_post=True):
+    """A permutation vector, which first initialized by minimum-cost perfect matching using Blossom V algorithm.
+
+    """
+    n = len(D)
+    assert (n % 2) == 0
+
+    if n == 1:  # relaxed
+        return _perm_to_P([0])
+    if n == 2:
+        return _perm_to_P([1, 0])
+    if n == 3:
+        return _perm_to_P([1, 2, 0])
+
+    p2s = []
+    p3s = []
+    p5s = []
+    perm_array = _execute_blossom_v(D)
+    for i in perm_array:
+        if i < perm_array[i]:
+            p2s.append((i, perm_array[i]))
+
+    if with_post:
+        _post_2_2_2_to_3_3(D, p2s, p3s)
+        p5s = _post_2_3_to_5(D, p2s, p3s)
+
+    perm_vector = zeros((n,), dtype='int')
+    for a, b in p2s:
+        perm_vector[a] = b
+        perm_vector[b] = a
+    for a, b, c in p3s:
+        perm_vector[a] = b
+        perm_vector[b] = c
+        perm_vector[c] = a
+    for v, w, x, y, z in p5s:
+        perm_vector[v] = w
+        perm_vector[w] = x
+        perm_vector[x] = y
+        perm_vector[y] = z
+        perm_vector[z] = v
+
+    return perm_vector
 
 
 def _validate_distance_matrix(D: np.ndarray):
