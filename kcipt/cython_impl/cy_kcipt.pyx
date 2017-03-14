@@ -19,6 +19,13 @@ cdef extern from "permutation.h":
     void split_permutation_interface(double *D, const int full_n, int*perm);
 
 
+cdef extern from "SDCIT.h":
+    void c_sdcit(const double *K_XZ, const double *K_Y, const double *D_Z_, const int n,
+             const int b, const int seed, const int n_threads,
+             double *const mmsd, double *const null);
+
+
+
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -114,3 +121,23 @@ def cy_split_permutation(np.ndarray[double, ndim=2, mode="c"]  D not None,
 
     split_permutation_interface(&D[0, 0], ll, &perm[0])
 
+
+
+
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def cy_sdcit(np.ndarray[double, ndim=2, mode="c"] K_XZ not None,
+             np.ndarray[double, ndim=2, mode="c"] K_Y not None,
+             np.ndarray[double, ndim=2, mode="c"]  D_Z,
+             int b,
+             int seed,
+             int n_threads,
+             np.ndarray[double, ndim=1, mode="c"]  mmsd not None,
+             np.ndarray[double, ndim=1, mode="c"]  null not None
+             ):
+    cdef int ll
+    ll = K_XZ.shape[0]
+
+    c_sdcit(&K_XZ[0, 0], &K_Y[0, 0], &D_Z[0, 0], ll, b, seed, n_threads, &mmsd[0], &null[0])

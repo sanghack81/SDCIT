@@ -8,7 +8,7 @@
 
 #include "TwoSamples.h"
 
-double u_mmd(const double *K_XYZ, const int full_n, const vector<int> &idx1, const vector<int> &idx2) {
+double u_mmd(const double *K_XYZ, const int full_n, const std::vector<int> &idx1, const std::vector<int> &idx2) {
     double k11 = 0.0, k22 = 0.0, k12 = 0.0;
 
     for (auto const &row_idx : idx1) {
@@ -38,8 +38,8 @@ double u_mmd(const double *K_XYZ, const int full_n, const vector<int> &idx1, con
 
 
 double u_mmd(const double *K_X, const double *K_Y, const double *K_Z, const int full_n,
-             const vector<int> &idx1x, const vector<int> &idx1y, const vector<int> &idx1z,
-             const vector<int> &idx2x, const vector<int> &idx2y, const vector<int> &idx2z) {
+             const std::vector<int> &idx1x, const std::vector<int> &idx1y, const std::vector<int> &idx1z,
+             const std::vector<int> &idx2x, const std::vector<int> &idx2y, const std::vector<int> &idx2z) {
     double k11 = 0.0, k22 = 0.0, k12 = 0.0;
 
     const int idx1_size = idx1x.size();

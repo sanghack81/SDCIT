@@ -26,8 +26,11 @@ names = {('CHSIC', 'chaotic'): names_chsic_chaotic,
 
 pvalue_column = {'CHSIC': 'pvalue', 'KCIT': 'boot_p_value', 'SDCIT': 'pvalue', 'adj_kcipt': 'pvalue', 'KCIPT': 'pvalue'}
 
-cp = sns.color_palette('Set1', 5)
-cps = {'CHSIC': 3, 'KCIT': 2, 'SDCIT': 0, 'adj_kcipt': 4, 'KCIPT': 1}
+cp = sns.color_palette('Paired', 10)
+# cp = sns.color_palette('Set1', 5)
+# cps = {'CHSIC': 3, 'KCIT': 2, 'SDCIT': 0, 'KCIPT': 1}
+cps = {'CHSIC': 9, 'KCIT': 3, 'SDCIT': 5, 'KCIPT': 1}
+markers = {'CHSIC': '^', 'KCIT': 'o', 'SDCIT': 's', 'KCIPT': '*'}
 all_algos = ['SDCIT', 'KCIT', 'KCIPT', 'CHSIC']
 
 
@@ -51,9 +54,11 @@ def draw_aupc_chaotic():
 
         for group_key, group_df in pd.groupby(df, by=['gamma', 'independent', 'N']):
             group_key = (int(group_key[0] * 10) / 10, *group_key[1:])
-            aupc_data.append([algo, *group_key, aupc(group_df[pvalue_column[algo]])])
-            if group_key[0] == 0.0:
-                print(algo, *group_key, np.mean(group_df[pvalue_column[algo]] <= 0.1))
+            if group_key[1] == 0:
+                aupc_data.append([algo, *group_key, aupc(group_df[pvalue_column[algo]])])
+
+    print(draw_aupc_chaotic.__name__)
+    [print(xx) for xx in aupc_data]
 
     aupc_data = np.array(aupc_data)
     aupc_df = pd.DataFrame({'algorithm': aupc_data[:, 0],
@@ -71,12 +76,11 @@ def draw_aupc_chaotic():
     sns_setting()
     for k, gdf in pd.groupby(aupc_df, ['algorithm', 'N']):
         if k[1] == 400:
-            plt.plot(gdf['gamma'], gdf['AUPC'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
-            plt.plot(gdf['gamma'], gdf['AUPC'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+            plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
     handles, labels = plt.axes().get_legend_handles_labels()
     plt.axes().legend(handles[::-1], labels[::-1])
-    # plt.legend()
     plt.axes().set_xlabel(r'$\gamma$')
     plt.axes().set_ylabel('Area Under Power Curve')
     plt.axes().set_ylim([0.45, 1.05])
@@ -96,6 +100,9 @@ def draw_calib_chaotic():
                 D, _ = scipy.stats.kstest(gdf[pvalue_column[algo]], 'uniform')
                 calib_data.append([algo, float(k[1]), int(k[2]), D])
 
+    print(draw_calib_chaotic.__name__)
+    [print(xx) for xx in calib_data]
+
     df = pd.DataFrame(calib_data, columns=['algo', 'gamma', 'N', 'D'])
     df['gamma'] = df['gamma'].astype(float)
     df['N'] = df['N'].map(int)
@@ -103,10 +110,11 @@ def draw_calib_chaotic():
     sns_setting()
     for k, gdf in pd.groupby(df, ['algo', 'N']):
         if k[1] == 400:
-            plt.plot(gdf['gamma'], gdf['D'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
-            plt.plot(gdf['gamma'], gdf['D'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
-    # plt.legend()
+            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+    handles, labels = plt.axes().get_legend_handles_labels()
+    plt.axes().legend(handles[::-1], labels[::-1], ncol=2)
     plt.axes().set_xlabel(r'$\gamma$')
     plt.axes().set_ylabel('KS test statistic')
     plt.axes().invert_yaxis()
@@ -125,8 +133,10 @@ def draw_Type_I_error_chaotic():
         for k, gdf in pd.groupby(df, by=['independent', 'gamma', 'N']):
             if float(k[0]) == 1:
                 calib_data.append([algo, float(k[1]), int(k[2]), np.mean(gdf[pvalue_column[algo]] <= 0.05)])
-    [print(xxx) for xxx in calib_data]
-    exit(0)
+
+    print(draw_Type_I_error_chaotic.__name__)
+    [print(xx) for xx in calib_data]
+
     df = pd.DataFrame(calib_data, columns=['algo', 'gamma', 'N', 'D'])
     df['gamma'] = df['gamma'].astype(float)
     df['N'] = df['N'].map(int)
@@ -134,10 +144,9 @@ def draw_Type_I_error_chaotic():
     sns_setting()
     for k, gdf in pd.groupby(df, ['algo', 'N']):
         if k[1] == 400:
-            plt.plot(gdf['gamma'], gdf['D'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
-            plt.plot(gdf['gamma'], gdf['D'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
-    # plt.legend()
+            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
     plt.axes().set_xlabel(r'$\gamma$')
     plt.axes().set_xticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5])
     plt.axes().set_ylabel('Type I error')
@@ -156,6 +165,9 @@ def draw_aupc_postnonlinear():
             group_key = (int(group_key[0] * 10) / 10, int(group_key[1]), int(group_key[2]))
             aupc_data.append([algo, *group_key, aupc(group_df[pvalue_column[algo]])])
 
+    print(draw_aupc_postnonlinear.__name__)
+    [print(xx) for xx in aupc_data]
+
     aupc_data = np.array(aupc_data)
     aupc_df = pd.DataFrame({'algorithm': [str(v) for v in aupc_data[:, 0]],
                             'noise': [int(float(v)) for v in aupc_data[:, 1]],
@@ -170,10 +182,9 @@ def draw_aupc_postnonlinear():
     for k, gdf in pd.groupby(aupc_df, ['algorithm', 'N']):
         gdf = gdf[gdf['dimension'] <= 5]
         if k[1] == 400:
-            plt.plot(gdf['dimension'], gdf['AUPC'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot(gdf['dimension'], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
-            plt.plot(gdf['dimension'], gdf['AUPC'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
-    # plt.legend()
+            plt.plot(gdf['dimension'], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
     plt.axes().set_xlabel('dimension')
     plt.axes().set_ylabel('Area Under Power Curve')
     plt.axes().set_ylim([0.45, 1.05])
@@ -193,6 +204,9 @@ def draw_aupc_postnonlinear_highdim():
             group_key = (int(group_key[0] * 10) / 10, int(group_key[1]), int(group_key[2]))
             aupc_data.append([algo, *group_key, aupc(group_df[pvalue_column[algo]])])
 
+    print(draw_aupc_postnonlinear_highdim.__name__)
+    [print(xx) for xx in aupc_data]
+
     aupc_data = np.array(aupc_data)
     aupc_df = pd.DataFrame({'algorithm': [str(v) for v in aupc_data[:, 0]],
                             'noise': [int(float(v)) for v in aupc_data[:, 1]],
@@ -206,9 +220,8 @@ def draw_aupc_postnonlinear_highdim():
     sns_setting()
     for k, gdf in pd.groupby(aupc_df, ['algorithm', 'N']):
         if k[1] == 400:
-            plt.plot([int(v) for v in gdf['dimension']], gdf['AUPC'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot([int(v) for v in gdf['dimension']], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
 
-    # plt.legend()
     plt.axes().set_xlabel('dimension')
     plt.axes().set_ylabel('Area Under Power Curve')
     plt.axes().set_ylim([0.95, 1.01])
@@ -230,6 +243,9 @@ def draw_calib_postnonlinear():
                 D, _ = scipy.stats.kstest(gdf[pvalue_column[algo]], 'uniform')
                 calib_data.append([algo, float(k[1]), int(k[2]), D])
 
+    print(draw_calib_postnonlinear.__name__)
+    [print(xx) for xx in calib_data]
+
     df = pd.DataFrame(calib_data, columns=['algo', 'noise', 'N', 'D'])
     df['noise'] = df['noise'].map(int)
     df['dimension'] = (df['noise'] + 1).astype(int)
@@ -239,10 +255,9 @@ def draw_calib_postnonlinear():
     for k, gdf in pd.groupby(df, ['algo', 'N']):
         gdf = gdf[gdf['dimension'] <= 5]
         if k[1] == 400:
-            plt.plot([int(v) for v in gdf['dimension']], gdf['D'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot([int(v) for v in gdf['dimension']], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
-            plt.plot([int(v) for v in gdf['dimension']], gdf['D'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
-    # plt.legend()
+            plt.plot([int(v) for v in gdf['dimension']], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
     plt.axes().set_xlabel('dimension')
     plt.axes().set_ylabel('KS test statistic')
     plt.axes().invert_yaxis()
@@ -272,6 +287,9 @@ def draw_calib_postnonlinear_highdim():
                 dd, _ = scipy.stats.kstest(gdf[pvalue_column[algo]], 'uniform')
                 calib_data.append([algo, float(k[1]), int(k[2]), dd])
 
+    print(draw_calib_postnonlinear_highdim.__name__)
+    [print(xx) for xx in calib_data]
+
     df = pd.DataFrame(calib_data, columns=['algo', 'noise', 'N', 'D'])
     df['noise'] = df['noise'].map(int)
     df['dimension'] = (df['noise'] + 1).astype(int)
@@ -280,10 +298,9 @@ def draw_calib_postnonlinear_highdim():
     sns_setting()
     for k, gdf in pd.groupby(df, ['algo', 'N']):
         if k[1] == 400:
-            plt.plot(gdf['dimension'], gdf['D'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
-            plt.plot(gdf['dimension'], gdf['D'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
-    # plt.legend()
+            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
     plt.axes().set_xlabel('dimension')
     plt.axes().set_ylabel('KS test statistic')
     plt.axes().set_xscale('log')
@@ -305,6 +322,10 @@ def draw_type_I_postnonlinear_highdim():
             if float(k[0]) == 1 and k[2] == 400:
                 dd = np.mean(gdf[pvalue_column[algo]] <= 0.05)
                 calib_data.append([algo, float(k[1]), int(k[2]), dd])
+
+    print(draw_type_I_postnonlinear_highdim.__name__)
+    [print(xx) for xx in calib_data]
+
     df = pd.DataFrame(calib_data, columns=['algo', 'noise', 'N', 'D'])
     df['noise'] = df['noise'].map(int)
     df['dimension'] = (df['noise'] + 1).astype(int)
@@ -313,10 +334,9 @@ def draw_type_I_postnonlinear_highdim():
     sns_setting()
     for k, gdf in pd.groupby(df, ['algo', 'N']):
         if k[1] == 400:
-            plt.plot(gdf['dimension'], gdf['D'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
-            plt.plot(gdf['dimension'], gdf['D'], c=cp[cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
-    # plt.legend()
+            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
     plt.axes().set_xlabel('dimension')
     # plt.axes().set_ylabel('Type I error')
     plt.axes().set_xscale('log')
@@ -330,44 +350,42 @@ def draw_type_I_postnonlinear_highdim():
     plt.close()
 
 
-def report_some():
-    data = 'chaotic'
-
-    aupc_data = []
-    for algo in all_algos:
-        df = pd.read_csv('../results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
-
-        for group_key, group_df in pd.groupby(df, by=['gamma', 'independent', 'N']):
-            group_key = (int(group_key[0] * 10) / 10, *group_key[1:])
-            aupc_data.append([algo, *group_key, aupc(group_df[pvalue_column[algo]])])
-    for x in aupc_data:
-        print(x)
-
-
-def report_other():
-    data = 'postnonlinear'
-    aupc_data = []
-    for algo in all_algos:
-        df = pd.read_csv('../results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
-
-        for group_key, group_df in pd.groupby(df, by=['noise', 'independent', 'N']):
-            group_key = (int(group_key[0] * 10) / 10, int(group_key[1]), int(group_key[2]))
-            aupc_data.append([algo, *group_key, aupc(group_df[pvalue_column[algo]])])
-    for x in aupc_data:
-        print(x)
+# def report_some():
+#     data = 'chaotic'
+#
+#     aupc_data = []
+#     for algo in all_algos:
+#         df = pd.read_csv('../results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
+#
+#         for group_key, group_df in pd.groupby(df, by=['gamma', 'independent', 'N']):
+#             group_key = (int(group_key[0] * 10) / 10, *group_key[1:])
+#             aupc_data.append([algo, *group_key, aupc(group_df[pvalue_column[algo]])])
+#     for x in aupc_data:
+#         print(x)
+#
+#
+# def report_other():
+#     data = 'postnonlinear'
+#     aupc_data = []
+#     for algo in all_algos:
+#         df = pd.read_csv('../results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
+#
+#         for group_key, group_df in pd.groupby(df, by=['noise', 'independent', 'N']):
+#             group_key = (int(group_key[0] * 10) / 10, int(group_key[1]), int(group_key[2]))
+#             aupc_data.append([algo, *group_key, aupc(group_df[pvalue_column[algo]])])
+#     for x in aupc_data:
+#         print(x)
 
 
 if __name__ == '__main__':
+    # chaotic series
+    draw_aupc_chaotic()
+    draw_calib_chaotic()
     draw_Type_I_error_chaotic()
-    # report_some()
-    # report_other()
-    # draw_Type_I_error_chaotic()
-    # draw_type_I_postnonlinear_highdim()
-    # draw_aupc_chaotic()
-    # draw_calib_chaotic()
-    # # #
+
+    # postnonlinear-noise
     # draw_aupc_postnonlinear()
     # draw_calib_postnonlinear()
-    # # #
     # draw_aupc_postnonlinear_highdim()
     # draw_calib_postnonlinear_highdim()
+    # draw_type_I_postnonlinear_highdim()

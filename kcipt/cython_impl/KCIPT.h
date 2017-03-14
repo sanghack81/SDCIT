@@ -5,10 +5,6 @@
 #ifndef C_KCIPT_KCIPT_H
 #define C_KCIPT_KCIPT_H
 
-#include <vector>
-
-using std::vector;
-
 void c_adj_kcipt(const int seed,
                  const double *K_X, const double *K_Y, const double *K_Z, const double *K_XYZ, const double *D_Z,
                  const int n,
@@ -27,4 +23,5 @@ void bootstrap_null(const int seed, const int B, const int b, const int M, doubl
 void null_distribution(const unsigned int seed, const double *K_XYZ, const int n, double *nulls, const int offset, const int sub_b);
 
 void bootstrap_single_null(const int seed, const int B, const int b, const int M, double *const inner_null, double *const outer_null);
+
 #endif //C_KCIPT_KCIPT_H

@@ -9,30 +9,28 @@
 #include <random>
 #include <algorithm>
 
-using std::vector;
-using std::mt19937;
 
 class TwoSamples {
     int length_of_sample;
 public:
-    vector<int> idx1x;
-    vector<int> idx1y;
-    vector<int> idx1z;
+    std::vector<int> idx1x;
+    std::vector<int> idx1y;
+    std::vector<int> idx1z;
 
-    vector<int> idx2x;
-    vector<int> idx2y;
-    vector<int> idx2z;
+    std::vector<int> idx2x;
+    std::vector<int> idx2y;
+    std::vector<int> idx2z;
 
     // initialize with randomized
     TwoSamples(const int n_sample, std::mt19937 &generator) {
         length_of_sample = n_sample / 2;
 
-        vector<int> samples(n_sample);
+        std::vector<int> samples(n_sample);
         std::iota(std::begin(samples), std::end(samples), 0);
         std::shuffle(samples.begin(), samples.end(), generator);
 
-        idx1x = idx1y = idx1z = vector<int>(samples.begin(), samples.begin() + length_of_sample);
-        idx2x = idx2y = idx2z = vector<int>(samples.begin() + length_of_sample, samples.end());
+        idx1x = idx1y = idx1z = std::vector<int>(samples.begin(), samples.begin() + length_of_sample);
+        idx2x = idx2y = idx2z = std::vector<int>(samples.begin() + length_of_sample, samples.end());
     }
 
     TwoSamples(TwoSamples &org) {
@@ -50,8 +48,8 @@ public:
         return length_of_sample;
     }
 
-    void permute_by(vector<int> &to_change, const vector<int> &perm) {
-        vector<int> new_idx(length_of_sample);
+    void permute_by(std::vector<int> &to_change, const std::vector<int> &perm) {
+        std::vector<int> new_idx(length_of_sample);
         for (int i = 0; i < length_of_sample; i++) {
             new_idx[i] = to_change[perm[i]];
         }
@@ -60,9 +58,9 @@ public:
 
     TwoSamples &resplit(const std::vector<int> &samples) {
         // 1. merge,
-        vector<int> xs = idx1x;
-        vector<int> ys = idx1y;
-        vector<int> zs = idx1z;
+        std::vector<int> xs = idx1x;
+        std::vector<int> ys = idx1y;
+        std::vector<int> zs = idx1z;
         xs.insert(xs.end(), idx2x.begin(), idx2x.end());
         ys.insert(ys.end(), idx2y.begin(), idx2y.end());
         zs.insert(zs.end(), idx2z.begin(), idx2z.end());
@@ -82,16 +80,16 @@ public:
     }
 
 
-    TwoSamples &resplit(mt19937 &generator) {
+    TwoSamples &resplit(std::mt19937 &generator) {
         // 1. merge,
-        vector<int> xs = idx1x;
-        vector<int> ys = idx1y;
-        vector<int> zs = idx1z;
+        std::vector<int> xs = idx1x;
+        std::vector<int> ys = idx1y;
+        std::vector<int> zs = idx1z;
         xs.insert(xs.end(), idx2x.begin(), idx2x.end());
         ys.insert(ys.end(), idx2y.begin(), idx2y.end());
         zs.insert(zs.end(), idx2z.begin(), idx2z.end());
 
-        vector<int> samples(length_of_sample * 2);
+        std::vector<int> samples(length_of_sample * 2);
         std::iota(std::begin(samples), std::end(samples), 0);
         std::shuffle(samples.begin(), samples.end(), generator);
 

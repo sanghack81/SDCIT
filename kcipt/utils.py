@@ -2,7 +2,6 @@ import numpy as np
 import numpy.ma as ma
 from numpy import diag, exp
 from numpy.matlib import repmat
-from scipy.stats import expon
 from sklearn.metrics import euclidean_distances
 
 
@@ -33,7 +32,7 @@ def safe_iter(iterable, sort=False):
             yield y
 
 
-def p_value_of(val, data, approxmation=False, sorted=False) -> float:
+def p_value_of(val, data) -> float:
     """The percentile of a value given a data
 
     Parameters
@@ -42,27 +41,10 @@ def p_value_of(val, data, approxmation=False, sorted=False) -> float:
         value to compute p-value
     data: array_like
         data representing a reference distribution
-    approxmation: bool
-        if approximated, an exponential distribution is used to approximate right-tail distribution.
-    sorted: bool
-        if the data is already sorted in ascending order
     """
 
-    if not sorted:
-        data = np.sort(data)
-
-    if approxmation:
-        assert len(data) >= 1000, 'not enough data (n={}) to confidently approximate'.format(len(data))
-        if data[-50] < val:  # when evidence becomes 'sparse'
-            last_50_p = p_value_of(data[-50], data, approxmation=False, sorted=True)  # fine tuning...
-            return expon.sf(val, *expon.fit(data[-50:], floc=data[-50])) * last_50_p
-
-    low = np.searchsorted(data, val)
-    high = np.searchsorted(data, val, side='right')
-    if low == high:  # if not found    3 in [1,2,4,5] = 0.5    (2,2)
-        return 1.0 - ((low + 0.5) / (len(data) + 1))
-    else:  # if found                  3 in [1,2,3,4,5] = 0.5  (2,3)
-        return 1.0 - (0.5 * (low + high) / len(data))
+    data = np.sort(data)
+    return 1 - np.searchsorted(data, val, side='right') / len(data)
 
 
 def random_seeds(n=None):

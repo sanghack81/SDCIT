@@ -35,6 +35,7 @@ new_extension = Extension("kcipt.cython_impl.cy_kcipt",
                           sources=[
                               'kcipt/cython_impl/cy_kcipt.pyx',
                               'kcipt/cython_impl/KCIPT.cpp',
+                              'kcipt/cython_impl/SDCIT.cpp',
                               'kcipt/cython_impl/permutation.cpp',
                               'kcipt/blossom_v/GEOM/GPMinit.cpp',
                               'kcipt/blossom_v/GEOM/GPMinterface.cpp',

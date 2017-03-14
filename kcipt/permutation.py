@@ -8,12 +8,12 @@ from kcipt.blossom_v.cy_blossom_v import cy_blossom_v, cy_post_2_2_2_to_3_3, cy_
 from kcipt.utils import safe_iter, K2D
 
 
-def permuted(idx, K=None, D=None):
+def permuted(idx, K=None, D=None, with_post=True):
     assert K is not None or D is not None
     Pidx = idx.copy()
     if D is None:
         D = K2D(K)
-    rows, cols = np.nonzero(blossom_permutation(D))
+    rows, cols = np.nonzero(blossom_permutation(D, with_post))
     Pidx[rows] = idx[cols]
     return Pidx
 
