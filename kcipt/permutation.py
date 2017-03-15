@@ -1,28 +1,31 @@
 from itertools import chain
 
 import numpy as np
+import numpy.ma as ma
+from kcipt.blossom_v.cy_blossom_v import cy_blossom_v, cy_post_2_2_2_to_3_3, cy_post_2_3_to_5
+from kcipt.cython_impl.cy_kcipt import cy_split_permutation
 from numpy import zeros, allclose, ix_, diag
 from numpy.random import randint
 
-from kcipt.blossom_v.cy_blossom_v import cy_blossom_v, cy_post_2_2_2_to_3_3, cy_post_2_3_to_5
-from kcipt.utils import safe_iter, K2D
+from kcipt.utils import safe_iter
 
 
-def permuted(idx, K=None, D=None, with_post=True):
-    assert K is not None or D is not None
+def permuted2(D):
+    out = np.zeros((len(D),), 'int32')
+    cy_split_permutation(D, out)
+    return out
+
+
+def permuted(idx, D, with_post=True):
     Pidx = idx.copy()
-    if D is None:
-        D = K2D(K)
     rows, cols = np.nonzero(blossom_permutation(D, with_post))
     Pidx[rows] = idx[cols]
     return Pidx
 
 
-def slim_permuted(idx, K=None, D=None, with_post=True):
-    assert K is not None or D is not None
-    if D is None:
-        D = K2D(K)
-    perm_vector = slim_blossom_permutation(D, with_post)
+def slim_permuted(idx, D):
+    """This is to learn a permutation only for 2n data points with distance matrix without infinite values."""
+    perm_vector = slim_blossom_permutation(D)
     return idx[perm_vector]
 
 
@@ -58,7 +61,7 @@ def split_permutation(D, perm_comp, **options):
     -----
     This ensures that permutation computation is based on a distance matrix without infinity.
     """
-
+    print('needs to fix infinite values.. non-metric...')
     # assuming x -- inf -- y, y -- not inf -- z, then, z -- inf -- x
     remains = set(range(len(D)))
     components = set()
@@ -253,7 +256,9 @@ def _validate_distance_matrix(D: np.ndarray):
 def _execute_blossom_v(D):
     assert len(D) >= 2 and not len(D) % 2
     D = np.ascontiguousarray(D, 'float64')
-    summed = np.sum(D)
+    # TODO sum except infinite values
+    # summed = np.sum(D)
+    summed = ma.array(D, mask=np.isinf(D)).sum()
     if summed > 0:
         D = (2 ** 30 / summed) * D
     perm_array = np.zeros((len(D),), dtype='int32')
@@ -262,9 +267,8 @@ def _execute_blossom_v(D):
     return perm_array
 
 
-# new one
-# greedy! greedy!
 def _post_2_2_2_to_3_3(D, p2s: list, p3s: list):
+    """Change three matchings (i.e., 2-cycle) to two 3-cycle"""
     output = np.zeros((len(p2s) // 3, 6), 'int32')
     cy_post_2_2_2_to_3_3(np.ascontiguousarray(D, 'float64'),
                          np.ascontiguousarray(list(chain(*p2s)), 'int32'),
@@ -282,6 +286,7 @@ def _post_2_2_2_to_3_3(D, p2s: list, p3s: list):
 
 
 def _post_2_3_to_5(D, p2s, p3s):
+    """Change a 2-cycle and a 3-cycle to a 5-cycle"""
     p5s = []
     output = np.zeros((len(p3s), 11), 'int32')
     cy_post_2_3_to_5(np.ascontiguousarray(D, 'float64'),

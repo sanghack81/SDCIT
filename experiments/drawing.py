@@ -20,18 +20,20 @@ names = {('CHSIC', 'chaotic'): names_chsic_chaotic,
          ('KCIT', 'postnonlinear'): names_kcit_postnonlinear,
          ('SDCIT', 'chaotic'): names_lee_chaotic,
          ('SDCIT', 'postnonlinear'): names_lee_postnonlinear,
+         ('CSDCIT', 'chaotic'): names_lee_chaotic,
+         ('CSDCIT', 'postnonlinear'): names_lee_postnonlinear,
          ('KCIPT', 'chaotic'): names_pykcipt_chaotic,
          ('KCIPT', 'postnonlinear'): names_pykcipt_postnonlinear,
          }
 
-pvalue_column = {'CHSIC': 'pvalue', 'KCIT': 'boot_p_value', 'SDCIT': 'pvalue', 'adj_kcipt': 'pvalue', 'KCIPT': 'pvalue'}
+pvalue_column = {'CHSIC': 'pvalue', 'KCIT': 'boot_p_value', 'SDCIT': 'pvalue', 'CSDCIT': 'pvalue', 'KCIPT': 'pvalue'}
 
 cp = sns.color_palette('Paired', 10)
 # cp = sns.color_palette('Set1', 5)
 # cps = {'CHSIC': 3, 'KCIT': 2, 'SDCIT': 0, 'KCIPT': 1}
-cps = {'CHSIC': 9, 'KCIT': 3, 'SDCIT': 5, 'KCIPT': 1}
-markers = {'CHSIC': '^', 'KCIT': 'o', 'SDCIT': 's', 'KCIPT': '*'}
-all_algos = ['SDCIT', 'KCIT', 'KCIPT', 'CHSIC']
+cps = {'CHSIC': 9, 'KCIT': 3, 'SDCIT': 5, 'KCIPT': 1, 'CSDCIT': 7}
+markers = {'CHSIC': '^', 'KCIT': 'o', 'SDCIT': 's', 'KCIPT': '*', 'CSDCIT': '<'}
+all_algos = ['SDCIT', 'KCIT', 'KCIPT', 'CHSIC', 'CSDCIT']
 
 
 def aupc(pvals):
@@ -76,11 +78,11 @@ def draw_aupc_chaotic():
     sns_setting()
     for k, gdf in pd.groupby(aupc_df, ['algorithm', 'N']):
         if k[1] == 400:
-            plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
-            plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
-    handles, labels = plt.axes().get_legend_handles_labels()
-    plt.axes().legend(handles[::-1], labels[::-1])
+            plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+    # handles, labels = plt.axes().get_legend_handles_labels()
+    # plt.axes().legend(handles[::-1], labels[::-1])
     plt.axes().set_xlabel(r'$\gamma$')
     plt.axes().set_ylabel('Area Under Power Curve')
     plt.axes().set_ylim([0.45, 1.05])
@@ -110,9 +112,9 @@ def draw_calib_chaotic():
     sns_setting()
     for k, gdf in pd.groupby(df, ['algo', 'N']):
         if k[1] == 400:
-            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
-            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
     handles, labels = plt.axes().get_legend_handles_labels()
     plt.axes().legend(handles[::-1], labels[::-1], ncol=2)
     plt.axes().set_xlabel(r'$\gamma$')
@@ -144,9 +146,9 @@ def draw_Type_I_error_chaotic():
     sns_setting()
     for k, gdf in pd.groupby(df, ['algo', 'N']):
         if k[1] == 400:
-            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
-            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
     plt.axes().set_xlabel(r'$\gamma$')
     plt.axes().set_xticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5])
     plt.axes().set_ylabel('Type I error')
@@ -182,9 +184,9 @@ def draw_aupc_postnonlinear():
     for k, gdf in pd.groupby(aupc_df, ['algorithm', 'N']):
         gdf = gdf[gdf['dimension'] <= 5]
         if k[1] == 400:
-            plt.plot(gdf['dimension'], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot(gdf['dimension'], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
-            plt.plot(gdf['dimension'], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+            plt.plot(gdf['dimension'], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
     plt.axes().set_xlabel('dimension')
     plt.axes().set_ylabel('Area Under Power Curve')
     plt.axes().set_ylim([0.45, 1.05])
@@ -220,7 +222,7 @@ def draw_aupc_postnonlinear_highdim():
     sns_setting()
     for k, gdf in pd.groupby(aupc_df, ['algorithm', 'N']):
         if k[1] == 400:
-            plt.plot([int(v) for v in gdf['dimension']], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot([int(v) for v in gdf['dimension']], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
 
     plt.axes().set_xlabel('dimension')
     plt.axes().set_ylabel('Area Under Power Curve')
@@ -255,9 +257,9 @@ def draw_calib_postnonlinear():
     for k, gdf in pd.groupby(df, ['algo', 'N']):
         gdf = gdf[gdf['dimension'] <= 5]
         if k[1] == 400:
-            plt.plot([int(v) for v in gdf['dimension']], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot([int(v) for v in gdf['dimension']], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
-            plt.plot([int(v) for v in gdf['dimension']], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+            plt.plot([int(v) for v in gdf['dimension']], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
     plt.axes().set_xlabel('dimension')
     plt.axes().set_ylabel('KS test statistic')
     plt.axes().invert_yaxis()
@@ -298,9 +300,9 @@ def draw_calib_postnonlinear_highdim():
     sns_setting()
     for k, gdf in pd.groupby(df, ['algo', 'N']):
         if k[1] == 400:
-            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
-            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
     plt.axes().set_xlabel('dimension')
     plt.axes().set_ylabel('KS test statistic')
     plt.axes().set_xscale('log')
@@ -334,9 +336,9 @@ def draw_type_I_postnonlinear_highdim():
     sns_setting()
     for k, gdf in pd.groupby(df, ['algo', 'N']):
         if k[1] == 400:
-            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
+            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
-            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1+cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-1 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
     plt.axes().set_xlabel('dimension')
     # plt.axes().set_ylabel('Type I error')
     plt.axes().set_xscale('log')

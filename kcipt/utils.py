@@ -3,7 +3,7 @@ import numpy.ma as ma
 from numpy import diag, exp
 from numpy.matlib import repmat
 from sklearn.metrics import euclidean_distances
-
+import warnings
 
 def median_heuristic(data, *args):
     """A list of RBF kernel matrices for data sets in arguments based on median heuristic"""
@@ -68,7 +68,6 @@ def K2D(K):
     temp = Kd + Kd.transpose() - 2 * K
     min_val = np.min(temp)
     if min_val < 0.0:
-        import warnings
-        warnings.warn('K2D: negative values will be ignored. Observed: {}'.format(min_val))
+        warnings.warn('K2D: negative values will be treated as zero. Observed: {}'.format(min_val))
         temp *= (temp > 0)
     return np.sqrt(temp)

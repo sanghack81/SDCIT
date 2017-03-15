@@ -5,12 +5,12 @@ from os.path import exists
 import pandas as pd
 import scipy.io
 
-from kcipt.sdcit import SDCIT
+from kcipt.sdcit import SDCIT, c_SDCIT
 from kcipt.utils import median_heuristic, K2D
 
 if __name__ == '__main__':
     # experiments
-    fname = '../results/sdcit_time.csv'
+    fname = '../results/c_sdcit_time.csv'
     independent = 1
     if not exists(fname):
         with open(fname, 'w') as f:
@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
                         kkk = median_heuristic(X, Y, Z)
                         Dz = K2D(kkk[-1])
-                        SDCIT(*kkk, Dz=Dz, size_of_null_sample=b, seed=trial)
+                        c_SDCIT(*kkk, Dz=Dz, size_of_null_sample=b, seed=trial)
 
                         endtime = time.time()
                         print(endtime - start, trial, N, b, file=f, sep=',', flush=True)

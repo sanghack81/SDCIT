@@ -43,14 +43,6 @@ def test_postnonlinear(independent, noise, trial, N, B=25, n_jobs=1):
 
 
 if __name__ == '__main__':
-    independent, gamma, N = 1, '0.0', 400
-    for B in [5000, 20000]:
-        print(independent, gamma, N, B)
-        time.sleep(1)
-        for trial in trange(300):
-            out = test_chaotic(independent, gamma, trial, N, B=B, n_jobs=32)
-            with open('../results/kcipt_chaotic_{}.csv'.format(B), 'a') as f:
-                print(*out, sep=',', file=f, flush=True)
 
     # # General Empirical Evaluation
     existing_chaotic = set(tuple(line.split(',')[:4]) for line in open('../results/kcipt_chaotic.csv', 'r'))
@@ -73,11 +65,22 @@ if __name__ == '__main__':
                 if out is not None:
                     print(*out, sep=',', file=f, flush=True)
 
-    # #
-    for noise, independent, N in postnonlinear_noise_configs():
-        print(noise, independent, N)
-        time.sleep(1)
-        outs = Parallel(-1)(delayed(test_postnonlinear)(independent, noise, trial, N, 25) for trial in trange(300))
-        with open('../results/kcipt_postnonlinear.csv', 'a') as f:
-            for out in outs:
-                print(*out, sep=',', file=f, flush=True)
+    if False:
+        # #
+        for noise, independent, N in postnonlinear_noise_configs():
+            print(noise, independent, N)
+            time.sleep(1)
+            outs = Parallel(-1)(delayed(test_postnonlinear)(independent, noise, trial, N, 25) for trial in trange(300))
+            with open('../results/kcipt_postnonlinear.csv', 'a') as f:
+                for out in outs:
+                    print(*out, sep=',', file=f, flush=True)
+
+        independent, gamma, N = 1, '0.0', 400
+        for B in [5000, 20000]:
+            print(independent, gamma, N, B)
+            time.sleep(1)
+            for trial in trange(300):
+                out = test_chaotic(independent, gamma, trial, N, B=B, n_jobs=32)
+                with open('../results/kcipt_chaotic_{}.csv'.format(B), 'a') as f:
+                    print(*out, sep=',', file=f, flush=True)
+

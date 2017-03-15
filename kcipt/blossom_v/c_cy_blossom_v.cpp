@@ -4,15 +4,18 @@
 #include <algorithm>
 #include <stdio.h>
 #include "PerfectMatching.h"
+#include <math.h>
 
-void c_cy_blossom_v(double* D, int* output, int n)
+void c_cy_blossom_v(const double* D, int* output, const int n)
 {
     int i, j;
     struct PerfectMatching::Options options;
     PerfectMatching* pm = new PerfectMatching(n, n * n - n);
     for (i = 0; i < n; i++) {
         for (j = i + 1; j < n; j++) {
-            pm->AddEdge(i, j, (int)D[i * n + j]);
+            if(!isinf(D[i*n+j])){
+                pm->AddEdge(i, j, (int)D[i * n + j]);
+            }
         }
     }
     options.verbose = false;
@@ -41,8 +44,8 @@ std::vector<size_t> sort_indexes(const std::vector<T>& v)
     return idx;
 }
 
-void c_cy_post_2_2_2_to_3_3(double* D, int* comps_of_2, int* abcdefs, int m,
-    int n)
+void c_cy_post_2_2_2_to_3_3(const double* D, int* comps_of_2, int* abcdefs, const int m,
+    const int n)
 {
     std::vector<bool> merged(m, false);
     std::vector<double> neg_dists_of_2(m);
@@ -123,7 +126,7 @@ void c_cy_post_2_2_2_to_3_3(double* D, int* comps_of_2, int* abcdefs, int m,
     }
 }
 
-double max3(double a, double b, double c)
+double max3(const double a, const double b, const double c)
 {
     if (a <= c && b <= c) {
         return c;
@@ -134,7 +137,7 @@ double max3(double a, double b, double c)
     return a;
 }
 
-double min3(double a, double b, double c)
+double min3(const double a, const double b, const double c)
 {
     if (a >= c && b >= c) {
         return c;
@@ -254,10 +257,10 @@ struct Comp235 {
     double gain;
 };
 
-bool acompare(Comp235 lhs, Comp235 rhs) { return lhs.gain > rhs.gain; }
+bool acompare(const Comp235& lhs, const Comp235& rhs) { return lhs.gain > rhs.gain; }
 
-void c_cy_post_2_3_to_5(double* D, int* comps_of_2, int* comps_of_3,
-    int* abcdes, int m2, int m3, int n)
+void c_cy_post_2_3_to_5(const double* D, int* comps_of_2, int* comps_of_3,
+    int* abcdes, const int m2, const int m3, const int n)
 {
     int* abcdes_at = abcdes;
     std::vector<Comp235> gains;

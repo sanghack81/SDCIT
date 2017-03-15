@@ -6,6 +6,7 @@
 #include <thread>
 #include <set>
 #include <iostream>
+#include <algorithm>
 #include "SDCIT.h"
 #include "permutation.h"
 //
@@ -41,16 +42,17 @@ std::tuple<double, vector<int>, vector<std::pair<int, int> >> MMSD(const double 
 
     const int sample_size = sample.size();
     for (int i = 0; i < sample_size; i++) {
+        const double* K_XZsin = &K_XZ[sample[i] * n];
+        const double* K_Ysin = &K_Y[sample[i] * n];
+        const int spi = sample[permutation[i]];
         for (int j = 0; j < sample_size; j++) {
-            test_statistic += K_XZ[sample[i] * n + sample[j]] * (K_Y[sample[i] * n + sample[j]] + K_Y[sample[permutation[i]] * n + sample[permutation[j]]] - K_Y[sample[i] * n + sample[permutation[j]]]) -
-                              K_XZ[sample[j] * n + sample[i]] * K_Y[sample[j] * n + sample[permutation[i]]];
+            test_statistic += K_XZsin[sample[j]] * (K_Ysin[sample[j]] + K_Y[spi * n + sample[permutation[j]]] - 2*K_Ysin[sample[permutation[j]]]);
         }
     }
     for (const auto &rc: mask) {
         const int i = rc.first;
         const int j = rc.second;
-        test_statistic -= K_XZ[sample[i] * n + sample[j]] * (K_Y[sample[i] * n + sample[j]] + K_Y[sample[permutation[i]] * n + sample[permutation[j]]] - K_Y[sample[i] * n + sample[permutation[j]]]) -
-                          K_XZ[sample[j] * n + sample[i]] * K_Y[sample[j] * n + sample[permutation[i]]];
+        test_statistic -= K_XZ[sample[i] * n + sample[j]] * (K_Y[sample[i] * n + sample[j]] + K_Y[sample[permutation[i]] * n + sample[permutation[j]]] - 2*K_Y[sample[i] * n + sample[permutation[j]]]);
     }
     test_statistic /= (sample_size * sample_size) - mask.size();
 
@@ -65,7 +67,7 @@ vector<double> penalty_distance(const vector<double> &D_Z, const int n, vector<s
     double max_val = *std::max_element(copied_D_Z.begin(), copied_D_Z.end());
 
     for (const auto &rc : mask) {
-        copied_D_Z[rc.first * n + rc.second] += 2.0 * max_val;
+        copied_D_Z[rc.first * n + rc.second] += max_val;
     }
     return copied_D_Z;
 }

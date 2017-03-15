@@ -248,7 +248,8 @@ struct Comp235 {
     double gain;
 };
 
-void data_analysis(const double *D, const int full_n, const int len, vector<vector<int>> &odd_components, const vector<int> &idxs, int &n_edges, double &max_distance, double &sum_distance);
+//void data_analysis(const double *D, const int full_n, const int len, vector<vector<int>> &odd_components, const vector<int> &idxs, int &n_edges, double &max_distance, double &sum_distance);
+void data_analysis(const double *D, const int full_n, const int len, const vector<int> &idxs, int &n_edges, double &max_distance, double &sum_distance);
 
 bool acompare(Comp235 lhs, Comp235 rhs) { return lhs.gain > rhs.gain; }
 
@@ -407,8 +408,9 @@ vector<int> split_permutation(const double *D, const int full_n, const vector<in
     int n_edges = 0;
     double max_distance = 0.0;
     double sum_distance = 0.0;
-    vector<vector<int>> odd_components;
-    data_analysis(D, full_n, len, odd_components, idxs, n_edges, max_distance, sum_distance);
+//    vector<vector<int>> odd_components;
+//    data_analysis(D, full_n, len, odd_components, idxs, n_edges, max_distance, sum_distance);
+    data_analysis(D, full_n, len, idxs, n_edges, max_distance, sum_distance);
 
     if (sum_distance == 0.0) {
         return random_permutation(idxs, generator);
@@ -416,7 +418,8 @@ vector<int> split_permutation(const double *D, const int full_n, const vector<in
 
 
     struct PerfectMatching::Options options;
-    PerfectMatching *pm = new PerfectMatching(len + odd_components.size(), n_edges);
+//    PerfectMatching *pm = new PerfectMatching(len + odd_components.size(), n_edges);
+    PerfectMatching *pm = new PerfectMatching(len, n_edges);
     {
         double factor = 1.0;
         if (sum_distance < INT_MAX) {
@@ -431,14 +434,14 @@ vector<int> split_permutation(const double *D, const int full_n, const vector<in
                 }
             }
         }
-
-        int dummy_node_id = len;
-        for (vector<int> component: odd_components) {
-            for (int idxs_index: component) {
-                pm->AddEdge(dummy_node_id, idxs_index, (int) (factor * max_distance));
-            }
-            dummy_node_id++;
-        }
+//
+//        int dummy_node_id = len;
+//        for (vector<int> component: odd_components) {
+//            for (int idxs_index: component) {
+//                pm->AddEdge(dummy_node_id, idxs_index, (int) (factor * max_distance));
+//            }
+//            dummy_node_id++;
+//        }
 
         options.verbose = false;
         pm->options = options;
@@ -459,36 +462,36 @@ vector<int> split_permutation(const double *D, const int full_n, const vector<in
 
 
     vector<int> comps_of_3;
-    // 1 + 2 = 3
-    // there exists exactly one singleton (i.e., unpermuted) for an "odd" component
-    for (auto odd_comp: odd_components) {
-        if (odd_comp.size() >= 3) {
-            for (auto i: odd_comp) {
-                if (perm_array[i] == i) {
-                    double min_d = INFINITY;
-                    int min_d_at = -1;
-                    for (int j: odd_comp) {
-                        if (j < perm_array[j]) {
-                            double d = D[idxs[i] * full_n + idxs[j]] + D[idxs[i] * full_n + idxs[perm_array[j]]];
-                            if (d <= min_d) {
-                                min_d = d;
-                                min_d_at = j;
-                            }
-                        }
-                    }
-                    if (min_d_at != -1) {
-                        comps_of_3.push_back(i);
-                        comps_of_3.push_back(min_d_at);
-                        comps_of_3.push_back(perm_array[min_d_at]);
-
-                        perm_array[i] = min_d_at;
-                        perm_array[perm_array[min_d_at]] = i;
-                    }
-                    break;
-                }
-            }
-        }
-    }
+//    // 1 + 2 = 3
+//    // there exists exactly one singleton (i.e., unpermuted) for an "odd" component
+//    for (auto odd_comp: odd_components) {
+//        if (odd_comp.size() >= 3) {
+//            for (auto i: odd_comp) {
+//                if (perm_array[i] == i) {
+//                    double min_d = INFINITY;
+//                    int min_d_at = -1;
+//                    for (int j: odd_comp) {
+//                        if (j < perm_array[j]) {
+//                            double d = D[idxs[i] * full_n + idxs[j]] + D[idxs[i] * full_n + idxs[perm_array[j]]];
+//                            if (d <= min_d) {
+//                                min_d = d;
+//                                min_d_at = j;
+//                            }
+//                        }
+//                    }
+//                    if (min_d_at != -1) {
+//                        comps_of_3.push_back(i);
+//                        comps_of_3.push_back(min_d_at);
+//                        comps_of_3.push_back(perm_array[min_d_at]);
+//
+//                        perm_array[i] = min_d_at;
+//                        perm_array[perm_array[min_d_at]] = i;
+//                    }
+//                    break;
+//                }
+//            }
+//        }
+//    }
 
     vector<int> comps_of_2;
     for (int i = 0; i < len; i++) {
@@ -506,41 +509,44 @@ vector<int> split_permutation(const double *D, const int full_n, const vector<in
     return perm_array;
 }
 
-void data_analysis(const double *D, const int full_n, const int len, vector<vector<int>> &odd_components, const vector<int> &idxs, int &n_edges, double &max_distance, double &sum_distance) {
-    std::vector<bool> visited(len);
-    for (int i = 0; i < len;) {
-        vector<int> component;  // indices of idxs
+// TODO this assumes that D_ij infinity and D_ik non-infinity imples Djk is infinite. This must be resolved.
+//void data_analysis(const double *D, const int full_n, const int len, vector<vector<int>> &odd_components, const vector<int> &idxs, int &n_edges, double &max_distance, double &sum_distance) {
+void data_analysis(const double *D, const int full_n, const int len, const vector<int> &idxs, int &n_edges, double &max_distance, double &sum_distance) {
+//    std::vector<bool> visited(len);
+    for (int i = 0; i < len;i++) {
+//        vector<int> component;  // indices of idxs
 
-        component.push_back(i);
-        visited[i] = true;
-        int next_component_start = -1;
+//        component.push_back(i);
+//        visited[i] = true;
+//        int next_component_start = -1;
         const double *D_i = D + idxs[i] * full_n;
         for (int j = i + 1; j < len; j++) {
             double d = D_i[idxs[j]];
             if (isinf(d)) {
-                if (next_component_start == -1 && !visited[j]) {
-                    next_component_start = j;
-                }
+//                if (next_component_start == -1 && !visited[j]) {
+//                    next_component_start = j;
+//                }
             } else {
                 if (max_distance < d) {
                     max_distance = d;
                 }
                 sum_distance += d;
-                component.push_back(j);
-                visited[j] = true;
+                n_edges += 1;
+//                component.push_back(j);
+//                visited[j] = true;
             }
         }
-        if (component.size() % 2) {
-            odd_components.push_back(component);
-        }
-        int evened = component.size() + (component.size() % 2);
-        n_edges += evened * (evened - 1);
+//        if (component.size() % 2) {
+//            odd_components.push_back(component);
+//        }
+//        int evened = component.size() + (component.size() % 2);
+//        n_edges += evened * (evened - 1);
 
-        if (next_component_start == -1) {
-            break;
-        } else {
-            i = next_component_start;
-        }
+//        if (next_component_start == -1) {
+//            break;
+//        } else {
+//            i = next_component_start;
+//        }
     }
 }
 

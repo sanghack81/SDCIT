@@ -26,7 +26,6 @@ cdef extern from "SDCIT.h":
 
 
 
-
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def cy_kcipt(np.ndarray[double, ndim=2, mode="c"] K_X not None,
@@ -141,3 +140,5 @@ def cy_sdcit(np.ndarray[double, ndim=2, mode="c"] K_XZ not None,
     ll = K_XZ.shape[0]
 
     c_sdcit(&K_XZ[0, 0], &K_Y[0, 0], &D_Z[0, 0], ll, b, seed, n_threads, &mmsd[0], &null[0])
+
+
