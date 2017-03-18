@@ -57,7 +57,7 @@ def jackknife_MMSD(kxz, ky, Dz):
     return jack.mean(), mask, Pidx
 
 
-def emp_MMSD(kxz, ky, Dz, b, avoid_mask=None):
+def emp_MMSD(kxz, ky, Dz, b):
     """Empirical distribution of Maximum Mean Self-Discrepancy"""
     n = len(kxz)
     empirical_distr = np.zeros((b,))
@@ -88,7 +88,7 @@ def SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, reserve_perm=True, with
     raw_null = emp_MMSD(kxz,
                         ky[np.ix_(Pidx, Pidx)],
                         penaltied_distance(Dz, mask),
-                        size_of_null_sample, avoid_mask=mask)
+                        size_of_null_sample)
 
     null = raw_null - raw_null.mean()
 
@@ -140,6 +140,8 @@ def penaltied_distance(Dz, mask):
     pDz[rows, cols] = float('inf')
     pDz[rows, rows] = 0  # set diagonal to 0
     return pDz
+
+
 
 
 def c_SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1):

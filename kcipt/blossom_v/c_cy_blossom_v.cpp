@@ -13,7 +13,7 @@ void c_cy_blossom_v(const double* D, int* output, const int n)
     PerfectMatching* pm = new PerfectMatching(n, n * n - n);
     for (i = 0; i < n; i++) {
         for (j = i + 1; j < n; j++) {
-            if(!isinf(D[i*n+j])){
+            if(!std::isinf(D[i*n+j])){
                 pm->AddEdge(i, j, (int)D[i * n + j]);
             }
         }

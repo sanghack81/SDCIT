@@ -37,6 +37,10 @@ if __name__ == '__main__':
     for key, gdf in df.groupby(by=['N', 'b']):
         print('{}: {:.2f} +- {:.2f}'.format(key, gdf['time'].mean(), gdf['time'].std()))
 
+    df = pd.read_csv(fname, names=['time', 'trial', 'N', 'b'])
+    for key, gdf in df.groupby(by=['N', 'b']):
+        print('{}: {:.5f} +- {:.5f}'.format(key, gdf['time'].mean(), gdf['time'].std()))
+
     print()
     print('KCIT')
     df_kcit = pd.read_csv('../results/kcit_chaotic_timing.csv', names=['independent', 'gamma', 'noise', 'trial', 'N', 'runtime', 'statistic', 'boot_p_value', 'appr_p_value'])
@@ -45,3 +49,7 @@ if __name__ == '__main__':
     for key, gdf in df_kcit.groupby(by=['N']):
         assert len(gdf) == 300
         print('{}: {:.2f} +- {:.2f}'.format(key, gdf['runtime'].mean(), gdf['runtime'].std()))
+
+    for key, gdf in df_kcit.groupby(by=['N']):
+        assert len(gdf) == 300
+        print('{}: {:.5f} +- {:.5f}'.format(key, gdf['runtime'].mean(), gdf['runtime'].std()))
