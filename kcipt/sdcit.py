@@ -1,6 +1,6 @@
 from kcipt.cython_impl.cy_kcipt import cy_sdcit
 
-from experiments.synthetic import henon
+from kcipt.algo import c_KCIPT
 from kcipt.permutation import slim_permuted
 from kcipt.utils import *
 
@@ -142,6 +142,11 @@ def penaltied_distance(Dz, mask):
     return pDz
 
 
+def suggest_B_for_KCIPT(kx, ky, kz, Dz):
+    _, _, null_sdcit = c_SDCIT(kx, ky, kz, Dz, 250, with_null=True)
+    _, _, inner_null, _ = c_KCIPT(kx, ky, kz, Dz, 10, 1000, 0)
+    inner_null = inner_null.flatten()
+    return int(1 + (np.std(inner_null) / np.std(null_sdcit)) ** 2)
 
 
 def c_SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1):
@@ -166,16 +171,16 @@ def c_SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
     else:
         return test_statistic, p_value_of(test_statistic, null)
 
-
-if __name__ == '__main__':
-    np.random.seed(0)
-    xs, ys = [], []
-    for _ in range(2):
-        for gamma in [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]:
-            x, y, z = henon(_, 200, gamma, 0)
-            kx, ky, kz = median_heuristic(x, y, z)
-            dz = K2D(kz)
-
-            #
-            t0, p0 = c_SDCIT(kx, ky, kz, dz, 2000, n_jobs=1)
-            print(gamma, p0)
+#
+# if __name__ == '__main__':
+#     np.random.seed(0)
+#     xs, ys = [], []
+#     for _ in range(2):
+#         for gamma in [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]:
+#             x, y, z = henon(_, 200, gamma, 0)
+#             kx, ky, kz = median_heuristic(x, y, z)
+#             dz = K2D(kz)
+#
+#             #
+#             t0, p0 = c_SDCIT(kx, ky, kz, dz, 2000, n_jobs=1)
+#             print(gamma, p0)
