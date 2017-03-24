@@ -1,7 +1,7 @@
 from kcipt.cython_impl.cy_kcipt import cy_sdcit
 
 from kcipt.algo import c_KCIPT
-from kcipt.permutation import slim_permuted
+from kcipt.permutation import permuted2
 from kcipt.utils import *
 
 
@@ -32,7 +32,8 @@ def perm_and_mask(Dz, Pidx=None):
     n = len(Dz)
     full_idx = np.arange(0, n)
     if Pidx is None:
-        Pidx = slim_permuted(full_idx, D=Dz)
+        # Pidx = slim_permuted(full_idx, D=Dz)
+        Pidx = permuted2(Dz)
 
     # 1 for masked (=excluded)
     mask = np.zeros((n, n))
@@ -134,12 +135,12 @@ def jackknife_SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, reserve_perm=
 
 
 def penaltied_distance(Dz, mask):
-    # return Dz + (mask - np.diag(np.diag(mask))) * Dz.max()
-    pDz = Dz.copy()
-    rows, cols = np.nonzero(mask)
-    pDz[rows, cols] = float('inf')
-    pDz[rows, rows] = 0  # set diagonal to 0
-    return pDz
+    # pDz = Dz.copy()
+    # rows, cols = np.nonzero(mask)
+    # pDz[rows, cols] = float('inf')
+    # pDz[rows, rows] = 0  # set diagonal to 0
+    # return pDz
+    return Dz + (mask - np.diag(np.diag(mask))) * Dz.max()  # fuzzy penalty
 
 
 def suggest_B_for_KCIPT(kx, ky, kz, Dz):
