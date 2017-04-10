@@ -4,7 +4,7 @@ import numpy as np
 from tqdm import trange
 
 from experiments.testing_utils import read_chaotic
-from kcipt.sdcit import emp_MMSD, MMSD, perm_and_mask, penaltied_distance
+from kcipt.sdcit import emp_MMSD, MMSD, perm_and_mask, penalized_distance
 from kcipt.utils import p_value_of
 
 if __name__ == '__main__':
@@ -20,12 +20,12 @@ if __name__ == '__main__':
                 bootmmd = emp_MMSD(kxz, ky, Dz, 100).mean()
 
                 test_statistic, mask, Pidx = MMSD(kxz, ky, Dz)
-                mask, Pidx = perm_and_mask(penaltied_distance(Dz, mask))
+                mask, Pidx = perm_and_mask(penalized_distance(Dz, mask))
 
                 # avoid permutation between already permuted pairs.
                 raw_null = emp_MMSD(kxz,
                                     ky[np.ix_(Pidx, Pidx)],
-                                    penaltied_distance(Dz, mask),
+                                    penalized_distance(Dz, mask),
                                     1000)
 
                 null = raw_null - raw_null.mean()

@@ -1,13 +1,12 @@
 import os
 
 
-
-def kcit(x, y, z, seed=None, mateng=None):
+def kcit(x, y, z, seed=None, mateng=None, installed_at='~/Dropbox/research/2014 rcm/workspace/python/KCIPT2017/kcit'):
     import matlab.engine
 
     if mateng is None:
         mateng = matlab.engine.start_matlab()
-        dir_at = os.path.expanduser('~/Dropbox/research/2014 rcm/workspace/python/KCIPT2017/kcit')
+        dir_at = os.path.expanduser(installed_at)
         mateng.addpath(mateng.genpath(dir_at))
 
         if seed is not None:
@@ -24,14 +23,12 @@ def kcit(x, y, z, seed=None, mateng=None):
         return statistic, v2, boot_p_value, v3, appr_p_value
 
 
-
-
-def kcit_lee(Kx, Ky, Kz, seed=None, mateng=None):
+def kcit_lee(Kx, Ky, Kz, seed=None, mateng=None, installed_at='~/Dropbox/research/2014 rcm/workspace/python/KCIPT2017/kcit'):
     import matlab.engine
 
     if mateng is None:
         mateng = matlab.engine.start_matlab()
-        dir_at = os.path.expanduser('~/Dropbox/research/2014 rcm/workspace/python/KCIPT2017/kcit')
+        dir_at = os.path.expanduser(installed_at)
         mateng.addpath(mateng.genpath(dir_at))
 
         if seed is not None:

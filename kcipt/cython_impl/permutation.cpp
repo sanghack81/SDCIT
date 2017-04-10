@@ -248,8 +248,8 @@ struct Comp235 {
     double gain;
 };
 
-//void data_analysis(const double *D, const int full_n, const int len, vector<vector<int>> &odd_components, const vector<int> &idxs, int &n_edges, double &max_distance, double &sum_distance);
-void data_analysis(const double *D, const int full_n, const int len, const vector<int> &idxs, int &n_edges, double &max_distance, double &sum_distance);
+void data_analysis(const double *D, const int full_n, const int len, vector<vector<int>> &odd_components, const vector<int> &idxs, int &n_edges, double &max_distance, double &sum_distance);
+//void data_analysis(const double *D, const int full_n, const int len, const vector<int> &idxs, int &n_edges, double &max_distance, double &sum_distance);
 
 bool acompare(Comp235 lhs, Comp235 rhs) { return lhs.gain > rhs.gain; }
 

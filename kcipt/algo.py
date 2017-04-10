@@ -14,13 +14,13 @@ def c_KCIPT(K_X, K_Y, K_Z, D_Z, B, b, M, n_jobs=1, seed=None):
     mmds = np.zeros((B,), dtype='float64')
 
     cy_kcipt(K_X, K_Y, K_Z, D_Z, B, b, inner_null, mmds, random_seeds() if seed is None else seed, n_jobs, outer_null, M)
+
     if M > 0:
         outer_null -= outer_null.mean()
+
     test_statistic = mmds.mean()
+
     return p_value_of(test_statistic, outer_null) if M > 0 else float('nan'), mmds, inner_null, outer_null
-
-
-
 
 
 def c_adj_KCIPT(K_X, K_Y, K_Z, D_Z, B, b, M, n_jobs=1, seed=None):
@@ -35,7 +35,10 @@ def c_adj_KCIPT(K_X, K_Y, K_Z, D_Z, B, b, M, n_jobs=1, seed=None):
     mmds = np.zeros((B,), dtype='float64')
 
     cy_adj_kcipt(K_X, K_Y, K_Z, K_XYZ, D_Z, B, b, inner_null, mmds, random_seeds() if seed is None else seed, n_jobs, outer_null, M, 1)
+
     if M > 0:
         outer_null -= outer_null.mean()
+
     test_statistic = mmds.mean()
+
     return p_value_of(test_statistic, outer_null) if M > 0 else float('nan'), mmds, inner_null, outer_null

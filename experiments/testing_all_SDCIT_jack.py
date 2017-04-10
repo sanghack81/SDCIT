@@ -12,7 +12,7 @@ def test_chaotic(independent, gamma, trial, N):
 
     kx, ky, kz, Dz = read_chaotic(independent, gamma, trial, N)
 
-    mmd, pval = jackknife_SDCIT(kx, ky, kz, Dz, size_of_null_sample=1000, reserve_perm=True)
+    mmd, pval = jackknife_SDCIT(kx, ky, kz, Dz, size_of_null_sample=1000)
     return independent, gamma, trial, N, mmd, pval
 
 
