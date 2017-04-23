@@ -2,6 +2,5 @@
 *.pyc
 .cache
 build
-pyKCIPT.egg-info
 SDCIT.egg-info
 temporary

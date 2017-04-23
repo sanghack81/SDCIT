@@ -16,9 +16,13 @@ def test_chaotic(independent, gamma, trial, N):
     return independent, gamma, trial, N, mmd, pval
 
 
-if __name__ == '__main__':
+def main():
     for independent, N, gamma in tqdm(chaotic_configs()):
         outs = Parallel(-2)(delayed(test_chaotic)(independent, gamma, trial, N) for trial in range(300))
         with open('../results/jack_chaotic.csv', 'a') as f:
             for out in outs:
                 print(*out, sep=',', file=f, flush=True)
+
+
+if __name__ == '__main__':
+    main()

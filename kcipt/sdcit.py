@@ -9,29 +9,29 @@ def MMSD(kxz, ky, Dz):
     n = len(kxz)
     full_idx = np.arange(0, n)
 
-    mask, Pidx = perm_and_mask(Dz)
+    mask, perm = perm_and_mask(Dz)
 
     K11 = kxz * ky
-    K12 = kxz * ky[np.ix_(full_idx, Pidx)]
-    K22 = kxz * ky[np.ix_(Pidx, Pidx)]
+    K12 = kxz * ky[np.ix_(full_idx, perm)]
+    K22 = kxz * ky[np.ix_(perm, perm)]
 
-    mmd = ma.array(K11 + K22 - K12 - K12.T, mask=mask).mean()
+    statistic = ma.array(K11 + K22 - K12 - K12.T, mask=mask).mean()
 
-    return mmd, mask, Pidx
+    return statistic, mask, perm
 
 
 def perm_and_mask(Dz):
     n = len(Dz)
     full_idx = np.arange(0, n)
-    Pidx = permuted(Dz)
+    perm = permuted(Dz)
 
     # 1 for masked (=excluded)
     mask = np.zeros((n, n))
     mask[full_idx, full_idx] = 1  # i==j
-    mask[full_idx, Pidx] = 1  # pi_i = j
-    mask[Pidx, full_idx] = 1  # i = pi_j
+    mask[full_idx, perm] = 1  # pi_i = j
+    mask[perm, full_idx] = 1  # i = pi_j
 
-    return mask, Pidx
+    return mask, perm
 
 
 def jackknife_MMSD(kxz, ky, Dz):
@@ -61,7 +61,12 @@ def emp_MMSD(kxz, ky, Dz, b):
     return 0.5 * (empirical_distr - empirical_distr.mean()) + empirical_distr.mean()
 
 
-def SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None):
+def SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, adjust_null=True, adjust_statistic_factor=0):
+    if adjust_statistic_factor and not adjust_null:
+        warnings.warn('test statistic is only adjusted if null is adjusted (set adjust_null=True)')
+    if adjust_statistic_factor < 0:
+        warnings.warn('0 <= adjust_statistic_factor <= 1.0, (Recommended: 0.5)')
+
     if seed is not None:
         np.random.seed(seed)
 
@@ -79,7 +84,13 @@ def SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=N
                         penalized_distance(Dz, mask),
                         size_of_null_sample)
 
-    null = raw_null - raw_null.mean()
+    null_bias = raw_null.mean()
+    if adjust_null:
+        null = raw_null - raw_null.mean()
+        if adjust_statistic_factor:
+            test_statistic -= adjust_statistic_factor * null_bias
+    else:
+        null = raw_null
 
     if with_null:
         return test_statistic, p_value_of(test_statistic, null), null
@@ -130,7 +141,7 @@ def suggest_B_for_KCIPT(kx, ky, kz, Dz):
     return int(1 + (np.std(inner_null) / np.std(null_sdcit)) ** 2)
 
 
-def c_SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1):
+def c_SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1, adjust_null=True, adjust_statistic_factor=0):
     if seed is None:
         seed = random_seeds()
     if Dz is None:
@@ -147,7 +158,14 @@ def c_SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
     cy_sdcit(K_XZ, K_Y, D_Z, size_of_null_sample, seed, n_jobs, mmsd, raw_null)
 
     test_statistic = mmsd[0]
-    null = 0.5 * (raw_null - raw_null.mean())
+    bias = raw_null.mean()
+    if adjust_null:
+        null = 0.5 * (raw_null - bias)
+        if adjust_statistic_factor:
+            test_statistic -= adjust_statistic_factor * bias
+    else:
+        null = 0.5 * (raw_null - bias) + bias
+
     if with_null:
         return test_statistic, p_value_of(test_statistic, null), null
     else:

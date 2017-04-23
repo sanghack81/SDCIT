@@ -25,7 +25,7 @@ def test_postnonlinear(independent, noise, trial, N):
     return independent, noise, trial, N, mmd, pval
 
 
-if __name__ == '__main__':
+def main():
     for independent, N, gamma in tqdm(chaotic_configs()):
         outs = Parallel(-1)(delayed(test_chaotic)(independent, gamma, trial, N) for trial in range(300))
         with open('../results/csdcit_chaotic.csv', 'a') as f:
@@ -37,3 +37,7 @@ if __name__ == '__main__':
         with open('../results/csdcit_postnonlinear.csv', 'a') as f:
             for out in outs:
                 print(*out, sep=',', file=f, flush=True)
+
+
+if __name__ == '__main__':
+    main()

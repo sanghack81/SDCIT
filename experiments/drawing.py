@@ -177,7 +177,7 @@ def draw_aupc_postnonlinear():
                             'independent': [int(v) for v in aupc_data[:, 2]],
                             'N': [int(v) for v in aupc_data[:, 3]],
                             'AUPC': [float(v) for v in aupc_data[:, 4]]})
-    aupc_df['dimension'] = (1 + aupc_df['noise']).astype(int)
+    aupc_df['dimension'] = (aupc_df['noise']+1).astype(int)
 
     aupc_df = aupc_df[aupc_df['independent'] == 0]
     aupc_df["algo-N"] = aupc_df["algorithm"].map(str) + aupc_df["N"].map(lambda xxx: ' (' + str(xxx) + ')')

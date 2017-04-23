@@ -5,7 +5,7 @@ from os.path import exists
 import pandas as pd
 import scipy.io
 
-from kcipt.sdcit import SDCIT, c_SDCIT
+from kcipt.sdcit import c_SDCIT
 from kcipt.utils import median_heuristic, K2D
 
 if __name__ == '__main__':

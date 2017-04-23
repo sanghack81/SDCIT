@@ -42,8 +42,7 @@ def test_postnonlinear(independent, noise, trial, N, B=25, n_jobs=1):
     return independent, noise, trial, N, mmds.mean(), pval, B
 
 
-if __name__ == '__main__':
-
+def main():
     # # General Empirical Evaluation
     existing_chaotic = set(tuple(line.split(',')[:4]) for line in open('../results/kcipt_chaotic.csv', 'r'))
 
@@ -84,3 +83,6 @@ if __name__ == '__main__':
                 with open('../results/kcipt_chaotic_{}.csv'.format(B), 'a') as f:
                     print(*out, sep=',', file=f, flush=True)
 
+
+if __name__ == '__main__':
+    main()

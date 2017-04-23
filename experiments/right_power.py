@@ -20,11 +20,11 @@ from kcipt.utils import p_value_of, K2D
 def experiment(obj_filename):
     if not os.path.exists(obj_filename):
         trial = 0
-        gamma = 0.0
+        gamma_param = 0.0
         N = 400
         independent = 1
         initial_B = 100
-        kx, ky, kz, Dz = read_chaotic(independent, gamma, trial, N)
+        kx, ky, kz, Dz = read_chaotic(independent, gamma_param, trial, N)
 
         # Compare SDCIT and KCIPT100
         print('SDCIT ... ')
@@ -50,14 +50,14 @@ def experiment(obj_filename):
         with open(obj_filename, 'wb') as f:  # Python 3: open(..., 'wb')
             pickle.dump([sdcit_mmd, sdcit_null, mmds100, outer_null100, desired_B, mmds_B, outer_null_B, distr_boot], f)
 
-        print(independent, gamma, N)
-        outs = [test_chaotic(independent, gamma, tt, N, B=desired_B, n_jobs=32) for tt in trange(300)]
+        print(independent, gamma_param, N)
+        outs = [test_chaotic(independent, gamma_param, tt, N, B=desired_B, n_jobs=32) for tt in trange(300)]
         with open('../results/kcipt_chaotic_{}.csv'.format(desired_B), 'a') as f:
             for out in outs:
                 print(*out, sep=',', file=f, flush=True)
 
 
-if __name__ == '__main__':
+def main():
     from experiments.drawing import cp, cps
 
     # cp = sns.color_palette('Set1', 5)
@@ -105,10 +105,7 @@ if __name__ == '__main__':
     if True:
         fig = plt.figure(figsize=[5, 3.5])
         ##################################
-        ax = fig.add_subplot(2, 2, 1, adjustable='box')
-
-        xs_T = np.linspace(2 * distr_boot.min(), 2 * distr_boot.max(), 1000)
-        ys_T = pearson3.pdf(xs_T, *pearson3.fit(distr_boot))
+        fig.add_subplot(2, 2, 1, adjustable='box')
 
         plt.plot(xs_sdcit, ys_sdcit, label='SDCIT null', lw=1.5, color=cp[cps['SDCIT']])
         plt.plot([sdcit_mmd, sdcit_mmd], [0, 1000], label='SDCIT TS', color=cp[cps['SDCIT']])
@@ -120,7 +117,7 @@ if __name__ == '__main__':
         plt.setp(plt.gca(), 'yticklabels', [])
         plt.legend(loc=1)
         ##################################
-        ax = fig.add_subplot(2, 2, 2, adjustable='box')
+        fig.add_subplot(2, 2, 2, adjustable='box')
 
         pvals_B = [p_value_of(t, outer_null_B) for t in distr_boot]
         pval_sdcit = p_value_of(sdcit_mmd, sdcit_null)
@@ -133,7 +130,7 @@ if __name__ == '__main__':
         sns.despine()
 
         ##################################
-        ax = fig.add_subplot(2, 2, 3, adjustable='box')
+        fig.add_subplot(2, 2, 3, adjustable='box')
         sns.distplot(df_sdcit['statistic'], hist=True, bins=20, kde=False, color=cp[cps['SDCIT']], label='SDCIT TS')
         sns.distplot(df['statistic'], hist=True, bins=20, kde=False, color=cp[cps['KCIPT']], label='KCIPT TS')
         plt.legend()
@@ -144,7 +141,7 @@ if __name__ == '__main__':
         plt.setp(plt.gca(), 'yticklabels', [])
 
         ##################################
-        ax = fig.add_subplot(2, 2, 4, adjustable='box')
+        fig.add_subplot(2, 2, 4, adjustable='box')
 
         sns.distplot(df_sdcit['pvalue'], hist=True, bins=20, kde=False, color=cp[cps['SDCIT']], norm_hist=True, label='SDCIT p-values')
         sns.distplot(df['pvalue'], hist=True, bins=20, kde=False, color=cp[cps['KCIPT']], norm_hist=True, label='KCIPT p-values')
@@ -170,7 +167,7 @@ if __name__ == '__main__':
         plt.rc('text.latex', preamble=r'\usepackage{cmbright}')
         fig = plt.figure(figsize=[5, 1.6])
         ##################################
-        ax = fig.add_subplot(1, 2, 1, adjustable='box')
+        fig.add_subplot(1, 2, 1, adjustable='box')
         sns.distplot(df5000['statistic'], hist=True, bins=20, kde=False, color=cp[cps['KCIPT']], label='TS')
         plt.legend()
         plt.gca().set_xlabel('MMD')
@@ -179,7 +176,7 @@ if __name__ == '__main__':
         plt.gca().set_xlim([-0.0002, 0.0003])
         plt.setp(plt.gca(), 'yticklabels', [])
         ##
-        ax = fig.add_subplot(1, 2, 2, adjustable='box')
+        fig.add_subplot(1, 2, 2, adjustable='box')
         sns.distplot(df5000['pvalue'], hist=True, bins=20, kde=False, color=cp[cps['KCIPT']], norm_hist=True, label='p-value')
         plt.gca().set_xlabel('p-value')
         # plt.gca().set_ylabel('density')
@@ -197,7 +194,7 @@ if __name__ == '__main__':
         plt.rc('text.latex', preamble=r'\usepackage{cmbright}')
         fig = plt.figure(figsize=[5, 1.6])
         ##################################
-        ax = fig.add_subplot(1, 2, 1, adjustable='box')
+        fig.add_subplot(1, 2, 1, adjustable='box')
         plt.plot(xs_sdcit, ys_sdcit, label='SDCIT null', lw=1.5, color=cp[cps['SDCIT']])
         plt.plot(xs_B, ys_20000, label='KCIPT null', lw=1.5, color=cp[cps['KCIPT']])
         sns.distplot(df20000['statistic'], hist=True, bins=20, kde=False, norm_hist=True, color=cp[cps['KCIPT']], label='KCIPT TS')
@@ -208,7 +205,7 @@ if __name__ == '__main__':
         plt.gca().set_xlim([-0.0002, 0.0003])
         plt.setp(plt.gca(), 'yticklabels', [])
         ##
-        ax = fig.add_subplot(1, 2, 2, adjustable='box')
+        fig.add_subplot(1, 2, 2, adjustable='box')
         sns.distplot(df20000['pvalue'], hist=True, bins=20, kde=False, color=cp[cps['KCIPT']], norm_hist=True, label='KCIPT p')
         sns.distplot([p_value_of(ss, sdcit_null) for ss in df20000['statistic']], hist=True, bins=20, kde=False, color='k', norm_hist=True, label='KCIPT p on SDCIT null')
 
@@ -226,3 +223,7 @@ if __name__ == '__main__':
         plt.plot(xs_sdcit, ys_sdcit, lw=1.5, color=cp[cps['SDCIT']])
         plt.savefig('../results/inspect_sdcit_null.pdf')
         plt.close()
+
+
+if __name__ == "__main__":
+    main()
