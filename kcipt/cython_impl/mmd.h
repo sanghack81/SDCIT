@@ -42,10 +42,10 @@ double u_mmd(const double *K_X, const double *K_Y, const double *K_Z, const int 
              const std::vector<int> &idx2x, const std::vector<int> &idx2y, const std::vector<int> &idx2z) {
     double k11 = 0.0, k22 = 0.0, k12 = 0.0;
 
-    const int idx1_size = idx1x.size();
-    const int idx2_size = idx2x.size();
+    auto idx1_size = idx1x.size();
+    auto idx2_size = idx2x.size();
 
-    for (int i = 0; i < idx1_size; i++) {
+    for (size_t i = 0; i < idx1_size; i++) {
         const double *k_row_x = &K_X[full_n * idx1x[i]];
         const double *k_row_y = &K_Y[full_n * idx1y[i]];
         const double *k_row_z = &K_Z[full_n * idx1z[i]];
@@ -54,12 +54,12 @@ double u_mmd(const double *K_X, const double *K_Y, const double *K_Z, const int 
         }
         k11 -= k_row_x[idx1x[i]] * k_row_y[idx1y[i]] * k_row_z[idx1z[i]];
 
-        for (int j = 0; j < idx2_size; j++) {
+        for (size_t j = 0; j < idx2_size; j++) {
             k12 += k_row_x[idx2x[j]] * k_row_y[idx2y[j]] * k_row_z[idx2z[j]];
         }
     }
 
-    for (int i = 0; i < idx2_size; i++) {
+    for (size_t i = 0; i < idx2_size; i++) {
         const double *k_row_x = &K_X[full_n * idx2x[i]];
         const double *k_row_y = &K_Y[full_n * idx2y[i]];
         const double *k_row_z = &K_Z[full_n * idx2z[i]];

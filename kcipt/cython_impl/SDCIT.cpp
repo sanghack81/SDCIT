@@ -12,26 +12,25 @@
 //
 using std::thread;
 using std::vector;
+using std::pair;
 using std::mt19937;
 
 
-std::pair<vector<int>, vector<std::pair<int, int> >> perm_and_mask(const vector<double> &D_Z, const int n, const vector<int> sample, mt19937 generator) {
-    vector<int> permutation;    // relative index
-    std::set<std::pair<int, int> > setmask;  // relative index
 
-    permutation = split_permutation(&D_Z[0], n, sample, generator);
+std::pair<vector<int>, vector<std::pair<int, int> >> perm_and_mask(const vector<double> &D_Z, const int n, const vector<int> &sample, mt19937 &generator) {
+    const vector<int>& permutation = split_permutation(&D_Z[0], n, sample, generator);
 
     // mask to hide!
+    std::set<pair<int, int> > setmask;  // relative index
     const int sample_size = sample.size();
     for (int i = 0; i < sample_size; i++) {
         setmask.insert(std::make_pair(i, i));
         setmask.insert(std::make_pair(i, permutation[i]));
         setmask.insert(std::make_pair(permutation[i], i));
     }
-    vector<std::pair<int, int> > mask(setmask.begin(), setmask.end());
-    return std::make_pair(permutation, mask);
+    vector<pair<int, int> > mask(setmask.begin(), setmask.end());
+    return std::move(std::make_pair(std::move(permutation), std::move(mask)));
 }
-
 
 std::tuple<double, vector<int>, vector<std::pair<int, int> >> MMSD(const double *K_XZ, const double *K_Y, const vector<double> &D_Z, const int n, const vector<int> &sample, mt19937 generator) {
     double test_statistic = 0.0;
@@ -40,12 +39,12 @@ std::tuple<double, vector<int>, vector<std::pair<int, int> >> MMSD(const double 
 
     std::tie(permutation, mask) = perm_and_mask(D_Z, n, sample, generator);
 
-    const int sample_size = sample.size();
-    for (int i = 0; i < sample_size; i++) {
+    size_t sample_size = sample.size();
+    for (size_t i = 0; i < sample_size; i++) {
         const double* K_XZsin = &K_XZ[sample[i] * n];
         const double* K_Ysin = &K_Y[sample[i] * n];
         const int spi = sample[permutation[i]];
-        for (int j = 0; j < sample_size; j++) {
+        for (size_t j = 0; j < sample_size; j++) {
             test_statistic += K_XZsin[sample[j]] * (K_Ysin[sample[j]] + K_Y[spi * n + sample[permutation[j]]] - 2*K_Ysin[sample[permutation[j]]]);
         }
     }
@@ -56,12 +55,12 @@ std::tuple<double, vector<int>, vector<std::pair<int, int> >> MMSD(const double 
     }
     test_statistic /= (sample_size * sample_size) - mask.size();
 
-    return std::make_tuple(test_statistic, permutation, mask);
+    return std::move(std::make_tuple(test_statistic, std::move(permutation), std::move(mask)));
 }
 
 
 // Returns a copy of distance matrix with max value added.
-vector<double> penalty_distance(const vector<double> &D_Z, const int n, vector<std::pair<int, int> > mask) {
+vector<double> penalized_distance(const vector<double> &D_Z, const int n, const vector<std::pair<int, int> > mask) {
 //    const double inf = std::numeric_limits<double>::infinity();
     vector<double> copied_D_Z(D_Z);
     double max_val = *std::max_element(copied_D_Z.begin(), copied_D_Z.end());
@@ -69,7 +68,7 @@ vector<double> penalty_distance(const vector<double> &D_Z, const int n, vector<s
     for (const auto &rc : mask) {
         copied_D_Z[rc.first * n + rc.second] += max_val;
     }
-    return copied_D_Z;
+    return std::move(copied_D_Z);
 }
 
 
@@ -101,7 +100,7 @@ vector<double> shuffle_matrix(const double *mat, const int n, const vector<int> 
             newmat[in + j] = mat[pin + perm[j]];
         }
     }
-    return newmat;
+    return std::move(newmat);
 }
 
 
@@ -119,9 +118,9 @@ void c_sdcit(const double *K_XZ, const double *K_Y, const double *D_Z_, const in
 
     std::tie(test_statistic, permutation, mask) = MMSD(K_XZ, K_Y, D_Z, n, full_idx, generator);
 
-    std::tie(permutation, mask) = perm_and_mask(penalty_distance(D_Z, n, mask), n, full_idx, generator);
-    const auto D_Z_for_null = penalty_distance(D_Z, n, mask);
-    const auto K_Y_null = shuffle_matrix(K_Y, n, permutation);
+    std::tie(permutation, mask) = perm_and_mask(penalized_distance(D_Z, n, mask), n, full_idx, generator);
+    const auto& D_Z_for_null = penalized_distance(D_Z, n, mask);
+    const auto& K_Y_null = shuffle_matrix(K_Y, n, permutation);
     vector<thread> threads;
     int b_offset = 0;
     for (int i = 0; i < n_threads; i++) {

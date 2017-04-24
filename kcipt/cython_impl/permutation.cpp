@@ -20,7 +20,7 @@ vector<size_t> sort_indexes(const vector<T> &v) {
     // sort indexes based on comparing values in v
     std::sort(idx.begin(), idx.end(), [&v](size_t i1, size_t i2) { return v[i1] < v[i2]; });
 
-    return idx;
+    return std::move(idx);
 }
 
 
@@ -118,7 +118,7 @@ void post_2_2_2_to_3_3(const double *DDDD, const int full_n, const vector<int> &
     }
 
     comps_of_2.clear();
-    int perm_size = perm_array.size();
+    auto perm_size = perm_array.size();
     for (size_t i = 0; i < perm_size; i++) {
         if (perm_array[perm_array[i]] == i && i < perm_array[i]) {
             comps_of_2.push_back(i);
@@ -395,7 +395,7 @@ vector<int> random_permutation(const vector<int> &idxs, std::mt19937 &generator)
 // Hence, the length of permutation array matches to the length of "idxs"
 // Further, a permutation array contains [0, |idxs|-1].
 vector<int> split_permutation(const double *D, const int full_n, const vector<int> &idxs, std::mt19937 &generator) {
-    const int len = idxs.size();
+    size_t len = idxs.size();
     if (len == 1) {
         return {0};
     }
@@ -410,7 +410,6 @@ vector<int> split_permutation(const double *D, const int full_n, const vector<in
     double sum_distance = 0.0;
     vector<vector<int>> odd_components;
     data_analysis(D, full_n, len, odd_components, idxs, n_edges, max_distance, sum_distance);
-//    data_analysis(D, full_n, len, idxs, n_edges, max_distance, sum_distance);
 
     if (sum_distance == 0.0) {
         return random_permutation(idxs, generator);
@@ -419,7 +418,6 @@ vector<int> split_permutation(const double *D, const int full_n, const vector<in
 
     struct PerfectMatching::Options options;
     PerfectMatching *pm = new PerfectMatching(len + odd_components.size(), n_edges);
-//    PerfectMatching *pm = new PerfectMatching(len, n_edges);
     {
         double factor = 1.0;
         if (sum_distance < INT_MAX) {
@@ -509,9 +507,96 @@ vector<int> split_permutation(const double *D, const int full_n, const vector<in
     return perm_array;
 }
 
-// TODO this assumes that D_ij infinity and D_ik non-infinity imples Djk is infinite. This must be resolved.
+
+void dense_data_analysis(const double *D, const int full_n, const int len, const vector<int> &idxs, int &n_edges, double &max_distance, double &sum_distance) {
+    for (int i = 0; i < len; i++) {
+        const double *D_i = D + idxs[i] * full_n;
+        for (int j = i + 1; j < len; j++) {
+            double d = D_i[idxs[j]];
+            if (isinf(d)) {
+
+            } else {
+                if (max_distance < d) {
+                    max_distance = d;
+                }
+                sum_distance += d;
+                n_edges += 1;
+            }
+        }
+    }
+}
+
+
+vector<int> dense_2n_permutation(const double *D, const int full_n, const vector<int> &idxs, std::mt19937 &generator) {
+    const int len = idxs.size();
+    if (len == 1) {
+        return {0};
+    }
+    if (D == NULL) {
+        return random_permutation(idxs, generator);
+    }
+
+    // Preparation
+    vector<int> perm_array(len);
+    int n_edges = 0;
+    double max_distance = 0.0;
+    double sum_distance = 0.0;
+    dense_data_analysis(D, full_n, len, idxs, n_edges, max_distance, sum_distance);
+
+    if (sum_distance == 0.0) {
+        return random_permutation(idxs, generator);
+    }
+
+
+    struct PerfectMatching::Options options;
+    PerfectMatching *pm = new PerfectMatching(len, n_edges);
+    {
+        double factor = 1.0;
+        if (sum_distance < INT_MAX) {
+            factor = INT_MAX / sum_distance;
+        }
+        for (int i = 0; i < len; i++) {
+            const double *D_i = D + idxs[i] * full_n;
+            for (int j = i + 1; j < len; j++) {
+                double d = D_i[idxs[j]];
+                if (!isinf(d)) {
+                    pm->AddEdge(i, j, (int) (d * factor));
+                }
+            }
+        }
+
+        options.verbose = false;
+        pm->options = options;
+        pm->Solve();
+        for (int i = 0; i < len; i++) {
+            int j = pm->GetMatch(i);
+            if (i < j) {
+                perm_array[i] = j;
+                perm_array[j] = i;
+            }
+        }
+        delete pm;
+    }
+
+    vector<int> comps_of_3;
+    vector<int> comps_of_2;
+    for (int i = 0; i < len; i++) {
+        if (perm_array[perm_array[i]] == i) {
+            if (i < perm_array[i]) {
+                comps_of_2.push_back(i);
+                comps_of_2.push_back(perm_array[i]);
+            }
+        }
+    }
+
+    post_2_2_2_to_3_3(D, full_n, idxs, comps_of_2, comps_of_3, perm_array);
+    post_2_3_to_5(D, full_n, idxs, comps_of_2, comps_of_3, perm_array);
+
+    return std::move(perm_array);
+}
+
+
 void data_analysis(const double *D, const int full_n, const int len, vector<vector<int>> &odd_components, const vector<int> &idxs, int &n_edges, double &max_distance, double &sum_distance) {
-//void data_analysis(const double *D, const int full_n, const int len, const vector<int> &idxs, int &n_edges, double &max_distance, double &sum_distance) {
     std::vector<bool> visited(len);
     for (int i = 0; i < len;) {
         vector<int> component;  // indices of idxs
@@ -556,8 +641,22 @@ void split_permutation_interface(const double *D, const int full_n, int *perm) {
     vector<int> samples(full_n);
     std::iota(std::begin(samples), std::end(samples), 0);
 
-    vector<int> output = split_permutation(D, full_n, samples, generator);
+    const vector<int>& output = split_permutation(D, full_n, samples, generator);
     for (int i: output) {
         *perm++ = i;
     }
 }
+
+
+void dense_2n_permutation_interface(const double *D, const int full_n, int *perm) {
+    std::mt19937 generator;
+
+    vector<int> samples(full_n);
+    std::iota(std::begin(samples), std::end(samples), 0);
+
+    const vector<int>& output = dense_2n_permutation(D, full_n, samples, generator);
+    for (int i: output) {
+        *perm++ = i;
+    }
+}
+
