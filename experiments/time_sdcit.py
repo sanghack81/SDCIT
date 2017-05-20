@@ -5,7 +5,7 @@ from os.path import exists
 import pandas as pd
 import scipy.io
 
-from kcipt.sdcit import c_SDCIT
+from kcipt.sdcit2 import c_SDCIT2
 from kcipt.utils import median_heuristic, K2D
 
 if __name__ == '__main__':
@@ -27,7 +27,8 @@ if __name__ == '__main__':
 
                         kkk = median_heuristic(X, Y, Z)
                         Dz = K2D(kkk[-1])
-                        c_SDCIT(*kkk, Dz=Dz, size_of_null_sample=b, seed=trial)
+                        # c_SDCIT(*kkk, Dz=Dz, size_of_null_sample=b, seed=trial)
+                        c_SDCIT2(*kkk, Dz=Dz, size_of_null_sample=b, seed=trial)
 
                         endtime = time.time()
                         print(endtime - start, trial, N, b, file=f, sep=',', flush=True)
@@ -41,15 +42,15 @@ if __name__ == '__main__':
     for key, gdf in df.groupby(by=['N', 'b']):
         print('{}: {:.5f} +- {:.5f}'.format(key, gdf['time'].mean(), gdf['time'].std()))
 
-    print()
-    print('KCIT')
-    df_kcit = pd.read_csv('../results/kcit_chaotic_timing.csv', names=['independent', 'gamma', 'noise', 'trial', 'N', 'runtime', 'statistic', 'boot_p_value', 'appr_p_value'])
-    df_kcit = df_kcit[df_kcit['independent'] == independent]
-    df_kcit = df_kcit[df_kcit['gamma'] == 0.0]
-    for key, gdf in df_kcit.groupby(by=['N']):
-        assert len(gdf) == 300
-        print('{}: {:.2f} +- {:.2f}'.format(key, gdf['runtime'].mean(), gdf['runtime'].std()))
-
-    for key, gdf in df_kcit.groupby(by=['N']):
-        assert len(gdf) == 300
-        print('{}: {:.5f} +- {:.5f}'.format(key, gdf['runtime'].mean(), gdf['runtime'].std()))
+    # print()
+    # print('KCIT')
+    # df_kcit = pd.read_csv('../results/kcit_chaotic_timing.csv', names=['independent', 'gamma', 'noise', 'trial', 'N', 'runtime', 'statistic', 'boot_p_value', 'appr_p_value'])
+    # df_kcit = df_kcit[df_kcit['independent'] == independent]
+    # df_kcit = df_kcit[df_kcit['gamma'] == 0.0]
+    # for key, gdf in df_kcit.groupby(by=['N']):
+    #     assert len(gdf) == 300
+    #     print('{}: {:.2f} +- {:.2f}'.format(key, gdf['runtime'].mean(), gdf['runtime'].std()))
+    #
+    # for key, gdf in df_kcit.groupby(by=['N']):
+    #     assert len(gdf) == 300
+    #     print('{}: {:.5f} +- {:.5f}'.format(key, gdf['runtime'].mean(), gdf['runtime'].std()))

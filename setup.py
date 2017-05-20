@@ -5,6 +5,8 @@ from sys import platform
 import numpy
 from Cython.Distutils import build_ext
 
+exec(open('edward/version.py').read())
+
 blossom_v_extension = Extension("kcipt.blossom_v.cy_blossom_v",
                                 sources=['kcipt/blossom_v/' + f for f in [
                                     'cy_blossom_v.pyx',
@@ -62,7 +64,7 @@ new_extension = Extension("kcipt.cython_impl.cy_kcipt",
 setup(
     name='SDCIT',
     packages=['kcipt'],
-    version='0.1',
+    version=__version__,
     description='Self-Discrepancy Conditional Independence Test',
     author='Sanghack Lee',
     author_email='sanghack.lee@gmail.com',
