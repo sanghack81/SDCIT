@@ -34,7 +34,7 @@ cp = sns.color_palette('Paired', 10)
 cps = {'CHSIC': 9, 'KCIT': 3, 'SDCIT': 5, 'KCIPT': 1, 'CSDCIT': 7}
 markers = {'CHSIC': '^', 'KCIT': 'o', 'SDCIT': 's', 'KCIPT': '*', 'CSDCIT': '<'}
 # all_algos = ['SDCIT', 'KCIT', 'KCIPT', 'CHSIC', 'CSDCIT']
-all_algos = ['SDCIT', 'KCIT', 'KCIPT', 'CHSIC', 'CSDCIT']
+all_algos = ['SDCIT', 'KCIT', 'KCIPT', 'CHSIC']
 
 
 def aupc(pvals):
@@ -78,10 +78,12 @@ def draw_aupc_chaotic():
     aupc_df["algo-N"] = aupc_df["algorithm"].map(str) + aupc_df["N"].map(lambda xxx: ' (' + str(xxx) + ')')
     sns_setting()
     for k, gdf in pd.groupby(aupc_df, ['algorithm', 'N']):
+        print('chaotic', k, gdf['AUPC'])
         if k[1] == 400:
             plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-0 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
             plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-0 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+
     # handles, labels = plt.axes().get_legend_handles_labels()
     # plt.axes().legend(handles[::-1], labels[::-1])
     plt.axes().set_xlabel(r'$\gamma$')
@@ -300,6 +302,7 @@ def draw_calib_postnonlinear_highdim():
     df['D'] = df['D'].astype(float)
     sns_setting()
     for k, gdf in pd.groupby(df, ['algo', 'N']):
+        print('postnonlinear', k, gdf['D'])
         if k[1] == 400:
             plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=cp[cps[k[0]]] if k[1] == 400 else cp[-0 + cps[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:

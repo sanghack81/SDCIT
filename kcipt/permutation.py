@@ -1,19 +1,171 @@
 # import time
 #
 # import cvxopt
-import numpy as np
 
-from kcipt.cython_impl.cy_kcipt import cy_split_permutation
+import numpy as np
+from sklearn.metrics import pairwise_distances
+
+from kcipt.cython_impl.cy_kcipt import cy_split_permutation, cy_dense_permutation
 
 
 # from cvxopt import matrix
 # from cvxopt.modeling import variable, dot, op
 
 
-def permuted(D):
+def permuted(D, dense=True):
     out = np.zeros((len(D),), 'int32')
-    cy_split_permutation(D, out)
+    if dense:
+        cy_dense_permutation(D, out)
+    else:
+        cy_split_permutation(D, out)
     return out
+
+
+def pathgrow(D, full=False):
+    n = len(D)
+    for i in range(n):
+        D[i, i] = float('inf')  # TODO do not change original matrix...
+    nearest_neighbors = np.argsort(D, axis=1)
+    d_nearest_neighbors = np.sort(D, axis=1)
+    threshold = float('inf') if full else np.median(D)
+
+    small_graph = dict()
+    for i in range(n):
+        small_graph[i] = list(nearest_neighbors[i, d_nearest_neighbors[i, :] < threshold])
+    # not undirected!!
+    m1 = [None] * n
+    m2 = [None] * n
+    flag = False
+    while small_graph:
+        x = np.random.choice(list(small_graph.keys()), 1)[0]
+        while small_graph[x]:
+            y = small_graph[x][0]
+            if flag:
+                m1[x] = y
+                m1[y] = x
+                flag = not flag
+            else:
+                m2[x] = y
+                m2[y] = x
+                flag = not flag
+            for z in small_graph.pop(x):
+                small_graph[z].remove(x)
+            x = y
+        small_graph.pop(x)
+    s1 = 0.0
+    for i, j in enumerate(m1):
+        if j is not None:
+            s1 += D[i, j]
+    s2 = 0.0
+    for i, j in enumerate(m2):
+        if j is not None:
+            s2 += D[i, j]
+    if s1 < s2:
+        return m1
+    else:
+        return m2
+
+
+def greedy_perfect_matching(D, full=False):
+    """Dense Greedy Perfect Matching"""
+    n = len(D)
+    dists = [None] * ((n * (n - 1)) // 2)
+    k = 0
+    threshold = float('inf') if full else np.median(D)
+    for i in range(n):
+        for j in range(i + 1, n):
+            if D[i, j] < threshold:
+                dists[k] = (D[i, j], i, j)
+                k += 1
+    dists = dists[:k]
+    dists = sorted(dists)
+    len_dists = len(dists)
+
+    at = 0
+    perm = [None] * n
+    filled = set()
+
+    while at < len_dists and len(filled) < n:  # what if odd-sized?
+        d, i, j = dists[at]
+        if perm[i] is None and perm[j] is None:
+            perm[i] = j
+            perm[j] = i
+            filled.add(i)
+            filled.add(j)
+        at += 1
+    # assert len(filled) >= n - 1
+    return perm, n - len(filled)
+
+
+def greedy_perm(D, full=False):
+    n = len(D)
+    dists = [None] * ((n * (n - 1)) // 2)
+    k = 0
+    threshold = float('inf') if full else np.median(D)
+    for i in range(n):
+        for j in range(i + 1, n):
+            if D[i, j] < threshold:
+                dists[k] = (D[i, j], i, j)
+                k += 1
+    dists = dists[:k]
+    dists = sorted(dists)
+    len_dists = len(dists)
+
+    at = 0
+    perm = [None] * n
+    filled = set()
+
+    waiting = dict()
+    while at < len_dists and len(filled) < n:  # what if odd-sized?
+        d, i, j = dij = dists[at]
+        if perm[i] is None and perm[j] is None:
+            perm[i] = j
+            perm[j] = i
+            filled.add(i)
+            filled.add(j)
+        elif perm[j] is None or perm[i] is None:
+            if perm[i] is None:
+                j, i = i, j
+            if j in waiting:
+                _, k, l = waiting.pop(j)
+                if {perm[i], j} == {k, l} and perm[perm[i]] == i:
+                    perm[i], perm[j], perm[k] = j, k, i
+                    filled.add(j)
+            else:
+                if perm[perm[i]] == i:
+                    waiting[j] = dij
+        at += 1
+    # assert len(filled) >= n - 1
+    return perm, n - len(filled)
+
+
+if __name__ == '__main__':
+    n = 400
+    for _ in range(100):
+        z = np.random.randn(n, 4)
+        Dz = pairwise_distances(z)
+        p1, missing = greedy_perm(Dz, True)
+        p2 = permuted(Dz)
+        p3, missing3 = greedy_perfect_matching(Dz, True)
+        p4 = pathgrow(Dz, True)
+        missing4 = p4.count(None)
+        sum2 = 0.0
+        for i, j in enumerate(p2):
+            sum2 += Dz[i, j]
+        sum1 = 0.0
+        for i, j in enumerate(p1):
+            if j is not None:
+                sum1 += Dz[i, j]
+        sum3 = 0.0
+        for i, j in enumerate(p3):
+            if j is not None:
+                sum3 += Dz[i, j]
+        sum4 = 0.0
+        for i, j in enumerate(p4):
+            if j is not None:
+                sum4 += Dz[i, j]
+        print(sum1 / sum2, sum3 / sum2, sum4 / sum2, missing, missing3, missing4)
+
 
 #
 # def sparsify(D: np.ndarray, min_degree=5):

@@ -49,4 +49,8 @@ def read_postnonlinear_noise(independent, noise, trial, N, dir_at='~/kcipt_data/
     mat_load = scipy.io.loadmat(dist_mat_file, squeeze_me=True, struct_as_record=False)
     Dz = np.array(mat_load['D'])
 
+    kx = np.ascontiguousarray(kx, 'float64')
+    ky = np.ascontiguousarray(ky, 'float64')
+    kz = np.ascontiguousarray(kz, 'float64')
+    Dz = np.ascontiguousarray(Dz, 'float64')
     return kx, ky, kz, Dz

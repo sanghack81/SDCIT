@@ -20,7 +20,7 @@ vector<size_t> sort_indexes(const vector<T> &v) {
     // sort indexes based on comparing values in v
     std::sort(idx.begin(), idx.end(), [&v](size_t i1, size_t i2) { return v[i1] < v[i2]; });
 
-    return std::move(idx);
+    return idx;
 }
 
 
@@ -395,7 +395,7 @@ vector<int> random_permutation(const vector<int> &idxs, std::mt19937 &generator)
 // Hence, the length of permutation array matches to the length of "idxs"
 // Further, a permutation array contains [0, |idxs|-1].
 vector<int> split_permutation(const double *D, const int full_n, const vector<int> &idxs, std::mt19937 &generator) {
-    size_t len = idxs.size();
+    const int len = idxs.size();
     if (len == 1) {
         return {0};
     }

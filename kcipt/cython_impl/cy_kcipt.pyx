@@ -17,6 +17,7 @@ cdef extern from "KCIPT.h":
 
 cdef extern from "permutation.h":
     void split_permutation_interface(double *D, const int full_n, int*perm);
+    void dense_2n_permutation_interface(const double *D, const int full_n, int *perm);
 
 
 cdef extern from "SDCIT.h":
@@ -125,6 +126,15 @@ def cy_split_permutation(np.ndarray[double, ndim=2, mode="c"]  D not None,
     split_permutation_interface(&D[0, 0], ll, &perm[0])
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def cy_dense_permutation(np.ndarray[double, ndim=2, mode="c"]  D not None,
+                         np.ndarray[int, ndim=1, mode="c"]  perm not None
+                         ):
+    cdef int ll
+    ll = D.shape[0]
+
+    dense_2n_permutation_interface(&D[0, 0], ll, &perm[0])
 
 
 

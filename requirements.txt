@@ -1,3 +1,5 @@
+sympy
+mpmath
 pandas
 tqdm
 matplotlib
