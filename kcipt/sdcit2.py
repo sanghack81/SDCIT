@@ -72,6 +72,10 @@ def bias_reduced_SDCIT(kx: np.ndarray, ky: np.ndarray, kz: np.ndarray, Dz=None, 
         return fix_test_statistic, p_value_of(fix_test_statistic, fix_null)
 
 
+def SDCIT2(kx: np.ndarray, ky: np.ndarray, kz: np.ndarray, Dz=None, size_of_null_sample=1000, with_null=False, seed=None):
+    return bias_reduced_SDCIT(kx, ky, kz, Dz, size_of_null_sample, with_null, seed)
+
+
 def c_SDCIT2(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1):
     if seed is None:
         seed = random_seeds()

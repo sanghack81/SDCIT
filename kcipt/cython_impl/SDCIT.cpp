@@ -29,7 +29,7 @@ std::pair<vector<int>, vector<std::pair<int, int> >> perm_and_mask(const vector<
         setmask.insert(std::make_pair(permutation[i], i));
     }
     vector<pair<int, int> > mask(setmask.begin(), setmask.end());
-    return std::move(std::make_pair(std::move(permutation), std::move(mask)));
+    return std::make_pair(std::move(permutation), std::move(mask));
 }
 
 std::tuple<double, vector<int>, vector<std::pair<int, int> >> MMSD(const double *K_XZ, const double *K_Y, const vector<double> &D_Z, const int n, const vector<int> &sample, mt19937 generator) {
@@ -55,7 +55,7 @@ std::tuple<double, vector<int>, vector<std::pair<int, int> >> MMSD(const double 
     }
     test_statistic /= (sample_size * sample_size) - mask.size();
 
-    return std::move(std::make_tuple(test_statistic, std::move(permutation), std::move(mask)));
+    return std::make_tuple(test_statistic, std::move(permutation), std::move(mask));
 }
 
 
@@ -68,7 +68,7 @@ vector<double> penalized_distance(const vector<double> &D_Z, const int n, const 
     for (const auto &rc : mask) {
         copied_D_Z[rc.first * n + rc.second] += max_val;
     }
-    return std::move(copied_D_Z);
+    return copied_D_Z;
 }
 
 
@@ -100,7 +100,7 @@ vector<double> shuffle_matrix(const double *mat, const int n, const vector<int> 
             newmat[in + j] = mat[pin + perm[j]];
         }
     }
-    return std::move(newmat);
+    return newmat;
 }
 
 

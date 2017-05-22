@@ -5,12 +5,12 @@ from sys import platform
 import numpy
 from Cython.Distutils import build_ext
 
-exec(open('edward/version.py').read())
+exec(open('version.py').read())
+
+blossom_v_dir = 'blossom5/'
 
 blossom_v_extension = Extension("kcipt.blossom_v.cy_blossom_v",
-                                sources=['kcipt/blossom_v/' + f for f in [
-                                    'cy_blossom_v.pyx',
-                                    'c_cy_blossom_v.cpp',
+                                sources=[blossom_v_dir+ f for f in [
                                     'PMduals.cpp',
                                     'PMexpand.cpp',
                                     'PMinit.cpp',
@@ -18,17 +18,17 @@ blossom_v_extension = Extension("kcipt.blossom_v.cy_blossom_v",
                                     'PMmain.cpp',
                                     'PMrepair.cpp',
                                     'PMshrink.cpp',
-                                    'example_lee.cpp',
                                     'misc.cpp',
                                     'MinCost/MinCost.cpp',
                                     'GEOM/GPMinit.cpp',
                                     'GEOM/GPMinterface.cpp',
                                     'GEOM/GPMkdtree.cpp',
                                     'GEOM/GPMmain.cpp'
-                                ]],
+                                ]] + ['kcipt/blossom_v/cy_blossom_v.pyx',
+                                    'kcipt/blossom_v/c_cy_blossom_v.cpp',],
                                 language="c++",
-                                include_dirs=[numpy.get_include(), 'kcipt/blossom_v/MinCost',
-                                              'kcipt/blossom_v/GEOM'],
+                                include_dirs=[numpy.get_include(), blossom_v_dir+'MinCost',
+                                              blossom_v_dir+'GEOM', 'kcipt/blossom_v'],
                                 extra_compile_args=["-std=c++11"],
                                 extra_link_args=["-std=c++11"]
                                 )
@@ -40,23 +40,23 @@ new_extension = Extension("kcipt.cython_impl.cy_kcipt",
                               'kcipt/cython_impl/SDCIT.cpp',
                               'kcipt/cython_impl/SDCIT2.cpp',
                               'kcipt/cython_impl/permutation.cpp',
-                              'kcipt/blossom_v/GEOM/GPMinit.cpp',
-                              'kcipt/blossom_v/GEOM/GPMinterface.cpp',
-                              'kcipt/blossom_v/GEOM/GPMkdtree.cpp',
-                              'kcipt/blossom_v/GEOM/GPMmain.cpp',
-                              'kcipt/blossom_v/MinCost/MinCost.cpp',
-                              'kcipt/blossom_v/misc.cpp',
-                              'kcipt/blossom_v/PMduals.cpp',
-                              'kcipt/blossom_v/PMexpand.cpp',
-                              'kcipt/blossom_v/PMinit.cpp',
-                              'kcipt/blossom_v/PMinterface.cpp',
-                              'kcipt/blossom_v/PMmain.cpp',
-                              'kcipt/blossom_v/PMrepair.cpp',
-                              'kcipt/blossom_v/PMshrink.cpp',
+                              blossom_v_dir + 'GEOM/GPMinit.cpp',
+                              blossom_v_dir + 'GEOM/GPMinterface.cpp',
+                              blossom_v_dir + 'GEOM/GPMkdtree.cpp',
+                              blossom_v_dir + 'GEOM/GPMmain.cpp',
+                              blossom_v_dir + 'MinCost/MinCost.cpp',
+                              blossom_v_dir + 'misc.cpp',
+                              blossom_v_dir + 'PMduals.cpp',
+                              blossom_v_dir + 'PMexpand.cpp',
+                              blossom_v_dir + 'PMinit.cpp',
+                              blossom_v_dir + 'PMinterface.cpp',
+                              blossom_v_dir + 'PMmain.cpp',
+                              blossom_v_dir + 'PMrepair.cpp',
+                              blossom_v_dir + 'PMshrink.cpp',
                           ],
                           language="c++",
-                          include_dirs=[numpy.get_include(), 'kcipt/cython_impl', 'kcipt/blossom_v',
-                                        'kcipt/blossom_v/MinCost', 'kcipt/blossom_v/GEOM'],
+                          include_dirs=[numpy.get_include(), 'kcipt/cython_impl', blossom_v_dir,
+                                        blossom_v_dir + 'MinCost', blossom_v_dir + 'GEOM'],
                           extra_compile_args=["-std=c++11", "-stdlib=libc++", "-mmacosx-version-min=10.7"] if platform == "darwin" else ["-std=c++11"],
                           extra_link_args=["-std=c++11", "-stdlib=libc++", "-mmacosx-version-min=10.7"] if platform == "darwin" else ["-std=c++11"]
                           )

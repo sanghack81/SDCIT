@@ -4,7 +4,7 @@
 #include <cmath>
 #include <random>
 #include <algorithm>
-#include "../blossom_v/PerfectMatching.h"
+#include "../../blossom5/PerfectMatching.h"
 
 using std::vector;
 using std::isinf;
@@ -592,7 +592,7 @@ vector<int> dense_2n_permutation(const double *D, const int full_n, const vector
     post_2_2_2_to_3_3(D, full_n, idxs, comps_of_2, comps_of_3, perm_array);
     post_2_3_to_5(D, full_n, idxs, comps_of_2, comps_of_3, perm_array);
 
-    return std::move(perm_array);
+    return perm_array;
 }
 
 

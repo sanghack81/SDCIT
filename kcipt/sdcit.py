@@ -62,6 +62,7 @@ def emp_MMSD(kxz, ky, Dz, b):
 
 
 def SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, adjust_null=True, adjust_statistic_factor=0):
+    print('deprecated, use SDCIT2')
     if adjust_statistic_factor and not adjust_null:
         warnings.warn('test statistic is only adjusted if null is adjusted (set adjust_null=True)')
     if adjust_statistic_factor < 0:
@@ -142,6 +143,7 @@ def suggest_B_for_KCIPT(kx, ky, kz, Dz):
 
 
 def c_SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1, adjust_null=True, adjust_statistic_factor=0):
+    print('deprecated, use c_SDCIT2')
     if seed is None:
         seed = random_seeds()
     if Dz is None:

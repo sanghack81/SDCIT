@@ -4,7 +4,7 @@
 #include <cmath>
 #include <algorithm>
 #include <stdio.h>
-#include "PerfectMatching.h"
+#include "../../blossom5/PerfectMatching.h"
 #include <math.h>
 
 void c_cy_blossom_v(const double* D, int* output, const int n)
