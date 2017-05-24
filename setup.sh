@@ -8,3 +8,16 @@ mv blossom5-v2.05.src blossom5
 
 python3 setup.py build_ext --inplace
 pip install -e .
+
+KCITURL=http://people.tuebingen.mpg.de/kzhang/KCI-test.zip
+KCITZIPFILE=KCI-test.zip
+
+wget $KCITURL -O $KCITZIPFILE
+unzip $KCITZIPFILE algorithms/* gpml-matlab/*
+mv gpml-matlab kcit
+mv algorithms/* kcit/algorithms
+rmdir algorithms
+cp kcit/CInd_test_new_withGP_Lee.m kcit/algorithms/
+
+rm $KCITZIPFILE
+
