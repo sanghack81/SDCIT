@@ -1,7 +1,7 @@
-from kcipt.algo import c_KCIPT
-from kcipt.cython_impl.cy_kcipt import cy_sdcit
-from kcipt.permutation import permuted
-from kcipt.utils import *
+from sdcit.algo import c_KCIPT
+from sdcit.cython_impl.cy_kcipt import cy_sdcit
+from sdcit.permutation import permuted
+from sdcit.utils import *
 
 
 def MMSD(kxz, ky, Dz):
@@ -142,7 +142,7 @@ def suggest_B_for_KCIPT(kx, ky, kz, Dz):
     return int(1 + (np.std(inner_null) / np.std(null_sdcit)) ** 2)
 
 
-def c_SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1, adjust_null=True, adjust_statistic_factor=0):
+def c_SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1, adjust_null=True):
     print('deprecated, use c_SDCIT2')
     if seed is None:
         seed = random_seeds()
@@ -163,8 +163,6 @@ def c_SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
     bias = raw_null.mean()
     if adjust_null:
         null = 0.5 * (raw_null - bias)
-        if adjust_statistic_factor:
-            test_statistic -= adjust_statistic_factor * bias
     else:
         null = 0.5 * (raw_null - bias) + bias
 

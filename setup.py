@@ -9,7 +9,7 @@ exec(open('version.py').read())
 
 blossom_v_dir = 'blossom5/'
 
-blossom_v_extension = Extension("kcipt.blossom_v.cy_blossom_v",
+blossom_v_extension = Extension("sdcit.blossom_v.cy_blossom_v",
                                 sources=[blossom_v_dir+ f for f in [
                                     'PMduals.cpp',
                                     'PMexpand.cpp',
@@ -24,22 +24,22 @@ blossom_v_extension = Extension("kcipt.blossom_v.cy_blossom_v",
                                     'GEOM/GPMinterface.cpp',
                                     'GEOM/GPMkdtree.cpp',
                                     'GEOM/GPMmain.cpp'
-                                ]] + ['kcipt/blossom_v/cy_blossom_v.pyx',
-                                    'kcipt/blossom_v/c_cy_blossom_v.cpp',],
+                                ]] + ['sdcit/blossom_v/cy_blossom_v.pyx',
+                                    'sdcit/blossom_v/c_cy_blossom_v.cpp',],
                                 language="c++",
                                 include_dirs=[numpy.get_include(), blossom_v_dir+'MinCost',
-                                              blossom_v_dir+'GEOM', 'kcipt/blossom_v'],
+                                              blossom_v_dir+'GEOM', 'sdcit/blossom_v'],
                                 extra_compile_args=["-std=c++11"],
                                 extra_link_args=["-std=c++11"]
                                 )
 
-new_extension = Extension("kcipt.cython_impl.cy_kcipt",
+new_extension = Extension("sdcit.cython_impl.cy_sdcit",
                           sources=[
-                              'kcipt/cython_impl/cy_kcipt.pyx',
-                              'kcipt/cython_impl/KCIPT.cpp',
-                              'kcipt/cython_impl/SDCIT.cpp',
-                              'kcipt/cython_impl/SDCIT2.cpp',
-                              'kcipt/cython_impl/permutation.cpp',
+                              'sdcit/cython_impl/cy_sdcit.pyx',
+                              'sdcit/cython_impl/KCIPT.cpp',
+                              'sdcit/cython_impl/SDCIT.cpp',
+                              'sdcit/cython_impl/SDCIT2.cpp',
+                              'sdcit/cython_impl/permutation.cpp',
                               blossom_v_dir + 'GEOM/GPMinit.cpp',
                               blossom_v_dir + 'GEOM/GPMinterface.cpp',
                               blossom_v_dir + 'GEOM/GPMkdtree.cpp',
@@ -55,7 +55,7 @@ new_extension = Extension("kcipt.cython_impl.cy_kcipt",
                               blossom_v_dir + 'PMshrink.cpp',
                           ],
                           language="c++",
-                          include_dirs=[numpy.get_include(), 'kcipt/cython_impl', blossom_v_dir,
+                          include_dirs=[numpy.get_include(), 'sdcit/cython_impl', blossom_v_dir,
                                         blossom_v_dir + 'MinCost', blossom_v_dir + 'GEOM'],
                           extra_compile_args=["-std=c++11", "-stdlib=libc++", "-mmacosx-version-min=10.7"] if platform == "darwin" else ["-std=c++11"],
                           extra_link_args=["-std=c++11", "-stdlib=libc++", "-mmacosx-version-min=10.7"] if platform == "darwin" else ["-std=c++11"]
@@ -63,7 +63,7 @@ new_extension = Extension("kcipt.cython_impl.cy_kcipt",
 
 setup(
     name='SDCIT',
-    packages=['kcipt'],
+    packages=['sdcit'],
     version=__version__,
     description='Self-Discrepancy Conditional Independence Test',
     author='Sanghack Lee',

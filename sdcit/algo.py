@@ -1,6 +1,6 @@
-from kcipt.cython_impl.cy_kcipt import cy_kcipt, cy_adj_kcipt
+from sdcit.cython_impl.cy_kcipt import cy_kcipt, cy_adj_kcipt
 
-from kcipt.utils import *
+from sdcit.utils import *
 
 
 def c_KCIPT(K_X, K_Y, K_Z, D_Z, B, b, M, n_jobs=1, seed=None):

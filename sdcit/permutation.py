@@ -1,15 +1,7 @@
-# import time
-#
-# import cvxopt
-
 import numpy as np
 from sklearn.metrics import pairwise_distances
 
-from kcipt.cython_impl.cy_kcipt import cy_split_permutation, cy_dense_permutation
-
-
-# from cvxopt import matrix
-# from cvxopt.modeling import variable, dot, op
+from sdcit.cython_impl.cy_kcipt import cy_split_permutation, cy_dense_permutation
 
 
 def permuted(D, dense=True):

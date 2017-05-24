@@ -53,7 +53,7 @@ def draw_aupc_chaotic():
 
     aupc_data = []
     for algo in all_algos:
-        df = pd.read_csv('../results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
+        df = pd.read_csv('results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
 
         for group_key, group_df in pd.groupby(df, by=['gamma', 'independent', 'N']):
             group_key = (int(group_key[0] * 10) / 10, *group_key[1:])
@@ -91,7 +91,7 @@ def draw_aupc_chaotic():
     plt.axes().set_ylim([0.45, 1.05])
     # plt.title('Chaotic series')
     sns.despine()
-    plt.savefig('../results/{}_aupc.pdf'.format(data), transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('figures/{}_aupc.pdf'.format(data), transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -99,7 +99,7 @@ def draw_calib_chaotic():
     data = 'chaotic'
     calib_data = []
     for algo in all_algos:
-        df = pd.read_csv('../results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
+        df = pd.read_csv('results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
         for k, gdf in pd.groupby(df, by=['independent', 'gamma', 'N']):
             if float(k[0]) == 1:
                 D, _ = scipy.stats.kstest(gdf[pvalue_column[algo]], 'uniform')
@@ -126,7 +126,7 @@ def draw_calib_chaotic():
     plt.axes().set_yticks([0.1, 0.2, 0.3])
     # plt.title('Chaotic series -- independent')
     sns.despine()
-    plt.savefig('../results/chaotic_calib.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('figures/chaotic_calib.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -134,7 +134,7 @@ def draw_Type_I_error_chaotic():
     data = 'chaotic'
     calib_data = []
     for algo in all_algos:
-        df = pd.read_csv('../results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
+        df = pd.read_csv('results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
         for k, gdf in pd.groupby(df, by=['independent', 'gamma', 'N']):
             if float(k[0]) == 1:
                 calib_data.append([algo, float(k[1]), int(k[2]), np.mean(gdf[pvalue_column[algo]] <= 0.05)])
@@ -156,7 +156,7 @@ def draw_Type_I_error_chaotic():
     plt.axes().set_xticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5])
     plt.axes().set_ylabel('Type I error')
     sns.despine()
-    plt.savefig('../results/chaotic_type_I.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('figures/chaotic_type_I.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -164,7 +164,7 @@ def draw_aupc_postnonlinear():
     data = 'postnonlinear'
     aupc_data = []
     for algo in all_algos:
-        df = pd.read_csv('../results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
+        df = pd.read_csv('results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
 
         for group_key, group_df in pd.groupby(df, by=['noise', 'independent', 'N']):
             group_key = (int(group_key[0] * 10) / 10, int(group_key[1]), int(group_key[2]))
@@ -195,7 +195,7 @@ def draw_aupc_postnonlinear():
     plt.axes().set_ylim([0.45, 1.05])
     # plt.title('Postnonlinear')
     sns.despine()
-    plt.savefig('../results/postnonlinear_aupc.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('figures/postnonlinear_aupc.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -203,7 +203,7 @@ def draw_aupc_postnonlinear_highdim():
     data = 'postnonlinear'
     aupc_data = []
     for algo in all_algos:
-        df = pd.read_csv('../results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
+        df = pd.read_csv('results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
 
         for group_key, group_df in pd.groupby(df, by=['noise', 'independent', 'N']):
             group_key = (int(group_key[0] * 10) / 10, int(group_key[1]), int(group_key[2]))
@@ -234,7 +234,7 @@ def draw_aupc_postnonlinear_highdim():
     plt.xticks([1, 5, 10, 20, 50], [1, 5, 10, 20, 50])
     # plt.title('Postnonlinear')
     sns.despine()
-    plt.savefig('../results/postnonlinear_aupc_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('figures/postnonlinear_aupc_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -242,7 +242,7 @@ def draw_calib_postnonlinear():
     data = 'postnonlinear'
     calib_data = []
     for algo in all_algos:
-        df = pd.read_csv('../results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
+        df = pd.read_csv('results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
         for k, gdf in pd.groupby(df, by=['independent', 'noise', 'N']):
             if float(k[0]) == 1:
                 D, _ = scipy.stats.kstest(gdf[pvalue_column[algo]], 'uniform')
@@ -269,7 +269,7 @@ def draw_calib_postnonlinear():
     plt.axes().set_yticks([0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
     # plt.title('Postnonlinear')
     sns.despine()
-    plt.savefig('../results/postnonlinear_calib.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('figures/postnonlinear_calib.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -286,7 +286,7 @@ def draw_calib_postnonlinear_highdim():
     data = 'postnonlinear'
     calib_data = []
     for algo in all_algos:
-        df = pd.read_csv('../results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
+        df = pd.read_csv('results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
         for k, gdf in pd.groupby(df, by=['independent', 'noise', 'N']):
             if float(k[0]) == 1 and k[2] == 400:
                 dd, _ = scipy.stats.kstest(gdf[pvalue_column[algo]], 'uniform')
@@ -315,7 +315,7 @@ def draw_calib_postnonlinear_highdim():
     plt.axes().set_yticks([0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
     # plt.title('Postnonlinear')
     sns.despine()
-    plt.savefig('../results/postnonlinear_calib_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('figures/postnonlinear_calib_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -323,7 +323,7 @@ def draw_type_I_postnonlinear_highdim():
     data = 'postnonlinear'
     calib_data = []
     for algo in all_algos:
-        df = pd.read_csv('../results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
+        df = pd.read_csv('results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
         for k, gdf in pd.groupby(df, by=['independent', 'noise', 'N']):
             if float(k[0]) == 1 and k[2] == 400:
                 dd = np.mean(gdf[pvalue_column[algo]] <= 0.05)
@@ -352,7 +352,7 @@ def draw_type_I_postnonlinear_highdim():
     plt.axes().legend(handles[::-1], labels[::-1])
     # plt.title('Postnonlinear')
     sns.despine()
-    plt.savefig('../results/postnonlinear_type_I_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig('figures/postnonlinear_type_I_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -361,7 +361,7 @@ def draw_type_I_postnonlinear_highdim():
 #
 #     aupc_data = []
 #     for algo in all_algos:
-#         df = pd.read_csv('../results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
+#         df = pd.read_csv('results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
 #
 #         for group_key, group_df in pd.groupby(df, by=['gamma', 'independent', 'N']):
 #             group_key = (int(group_key[0] * 10) / 10, *group_key[1:])
@@ -374,7 +374,7 @@ def draw_type_I_postnonlinear_highdim():
 #     data = 'postnonlinear'
 #     aupc_data = []
 #     for algo in all_algos:
-#         df = pd.read_csv('../results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
+#         df = pd.read_csv('results/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
 #
 #         for group_key, group_df in pd.groupby(df, by=['noise', 'independent', 'N']):
 #             group_key = (int(group_key[0] * 10) / 10, int(group_key[1]), int(group_key[2]))

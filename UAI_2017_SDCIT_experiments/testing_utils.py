@@ -5,7 +5,7 @@ import numpy as np
 import scipy
 import scipy.io
 
-from kcipt.utils import median_heuristic, K2D
+from sdcit.utils import median_heuristic, K2D
 
 
 def chaotic_configs():

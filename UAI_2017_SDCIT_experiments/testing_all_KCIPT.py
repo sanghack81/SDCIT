@@ -7,9 +7,9 @@ from joblib import delayed
 from tqdm import tqdm
 from tqdm import trange
 
-from experiments.testing_utils import *
-from kcipt.algo import c_KCIPT
-from kcipt.utils import *
+from UAI_2017_SDCIT_experiments.testing_utils import *
+from sdcit.algo import c_KCIPT
+from sdcit.utils import *
 
 
 def test_chaotic(independent, gamma, trial, N, B=25, n_jobs=1):
@@ -44,7 +44,7 @@ def test_postnonlinear(independent, noise, trial, N, B=25, n_jobs=1):
 
 def main():
     # # General Empirical Evaluation
-    existing_chaotic = set(tuple(line.split(',')[:4]) for line in open('../results/kcipt_chaotic.csv', 'r'))
+    existing_chaotic = set(tuple(line.split(',')[:4]) for line in open('results/kcipt_chaotic.csv', 'r'))
 
     for independent, N, gamma in chaotic_configs():
         to_test_trials = set(range(300))
@@ -59,7 +59,7 @@ def main():
         print(independent, N, gamma)
         time.sleep(1)
         outs = Parallel(-1)(delayed(test_chaotic)(independent, gamma, trial, N, 25) for trial in tqdm(to_test_trials))
-        with open('../results/kcipt_chaotic.csv', 'a') as f:
+        with open('results/kcipt_chaotic.csv', 'a') as f:
             for out in outs:
                 if out is not None:
                     print(*out, sep=',', file=f, flush=True)
@@ -70,7 +70,7 @@ def main():
             print(noise, independent, N)
             time.sleep(1)
             outs = Parallel(-1)(delayed(test_postnonlinear)(independent, noise, trial, N, 25) for trial in trange(300))
-            with open('../results/kcipt_postnonlinear.csv', 'a') as f:
+            with open('results/kcipt_postnonlinear.csv', 'a') as f:
                 for out in outs:
                     print(*out, sep=',', file=f, flush=True)
 
@@ -80,7 +80,7 @@ def main():
             time.sleep(1)
             for trial in trange(300):
                 out = test_chaotic(independent, gamma, trial, N, B=B, n_jobs=32)
-                with open('../results/kcipt_chaotic_{}.csv'.format(B), 'a') as f:
+                with open('results/kcipt_chaotic_{}.csv'.format(B), 'a') as f:
                     print(*out, sep=',', file=f, flush=True)
 
 

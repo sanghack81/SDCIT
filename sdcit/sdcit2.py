@@ -2,9 +2,9 @@ import numpy as np
 import numpy.ma as ma
 from sklearn.linear_model import LinearRegression
 
-from kcipt.cython_impl.cy_kcipt import cy_sdcit2
-from kcipt.sdcit import penalized_distance, perm_and_mask
-from kcipt.utils import K2D, p_value_of, random_seeds
+from sdcit.cython_impl.cy_kcipt import cy_sdcit2
+from sdcit.sdcit import penalized_distance, perm_and_mask
+from sdcit.utils import K2D, p_value_of, random_seeds
 
 
 def MMSD(ky: np.ndarray, kz: np.ndarray, kxz: np.ndarray, Dz: np.ndarray):
@@ -72,6 +72,7 @@ def bias_reduced_SDCIT(kx: np.ndarray, ky: np.ndarray, kz: np.ndarray, Dz=None, 
         return fix_test_statistic, p_value_of(fix_test_statistic, fix_null)
 
 
+# alias
 def SDCIT2(kx: np.ndarray, ky: np.ndarray, kz: np.ndarray, Dz=None, size_of_null_sample=1000, with_null=False, seed=None):
     return bias_reduced_SDCIT(kx, ky, kz, Dz, size_of_null_sample, with_null, seed)
 
@@ -106,27 +107,3 @@ def c_SDCIT2(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, see
         return fix_test_statistic, p_value_of(fix_test_statistic, fix_null), fix_null
     else:
         return fix_test_statistic, p_value_of(fix_test_statistic, fix_null)
-
-# if __name__ == '__main__':
-#     n = 200
-#     for i in range(10):
-#         print(i)
-#         for gamma in [0.0]:
-#             x, y, z = henon(i, n, gamma, 0)
-#             kx, ky, kz = median_heuristic(x, y, z)
-#             dz = K2D(kz)
-#             t, p1 = c_SDCIT(kx, ky, kz, dz, seed=i, n_jobs=1)
-#             t, p2 = c_SDCIT2(kx, ky, kz, dz, seed=i, n_jobs=1)
-#             t, p3 = SDCIT(kx, ky, kz, dz)
-#             t, p4 = bias_reduced_SDCIT(kx, ky, kz, dz)
-
-# import pandas as pd
-#
-#     df = pd.read_csv('allfour.csv', names=['gamma', 'c_sdcit', 'c_sdcit2', 'py_sdcit', 'py_sdcit2'])
-#     for key, gdf in df.groupby('gamma'):
-#         print(key, aupc(gdf['c_sdcit']), aupc(gdf['c_sdcit2']), aupc(gdf['py_sdcit']), aupc(gdf['py_sdcit2']))
-#
-#
-#     # 0.0 0.489301 0.49024 0.489126 0.490071
-#     # 0.25 0.936781 0.947112 0.936875 0.947134
-#     # 0.4 0.981879 0.985635 0.98187 0.985481

@@ -37,49 +37,15 @@ Kx = Kx.*Kz;
 Kx = H * Kx * H;
 Ky = H * Ky * H;
 
-if IF_GP
-    % learning the hyperparameters
-    [eig_Kx, eix] = eigdec((Kx+Kx')/2, min(400, floor(T/4))); % /2
-    [eig_Ky, eiy] = eigdec((Ky+Ky')/2, min(200, floor(T/5))); % /3
-    
-    covfunc = {'covSum', {'covSEard','covNoise'}};
-    logtheta0 = [log(0.75 * sqrt(D))*ones(D,1) ; 0; log(sqrt(0.1))];
-    fprintf('Optimizing hyperparameters in GP regression...\n');
-    %
-    IIx = find(eig_Kx > max(eig_Kx) * Thresh); eig_Kx = eig_Kx(IIx); eix = eix(:,IIx);
-    IIy = find(eig_Ky > max(eig_Ky) * Thresh); eig_Ky = eig_Ky(IIy); eiy = eiy(:,IIy);
-    [logtheta_x, fvals_x, iter_x] = minimize(logtheta0, 'gpr_multi', -350, covfunc, z, 2*sqrt(T) *eix * diag(sqrt(eig_Kx))/sqrt(eig_Kx(1)));
-    [logtheta_y, fvals_y, iter_y] = minimize(logtheta0, 'gpr_multi', -350, covfunc, z, 2*sqrt(T) *eiy * diag(sqrt(eig_Ky))/sqrt(eig_Ky(1)));
-    
-    covfunc_z = {'covSEard'};
-    Kz_x = feval(covfunc_z{:}, logtheta_x, z);
-    Kz_y = feval(covfunc_z{:}, logtheta_y, z);
-    
-    % Note: in the conditional case, no need to do centering, as the regression
-    % will automatically enforce that.
-    
-    % Kernel matrices of the errors
-    P1_x = (eye(T) - Kz_x*pdinv(Kz_x + exp(2*logtheta_x(end))*eye(T)));
-    Kxz = P1_x* Kx * P1_x';
-    P1_y = (eye(T) - Kz_y*pdinv(Kz_y + exp(2*logtheta_y(end))*eye(T)));
-    Kyz = P1_y* Ky * P1_y';
-    % calculate the statistic
-    Sta = trace(Kxz * Kyz);
-    
-    % degrees of freedom
-    df_x = trace(eye(T)-P1_x);
-    df_y = trace(eye(T)-P1_y);
-else
-    Kz = H * Kz * H; %*4 % as we will calculate Kz
-    % Kernel matrices of the errors
-    P1 = (eye(T) - Kz*pdinv(Kz + lambda*eye(T)));
-    Kxz = P1* Kx * P1';
-    Kyz = P1* Ky * P1';
-    % calculate the statistic
-    Sta = trace(Kxz * Kyz);
-    % degrees of freedom
-    df = trace(eye(T)-P1);
-end
+Kz = H * Kz * H; %*4 % as we will calculate Kz
+% Kernel matrices of the errors
+P1 = (eye(T) - Kz*pdinv(Kz + lambda*eye(T)));
+Kxz = P1* Kx * P1';
+Kyz = P1* Ky * P1';
+% calculate the statistic
+Sta = trace(Kxz * Kyz);
+% degrees of freedom
+df = trace(eye(T)-P1);
 
 % calculate the eigenvalues
 % Due to numerical issues, Kxz and Kyz may not be symmetric:
@@ -121,42 +87,6 @@ Cri=-1;
 p_val=-1;
 Cri_appr=-1;
 p_appr=-1;
-
-% if Bootstrap
-%     eig_uu = eigdec(uu_prod,min(T,Size_u));
-%     II_f = find(eig_uu > max(eig_uu) * Thresh);
-%     eig_uu = eig_uu(II_f);
-%     
-%     % use mixture of F distributions to generate the Null dstr
-%     if length(eig_uu) * T < 1E6
-%         f_rand1 = chi2rnd(1,length(eig_uu),T_BS);
-%         if IF_unbiased
-%             Null_dstr = T^2/(T-1-df_x)/(T-1-df_y) * eig_uu' * f_rand1; %%%%Problem
-%         else
-%             Null_dstr = eig_uu' * f_rand1;
-%         end
-%     else
-%         % iteratively calcuate the null dstr to save memory
-%         Null_dstr = zeros(1,T_BS);
-%         Length = max(floor(1E6/T),100);
-%         Itmax = floor(length(eig_uu)/Length);
-%         for iter = 1:Itmax
-%             f_rand1 = chi2rnd(1,Length,T_BS);
-%             if IF_unbiased
-%                 Null_dstr = Null_dstr + T^2/(T-1-df_x)/(T-1-df_y) *... %%%%Problem
-%                     eig_uu((iter-1)*Length+1:iter*Length)' * f_rand1;
-%             else
-%                 Null_dstr = Null_dstr + ... %%%%Problem
-%                     eig_uu((iter-1)*Length+1:iter*Length)' * f_rand1;
-%             end
-%         end
-%     end
-%     
-%     % use chi2 to generate the Null dstr:
-%     sort_Null_dstr = sort(Null_dstr);
-%     Cri = sort_Null_dstr(ceil((1-alpha)*T_BS));
-%     p_val = sum(Null_dstr>Sta)/T_BS;
-% end
 
 if Approximate
     mean_appr = trace(uu_prod);

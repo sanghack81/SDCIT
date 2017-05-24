@@ -6,8 +6,10 @@ SDCIT.egg-info
 temporary
 blossom5
 kcipt/blossom_v/cy_blossom_v.cpp
-kcipt/blossom_v/cy_blossom_v.cpython-36m-darwin.so
+kcipt/blossom_v/*.so
 kcipt/cython_impl/cy_kcipt.cpp
-kcipt/cython_impl/cy_kcipt.cpython-36m-darwin.so
+kcipt/cython_impl/*.so
 kcit/algorithms
 kcit/gpml-matlab
+blossom5-v2.05.src.tar.gz
+KCI-test.zip

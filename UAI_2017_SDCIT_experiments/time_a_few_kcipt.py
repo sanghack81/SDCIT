@@ -3,8 +3,8 @@ import time
 
 import scipy.io
 
-from kcipt.algo import c_KCIPT
-from kcipt.utils import median_heuristic, K2D
+from sdcit.algo import c_KCIPT
+from sdcit.utils import median_heuristic, K2D
 
 if __name__ == '__main__':
     # experiments

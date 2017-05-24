@@ -5,12 +5,12 @@ from os.path import exists
 import pandas as pd
 import scipy.io
 
-from kcipt.sdcit2 import c_SDCIT2
-from kcipt.utils import median_heuristic, K2D
+from sdcit.sdcit2 import c_SDCIT2
+from sdcit.utils import median_heuristic, K2D
 
 if __name__ == '__main__':
     # experiments
-    fname = '../results/c_sdcit_time.csv'
+    fname = 'results/c_sdcit_time.csv'
     independent = 1
     if not exists(fname):
         with open(fname, 'w') as f:
@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     # print()
     # print('KCIT')
-    # df_kcit = pd.read_csv('../results/kcit_chaotic_timing.csv', names=['independent', 'gamma', 'noise', 'trial', 'N', 'runtime', 'statistic', 'boot_p_value', 'appr_p_value'])
+    # df_kcit = pd.read_csv('results/kcit_chaotic_timing.csv', names=['independent', 'gamma', 'noise', 'trial', 'N', 'runtime', 'statistic', 'boot_p_value', 'appr_p_value'])
     # df_kcit = df_kcit[df_kcit['independent'] == independent]
     # df_kcit = df_kcit[df_kcit['gamma'] == 0.0]
     # for key, gdf in df_kcit.groupby(by=['N']):

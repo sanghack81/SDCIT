@@ -10,11 +10,11 @@ import seaborn as sns
 from scipy.stats import gamma, pearson3
 from tqdm import trange
 
-from experiments.testing_all_KCIPT import test_chaotic
-from experiments.testing_utils import read_chaotic
-from kcipt.algo import c_KCIPT
-from kcipt.sdcit2 import bias_reduced_SDCIT
-from kcipt.utils import p_value_of, K2D
+from UAI_2017_SDCIT_experiments.testing_all_KCIPT import test_chaotic
+from UAI_2017_SDCIT_experiments.testing_utils import read_chaotic
+from sdcit.algo import c_KCIPT
+from sdcit.sdcit2 import bias_reduced_SDCIT
+from sdcit.utils import p_value_of, K2D
 
 
 def experiment(obj_filename):
@@ -52,18 +52,18 @@ def experiment(obj_filename):
 
         print(independent, gamma_param, N)
         outs = [test_chaotic(independent, gamma_param, tt, N, B=desired_B, n_jobs=32) for tt in trange(300)]
-        with open('../results/kcipt_chaotic_{}.csv'.format(desired_B), 'a') as f:
+        with open('results/kcipt_chaotic_{}.csv'.format(desired_B), 'a') as f:
             for out in outs:
                 print(*out, sep=',', file=f, flush=True)
 
 
 def main():
-    from experiments.drawing import cp, cps
+    from UAI_2017_SDCIT_experiments.drawing import cp, cps
 
     # cp = sns.color_palette('Set1', 5)
     # cps = {'CHSIC': 3, 'KCIT': 2, 'SDCIT': 0, 'KCIPT': 1}
 
-    obj_filename = '../results/right_power.pickle'
+    obj_filename = 'results/right_power.pickle'
     experiment(obj_filename)
 
     time.sleep(3)
@@ -78,10 +78,10 @@ def main():
     names_kcipt_chaotic = ['independent', 'gamma', 'trial', 'N', 'statistic', 'pvalue', 'B']
     names_sdcit_chaotic = ['independent', 'gamma', 'trial', 'N', 'statistic', 'pvalue']
 
-    df = pd.read_csv('../results/kcipt_chaotic_{}.csv'.format(desired_B), names=names_kcipt_chaotic, )
-    df5000 = pd.read_csv('../results/kcipt_chaotic_5000.csv', names=names_kcipt_chaotic, )
-    df20000 = pd.read_csv('../results/kcipt_chaotic_20000.csv', names=names_kcipt_chaotic, )
-    df_sdcit = pd.read_csv('../results/sdcit_chaotic.csv', names=names_sdcit_chaotic, )
+    df = pd.read_csv('results/kcipt_chaotic_{}.csv'.format(desired_B), names=names_kcipt_chaotic, )
+    df5000 = pd.read_csv('results/kcipt_chaotic_5000.csv', names=names_kcipt_chaotic, )
+    df20000 = pd.read_csv('results/kcipt_chaotic_20000.csv', names=names_kcipt_chaotic, )
+    df_sdcit = pd.read_csv('results/sdcit_chaotic.csv', names=names_sdcit_chaotic, )
     df_sdcit = df_sdcit[df_sdcit['N'] == 400]
     df_sdcit = df_sdcit[df_sdcit['independent'] == 1]
     df_sdcit = df_sdcit[df_sdcit['gamma'] == 0.0]
@@ -150,7 +150,7 @@ def main():
         plt.gca().set_ylim([0, 2.2])
         plt.legend(loc=0)
         sns.despine()
-        plt.savefig('../results/kcipt_{}_ps.pdf'.format(desired_B), transparent=True, bbox_inches='tight', pad_inches=0.02)
+        plt.savefig('figures/kcipt_{}_ps.pdf'.format(desired_B), transparent=True, bbox_inches='tight', pad_inches=0.02)
         plt.close()
 
     ###############################################
@@ -183,7 +183,7 @@ def main():
         plt.gcf().subplots_adjust(wspace=0.3, hspace=0.3)
         plt.legend(loc=0)
         sns.despine()
-        plt.savefig('../results/kcipt_5000_ps.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+        plt.savefig('figures/kcipt_5000_ps.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
         plt.close()
 
     if True:
@@ -213,7 +213,7 @@ def main():
         plt.gcf().subplots_adjust(wspace=0.3, hspace=0.3)
         plt.legend(loc=0)
         sns.despine()
-        plt.savefig('../results/kcipt_20000_ps.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+        plt.savefig('figures/kcipt_20000_ps.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
         plt.close()
 
     if True:
@@ -221,7 +221,7 @@ def main():
         sns.set()
         sns.distplot(sdcit_null, norm_hist=True, kde=False)
         plt.plot(xs_sdcit, ys_sdcit, lw=1.5, color=cp[cps['SDCIT']])
-        plt.savefig('../results/inspect_sdcit_null.pdf')
+        plt.savefig('figures/inspect_sdcit_null.pdf')
         plt.close()
 
 
