@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn.metrics import pairwise_distances
 
 from sdcit.cython_impl.cy_kcipt import cy_split_permutation, cy_dense_permutation
 
@@ -129,35 +128,6 @@ def greedy_perm(D, full=False):
         at += 1
     # assert len(filled) >= n - 1
     return perm, n - len(filled)
-
-
-if __name__ == '__main__':
-    n = 400
-    for _ in range(100):
-        z = np.random.randn(n, 4)
-        Dz = pairwise_distances(z)
-        p1, missing = greedy_perm(Dz, True)
-        p2 = permuted(Dz)
-        p3, missing3 = greedy_perfect_matching(Dz, True)
-        p4 = pathgrow(Dz, True)
-        missing4 = p4.count(None)
-        sum2 = 0.0
-        for i, j in enumerate(p2):
-            sum2 += Dz[i, j]
-        sum1 = 0.0
-        for i, j in enumerate(p1):
-            if j is not None:
-                sum1 += Dz[i, j]
-        sum3 = 0.0
-        for i, j in enumerate(p3):
-            if j is not None:
-                sum3 += Dz[i, j]
-        sum4 = 0.0
-        for i, j in enumerate(p4):
-            if j is not None:
-                sum4 += Dz[i, j]
-        print(sum1 / sum2, sum3 / sum2, sum4 / sum2, missing, missing3, missing4)
-
 
 #
 # def sparsify(D: np.ndarray, min_degree=5):

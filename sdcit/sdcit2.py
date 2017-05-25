@@ -34,8 +34,7 @@ def emp_MMSD(kxz: np.ndarray, ky: np.ndarray, kz: np.ndarray, Dz: np.ndarray, b:
         _11 = np.ix_(idx1, idx1)
         empirical_distr[b_i], empirical_error_distr[b_i], *_ = MMSD(ky[_11], kz[_11], kxz[_11], Dz[_11])
 
-    return 0.5 * (empirical_distr - empirical_distr.mean()) + empirical_distr.mean(), \
-           0.5 * (empirical_error_distr - empirical_error_distr.mean()) + empirical_error_distr.mean()
+    return 0.5 * (empirical_distr - empirical_distr.mean()) + empirical_distr.mean(), 0.5 * (empirical_error_distr - empirical_error_distr.mean()) + empirical_error_distr.mean()
 
 
 def fix_you(null_errors, null, error, test_statistic):

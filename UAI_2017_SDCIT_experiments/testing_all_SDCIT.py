@@ -2,7 +2,7 @@ from joblib import Parallel
 from joblib import delayed
 from tqdm import tqdm
 
-from UAI_2017_SDCIT_experiments.testing_utils import read_chaotic, read_postnonlinear_noise, chaotic_configs, postnonlinear_noise_configs
+from UAI_2017_SDCIT_experiments.testing_utils import read_chaotic, read_postnonlinear_noise, postnonlinear_noise_configs
 from sdcit.sdcit2 import bias_reduced_SDCIT
 from sdcit.utils import *
 

@@ -10,7 +10,7 @@ exec(open('version.py').read())
 blossom_v_dir = 'blossom5/'
 
 blossom_v_extension = Extension("sdcit.blossom_v.cy_blossom_v",
-                                sources=[blossom_v_dir+ f for f in [
+                                sources=[blossom_v_dir + f for f in [
                                     'PMduals.cpp',
                                     'PMexpand.cpp',
                                     'PMinit.cpp',
@@ -24,11 +24,10 @@ blossom_v_extension = Extension("sdcit.blossom_v.cy_blossom_v",
                                     'GEOM/GPMinterface.cpp',
                                     'GEOM/GPMkdtree.cpp',
                                     'GEOM/GPMmain.cpp'
-                                ]] + ['sdcit/blossom_v/cy_blossom_v.pyx',
-                                    'sdcit/blossom_v/c_cy_blossom_v.cpp',],
+                                ]] + ['sdcit/blossom_v/cy_blossom_v.pyx', 'sdcit/blossom_v/c_cy_blossom_v.cpp', ],
                                 language="c++",
-                                include_dirs=[numpy.get_include(), blossom_v_dir+'MinCost',
-                                              blossom_v_dir+'GEOM', 'sdcit/blossom_v'],
+                                include_dirs=[numpy.get_include(), blossom_v_dir + 'MinCost',
+                                              blossom_v_dir + 'GEOM', 'sdcit/blossom_v'],
                                 extra_compile_args=["-std=c++11"],
                                 extra_link_args=["-std=c++11"]
                                 )
