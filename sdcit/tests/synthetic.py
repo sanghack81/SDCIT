@@ -44,7 +44,7 @@ def henon(seed, n, gamma, independence, noise_dim=2, noise_std=0.5):
 
 
 def normalize(X):
-    return (X - np.mean(X)) / np.std(X)
+    return (X - np.mean(X, axis=0)) / np.std(X, axis=0)
 
 
 def zhang2012(seed, N, dimensions, the_case, independent=True):
@@ -110,59 +110,59 @@ def zhang2012(seed, N, dimensions, the_case, independent=True):
             Z2 = normalize(Z2)
             Z = np.hstack([Z, Z2])
 
-        if dimensions > 2:
-            Z3 = randn(N, 1)
-            X = randn(N, 1)
-            Y = randn(N, 1)
-            ZZ1_3 = ZZ1_2 * 2 / 3 + Z3 * 5 / 6
-            ZZ1_3 = ZZ1_3 / 2 + 0.7 * tanh(ZZ1_3)
-            X = ZZ1_3 + tanh(X)
-            X = X + (X ** 3) / 3 + tanh(X / 3) / 2
-            ZZ2_3 = ZZ2_2 * 2 / 3 + Z3 * 5 / 6
-            ZZ2_3 = ZZ2_3 / 2 + 0.7 * tanh(ZZ2_3)
-            Y += ZZ2_3
-            Y = Y + tanh(Y / 3)
+            if dimensions > 2:
+                Z3 = randn(N, 1)
+                X = randn(N, 1)
+                Y = randn(N, 1)
+                ZZ1_3 = ZZ1_2 * 2 / 3 + Z3 * 5 / 6
+                ZZ1_3 = ZZ1_3 / 2 + 0.7 * tanh(ZZ1_3)
+                X = ZZ1_3 + tanh(X)
+                X = X + (X ** 3) / 3 + tanh(X / 3) / 2
+                ZZ2_3 = ZZ2_2 * 2 / 3 + Z3 * 5 / 6
+                ZZ2_3 = ZZ2_3 / 2 + 0.7 * tanh(ZZ2_3)
+                Y += ZZ2_3
+                Y = Y + tanh(Y / 3)
 
-            X = normalize(X)
-            Y = normalize(Y)
-            Z3 = normalize(Z3)
-            Z = np.hstack([Z, Z3])
+                X = normalize(X)
+                Y = normalize(Y)
+                Z3 = normalize(Z3)
+                Z = np.hstack([Z, Z3])
 
-        if dimensions > 3:
-            Z4 = randn(N, 1)
-            X = randn(N, 1)
-            Y = randn(N, 1)
-            ZZ1_4 = ZZ1_3 * 2 / 3 + Z4 * 5 / 6
-            ZZ1_4 = ZZ1_4 / 2 + 0.7 * tanh(ZZ1_4)
-            X = ZZ1_4 + tanh(X)
-            X = X + ((X ** 3) / 3) + tanh(X / 3) / 2
-            ZZ2_4 = ZZ2_3 * 2 / 3 + Z4 * 5 / 6
-            ZZ2_4 = ZZ2_4 / 2 + 0.7 * tanh(ZZ2_4)
-            Y += ZZ2_4
-            Y = Y + tanh(Y / 3)
+                if dimensions > 3:
+                    Z4 = randn(N, 1)
+                    X = randn(N, 1)
+                    Y = randn(N, 1)
+                    ZZ1_4 = ZZ1_3 * 2 / 3 + Z4 * 5 / 6
+                    ZZ1_4 = ZZ1_4 / 2 + 0.7 * tanh(ZZ1_4)
+                    X = ZZ1_4 + tanh(X)
+                    X = X + ((X ** 3) / 3) + tanh(X / 3) / 2
+                    ZZ2_4 = ZZ2_3 * 2 / 3 + Z4 * 5 / 6
+                    ZZ2_4 = ZZ2_4 / 2 + 0.7 * tanh(ZZ2_4)
+                    Y += ZZ2_4
+                    Y = Y + tanh(Y / 3)
 
-            X = normalize(X)
-            Y = normalize(Y)
-            Z4 = normalize(Z4)
-            Z = np.hstack([Z, Z4])
+                    X = normalize(X)
+                    Y = normalize(Y)
+                    Z4 = normalize(Z4)
+                    Z = np.hstack([Z, Z4])
 
-        if dimensions > 4:
-            Z5 = randn(N, 1)
-            X = randn(N, 1)
-            Y = randn(N, 1)
-            ZZ1_5 = ZZ1_4 * 2 / 3 + Z5 * 5 / 6
-            ZZ1_5 = ZZ1_5 / 2 + 0.7 * tanh(ZZ1_5)
-            X = ZZ1_5 + tanh(X)
-            X = X + ((X ** 3) / 3) + tanh(X / 3) / 2
-            ZZ2_5 = ZZ2_4 * 2 / 3 + Z5 * 5 / 6
-            ZZ2_5 = ZZ2_5 / 2 + 0.7 * tanh(ZZ2_5)
-            Y += ZZ2_5
-            Y = Y + tanh(Y / 3)
+                    if dimensions > 4:
+                        Z5 = randn(N, 1)
+                        X = randn(N, 1)
+                        Y = randn(N, 1)
+                        ZZ1_5 = ZZ1_4 * 2 / 3 + Z5 * 5 / 6
+                        ZZ1_5 = ZZ1_5 / 2 + 0.7 * tanh(ZZ1_5)
+                        X = ZZ1_5 + tanh(X)
+                        X = X + ((X ** 3) / 3) + tanh(X / 3) / 2
+                        ZZ2_5 = ZZ2_4 * 2 / 3 + Z5 * 5 / 6
+                        ZZ2_5 = ZZ2_5 / 2 + 0.7 * tanh(ZZ2_5)
+                        Y += ZZ2_5
+                        Y = Y + tanh(Y / 3)
 
-            X = normalize(X)
-            Y = normalize(Y)
-            Z5 = normalize(Z5)
-            Z = np.hstack([Z, Z5])
+                        X = normalize(X)
+                        Y = normalize(Y)
+                        Z5 = normalize(Z5)
+                        Z = np.hstack([Z, Z5])
 
     if not independent:
         ff = 0.5 * randn(N, 1)
@@ -227,59 +227,59 @@ def symmetric_zhang2012(seed, N, dimensions, the_case, independent=True):
             Z2 = normalize(Z2)
             Z = np.hstack([Z, Z2])
 
-        if dimensions > 2:
-            Z3 = randn(N, 1)
-            X = randn(N, 1)
-            Y = randn(N, 1)
-            ZZ1_3 = ZZ1_2 * 2 / 3 + Z3 * 5 / 6
-            ZZ1_3 = ZZ1_3 / 2 + 0.7 * tanh(ZZ1_3)
-            X = ZZ1_3 + tanh(X)
-            X = X + (X ** 3) / 3 + tanh(X / 3) / 2
-            ZZ2_3 = ZZ2_2 * 2 / 3 + Z3 * 5 / 6
-            ZZ2_3 = ZZ2_3 / 2 + 0.7 * tanh(ZZ2_3)
-            Y += ZZ2_3
-            Y = Y + tanh(Y / 3)
+            if dimensions > 2:
+                Z3 = randn(N, 1)
+                X = randn(N, 1)
+                Y = randn(N, 1)
+                ZZ1_3 = ZZ1_2 * 2 / 3 + Z3 * 5 / 6
+                ZZ1_3 = ZZ1_3 / 2 + 0.7 * tanh(ZZ1_3)
+                X = ZZ1_3 + tanh(X)
+                X = X + (X ** 3) / 3 + tanh(X / 3) / 2
+                ZZ2_3 = ZZ2_2 * 2 / 3 + Z3 * 5 / 6
+                ZZ2_3 = ZZ2_3 / 2 + 0.7 * tanh(ZZ2_3)
+                Y += ZZ2_3
+                Y = Y + tanh(Y / 3)
 
-            X = normalize(X)
-            Y = normalize(Y)
-            Z3 = normalize(Z3)
-            Z = np.hstack([Z, Z3])
+                X = normalize(X)
+                Y = normalize(Y)
+                Z3 = normalize(Z3)
+                Z = np.hstack([Z, Z3])
 
-        if dimensions > 3:
-            Z4 = randn(N, 1)
-            X = randn(N, 1)
-            Y = randn(N, 1)
-            ZZ1_4 = ZZ1_3 * 2 / 3 + Z4 * 5 / 6
-            ZZ1_4 = ZZ1_4 / 2 + 0.7 * tanh(ZZ1_4)
-            X = ZZ1_4 + tanh(X)
-            X = X + ((X ** 3) / 3) + tanh(X / 3) / 2
-            ZZ2_4 = ZZ2_3 * 2 / 3 + Z4 * 5 / 6
-            ZZ2_4 = ZZ2_4 / 2 + 0.7 * tanh(ZZ2_4)
-            Y += ZZ2_4
-            Y = Y + tanh(Y / 3)
+                if dimensions > 3:
+                    Z4 = randn(N, 1)
+                    X = randn(N, 1)
+                    Y = randn(N, 1)
+                    ZZ1_4 = ZZ1_3 * 2 / 3 + Z4 * 5 / 6
+                    ZZ1_4 = ZZ1_4 / 2 + 0.7 * tanh(ZZ1_4)
+                    X = ZZ1_4 + tanh(X)
+                    X = X + ((X ** 3) / 3) + tanh(X / 3) / 2
+                    ZZ2_4 = ZZ2_3 * 2 / 3 + Z4 * 5 / 6
+                    ZZ2_4 = ZZ2_4 / 2 + 0.7 * tanh(ZZ2_4)
+                    Y += ZZ2_4
+                    Y = Y + tanh(Y / 3)
 
-            X = normalize(X)
-            Y = normalize(Y)
-            Z4 = normalize(Z4)
-            Z = np.hstack([Z, Z4])
+                    X = normalize(X)
+                    Y = normalize(Y)
+                    Z4 = normalize(Z4)
+                    Z = np.hstack([Z, Z4])
 
-        if dimensions > 4:
-            Z5 = randn(N, 1)
-            X = randn(N, 1)
-            Y = randn(N, 1)
-            ZZ1_5 = ZZ1_4 * 2 / 3 + Z5 * 5 / 6
-            ZZ1_5 = ZZ1_5 / 2 + 0.7 * tanh(ZZ1_5)
-            X = ZZ1_5 + tanh(X)
-            X = X + ((X ** 3) / 3) + tanh(X / 3) / 2
-            ZZ2_5 = ZZ2_4 * 2 / 3 + Z5 * 5 / 6
-            ZZ2_5 = ZZ2_5 / 2 + 0.7 * tanh(ZZ2_5)
-            Y += ZZ2_5
-            Y = Y + tanh(Y / 3)
+                    if dimensions > 4:
+                        Z5 = randn(N, 1)
+                        X = randn(N, 1)
+                        Y = randn(N, 1)
+                        ZZ1_5 = ZZ1_4 * 2 / 3 + Z5 * 5 / 6
+                        ZZ1_5 = ZZ1_5 / 2 + 0.7 * tanh(ZZ1_5)
+                        X = ZZ1_5 + tanh(X)
+                        X = X + ((X ** 3) / 3) + tanh(X / 3) / 2
+                        ZZ2_5 = ZZ2_4 * 2 / 3 + Z5 * 5 / 6
+                        ZZ2_5 = ZZ2_5 / 2 + 0.7 * tanh(ZZ2_5)
+                        Y += ZZ2_5
+                        Y = Y + tanh(Y / 3)
 
-            X = normalize(X)
-            Y = normalize(Y)
-            Z5 = normalize(Z5)
-            Z = np.hstack([Z, Z5])
+                        X = normalize(X)
+                        Y = normalize(Y)
+                        Z5 = normalize(Z5)
+                        Z = np.hstack([Z, Z5])
 
     ff = 0.5 * randn(N, 1)
     X += ff

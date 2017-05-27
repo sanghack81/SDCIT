@@ -37,7 +37,7 @@ def emp_MMSD(kxz: np.ndarray, ky: np.ndarray, kz: np.ndarray, Dz: np.ndarray, b:
     return 0.5 * (empirical_distr - empirical_distr.mean()) + empirical_distr.mean(), 0.5 * (empirical_error_distr - empirical_error_distr.mean()) + empirical_error_distr.mean()
 
 
-def fix_you(null_errors, null, error, test_statistic):
+def _adjust_errors(null_errors, null, error, test_statistic):
     model = LinearRegression().fit(null_errors[:, None], null[:, None])
     beta = model.coef_[0, 0]
     beta = max(0, beta)
@@ -63,7 +63,7 @@ def bias_reduced_SDCIT(kx: np.ndarray, ky: np.ndarray, kz: np.ndarray, Dz=None, 
                                         penalized_distance(Dz, mask),
                                         size_of_null_sample)
 
-    fix_null, fix_test_statistic = fix_you(raw_null_error, raw_null, error_statistic, test_statistic)
+    fix_null, fix_test_statistic = _adjust_errors(raw_null_error, raw_null, error_statistic, test_statistic)
     fix_null = fix_null - fix_null.mean()  # why? why not?
     if with_null:
         return fix_test_statistic, p_value_of(fix_test_statistic, fix_null), fix_null
@@ -79,6 +79,7 @@ def SDCIT2(kx: np.ndarray, ky: np.ndarray, kz: np.ndarray, Dz=None, size_of_null
 def c_SDCIT2(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1):
     if seed is None:
         seed = random_seeds()
+
     if Dz is None:
         Dz = K2D(kz)
 
@@ -100,9 +101,9 @@ def c_SDCIT2(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, see
     test_statistic = mmsd[0]
     error_statistic = error_mmsd[0]
 
-    fix_null, fix_test_statistic = fix_you(error_raw_null, raw_null, error_statistic, test_statistic)
-    fix_null = fix_null - fix_null.mean()  # why? why not?
+    fixed_null, fix_test_statistic = _adjust_errors(error_raw_null, raw_null, error_statistic, test_statistic)
+    fixed_null = fixed_null - fixed_null.mean()  # why? why not?
     if with_null:
-        return fix_test_statistic, p_value_of(fix_test_statistic, fix_null), fix_null
+        return fix_test_statistic, p_value_of(fix_test_statistic, fixed_null), fixed_null
     else:
-        return fix_test_statistic, p_value_of(fix_test_statistic, fix_null)
+        return fix_test_statistic, p_value_of(fix_test_statistic, fixed_null)

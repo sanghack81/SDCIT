@@ -441,8 +441,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__kcipt__blossom_v__cy_blossom_v
-#define __PYX_HAVE_API__kcipt__blossom_v__cy_blossom_v
+#define __PYX_HAVE__sdcit__blossom_v__cy_blossom_v
+#define __PYX_HAVE_API__sdcit__blossom_v__cy_blossom_v
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -666,7 +666,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "kcipt/blossom_v/cy_blossom_v.pyx",
+  "sdcit/blossom_v/cy_blossom_v.pyx",
   "__init__.pxd",
   "type.pxd",
 };
@@ -1380,13 +1380,13 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *, cha
 
 /* Module declarations from 'cython' */
 
-/* Module declarations from 'kcipt.blossom_v.cy_blossom_v' */
+/* Module declarations from 'sdcit.blossom_v.cy_blossom_v' */
 static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_int = { "int", NULL, sizeof(int), { 0 }, 0, IS_UNSIGNED(int) ? 'U' : 'I', IS_UNSIGNED(int), 0 };
-#define __Pyx_MODULE_NAME "kcipt.blossom_v.cy_blossom_v"
-int __pyx_module_is_main_kcipt__blossom_v__cy_blossom_v = 0;
+#define __Pyx_MODULE_NAME "sdcit.blossom_v.cy_blossom_v"
+int __pyx_module_is_main_sdcit__blossom_v__cy_blossom_v = 0;
 
-/* Implementation of 'kcipt.blossom_v.cy_blossom_v' */
+/* Implementation of 'sdcit.blossom_v.cy_blossom_v' */
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_RuntimeError;
@@ -1410,8 +1410,8 @@ static const char __pyx_k_cy_blossom_v[] = "cy_blossom_v";
 static const char __pyx_k_cy_post_2_3_to_5[] = "cy_post_2_3_to_5";
 static const char __pyx_k_cy_post_2_2_2_to_3_3[] = "cy_post_2_2_2_to_3_3";
 static const char __pyx_k_ndarray_is_not_C_contiguous[] = "ndarray is not C contiguous";
-static const char __pyx_k_kcipt_blossom_v_cy_blossom_v[] = "kcipt.blossom_v.cy_blossom_v";
-static const char __pyx_k_Users_sanghacklee_Dropbox_resea[] = "/Users/sanghacklee/Dropbox/research/2014 rcm/workspace/python/KCIPT2017/kcipt/blossom_v/cy_blossom_v.pyx";
+static const char __pyx_k_sdcit_blossom_v_cy_blossom_v[] = "sdcit.blossom_v.cy_blossom_v";
+static const char __pyx_k_Users_sanghacklee_Dropbox_resea[] = "/Users/sanghacklee/Dropbox/research/2014 rcm/workspace/python/SDCIT/sdcit/blossom_v/cy_blossom_v.pyx";
 static const char __pyx_k_numpy_core_multiarray_failed_to[] = "numpy.core.multiarray failed to import";
 static const char __pyx_k_unknown_dtype_code_in_numpy_pxd[] = "unknown dtype code in numpy.pxd (%d)";
 static const char __pyx_k_Format_string_allocated_too_shor[] = "Format string allocated too short, see comment in numpy.pxd";
@@ -1435,7 +1435,6 @@ static PyObject *__pyx_n_s_cy_blossom_v;
 static PyObject *__pyx_n_s_cy_post_2_2_2_to_3_3;
 static PyObject *__pyx_n_s_cy_post_2_3_to_5;
 static PyObject *__pyx_n_s_import;
-static PyObject *__pyx_n_s_kcipt_blossom_v_cy_blossom_v;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_kp_u_ndarray_is_not_C_contiguous;
 static PyObject *__pyx_kp_u_ndarray_is_not_Fortran_contiguou;
@@ -1445,11 +1444,12 @@ static PyObject *__pyx_kp_s_numpy_core_multiarray_failed_to;
 static PyObject *__pyx_kp_s_numpy_core_umath_failed_to_impor;
 static PyObject *__pyx_n_s_output;
 static PyObject *__pyx_n_s_range;
+static PyObject *__pyx_n_s_sdcit_blossom_v_cy_blossom_v;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_kp_u_unknown_dtype_code_in_numpy_pxd;
-static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_cy_blossom_v(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_D, PyArrayObject *__pyx_v_output); /* proto */
-static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_2cy_post_2_2_2_to_3_3(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_D, PyArrayObject *__pyx_v_comps_of_2, PyArrayObject *__pyx_v_abcdefs); /* proto */
-static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_4cy_post_2_3_to_5(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_D, PyArrayObject *__pyx_v_comps_of_2, PyArrayObject *__pyx_v_comps_of_3, PyArrayObject *__pyx_v_abcdes); /* proto */
+static PyObject *__pyx_pf_5sdcit_9blossom_v_12cy_blossom_v_cy_blossom_v(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_D, PyArrayObject *__pyx_v_output); /* proto */
+static PyObject *__pyx_pf_5sdcit_9blossom_v_12cy_blossom_v_2cy_post_2_2_2_to_3_3(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_D, PyArrayObject *__pyx_v_comps_of_2, PyArrayObject *__pyx_v_abcdefs); /* proto */
+static PyObject *__pyx_pf_5sdcit_9blossom_v_12cy_blossom_v_4cy_post_2_3_to_5(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_D, PyArrayObject *__pyx_v_comps_of_2, PyArrayObject *__pyx_v_comps_of_3, PyArrayObject *__pyx_v_abcdes); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
 static PyObject *__pyx_tuple_;
@@ -1468,7 +1468,7 @@ static PyObject *__pyx_codeobj__11;
 static PyObject *__pyx_codeobj__13;
 static PyObject *__pyx_codeobj__15;
 
-/* "kcipt/blossom_v/cy_blossom_v.pyx":12
+/* "sdcit/blossom_v/cy_blossom_v.pyx":12
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * def cy_blossom_v(np.ndarray[double, ndim=2, mode="c"] D not None, np.ndarray[int, ndim=1, mode="c"] output not None):             # <<<<<<<<<<<<<<
@@ -1477,9 +1477,9 @@ static PyObject *__pyx_codeobj__15;
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_1cy_blossom_v(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5kcipt_9blossom_v_12cy_blossom_v_1cy_blossom_v = {"cy_blossom_v", (PyCFunction)__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_1cy_blossom_v, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_1cy_blossom_v(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5sdcit_9blossom_v_12cy_blossom_v_1cy_blossom_v(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5sdcit_9blossom_v_12cy_blossom_v_1cy_blossom_v = {"cy_blossom_v", (PyCFunction)__pyx_pw_5sdcit_9blossom_v_12cy_blossom_v_1cy_blossom_v, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sdcit_9blossom_v_12cy_blossom_v_1cy_blossom_v(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_D = 0;
   PyArrayObject *__pyx_v_output = 0;
   PyObject *__pyx_r = 0;
@@ -1524,13 +1524,13 @@ static PyObject *__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_1cy_blossom_v(PyObjec
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("cy_blossom_v", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 12, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("kcipt.blossom_v.cy_blossom_v.cy_blossom_v", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("sdcit.blossom_v.cy_blossom_v.cy_blossom_v", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_D), __pyx_ptype_5numpy_ndarray, 0, "D", 0))) __PYX_ERR(0, 12, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output), __pyx_ptype_5numpy_ndarray, 0, "output", 0))) __PYX_ERR(0, 12, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_cy_blossom_v(__pyx_self, __pyx_v_D, __pyx_v_output);
+  __pyx_r = __pyx_pf_5sdcit_9blossom_v_12cy_blossom_v_cy_blossom_v(__pyx_self, __pyx_v_D, __pyx_v_output);
 
   /* function exit code */
   goto __pyx_L0;
@@ -1541,7 +1541,7 @@ static PyObject *__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_1cy_blossom_v(PyObjec
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_cy_blossom_v(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_D, PyArrayObject *__pyx_v_output) {
+static PyObject *__pyx_pf_5sdcit_9blossom_v_12cy_blossom_v_cy_blossom_v(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_D, PyArrayObject *__pyx_v_output) {
   __Pyx_LocalBuf_ND __pyx_pybuffernd_D;
   __Pyx_Buffer __pyx_pybuffer_D;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_output;
@@ -1571,7 +1571,7 @@ static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_cy_blossom_v(CYTHON_U
   }
   __pyx_pybuffernd_output.diminfo[0].strides = __pyx_pybuffernd_output.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_output.diminfo[0].shape = __pyx_pybuffernd_output.rcbuffer->pybuffer.shape[0];
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":13
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":13
  * @cython.wraparound(False)
  * def cy_blossom_v(np.ndarray[double, ndim=2, mode="c"] D not None, np.ndarray[int, ndim=1, mode="c"] output not None):
  *     c_cy_blossom_v(&D[0, 0], &output[0], D.shape[0])             # <<<<<<<<<<<<<<
@@ -1583,7 +1583,7 @@ static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_cy_blossom_v(CYTHON_U
   __pyx_t_3 = 0;
   c_cy_blossom_v((&(*__Pyx_BufPtrCContig2d(double *, __pyx_pybuffernd_D.rcbuffer->pybuffer.buf, __pyx_t_1, __pyx_pybuffernd_D.diminfo[0].strides, __pyx_t_2, __pyx_pybuffernd_D.diminfo[1].strides))), (&(*__Pyx_BufPtrCContig1d(int *, __pyx_pybuffernd_output.rcbuffer->pybuffer.buf, __pyx_t_3, __pyx_pybuffernd_output.diminfo[0].strides))), (__pyx_v_D->dimensions[0]));
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":12
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":12
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * def cy_blossom_v(np.ndarray[double, ndim=2, mode="c"] D not None, np.ndarray[int, ndim=1, mode="c"] output not None):             # <<<<<<<<<<<<<<
@@ -1602,7 +1602,7 @@ static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_cy_blossom_v(CYTHON_U
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_D.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_output.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("kcipt.blossom_v.cy_blossom_v.cy_blossom_v", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("sdcit.blossom_v.cy_blossom_v.cy_blossom_v", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -1614,7 +1614,7 @@ static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_cy_blossom_v(CYTHON_U
   return __pyx_r;
 }
 
-/* "kcipt/blossom_v/cy_blossom_v.pyx":17
+/* "sdcit/blossom_v/cy_blossom_v.pyx":17
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * def cy_post_2_2_2_to_3_3(np.ndarray[double, ndim=2, mode="c"] D not None,             # <<<<<<<<<<<<<<
@@ -1623,9 +1623,9 @@ static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_cy_blossom_v(CYTHON_U
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_3cy_post_2_2_2_to_3_3(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5kcipt_9blossom_v_12cy_blossom_v_3cy_post_2_2_2_to_3_3 = {"cy_post_2_2_2_to_3_3", (PyCFunction)__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_3cy_post_2_2_2_to_3_3, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_3cy_post_2_2_2_to_3_3(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5sdcit_9blossom_v_12cy_blossom_v_3cy_post_2_2_2_to_3_3(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5sdcit_9blossom_v_12cy_blossom_v_3cy_post_2_2_2_to_3_3 = {"cy_post_2_2_2_to_3_3", (PyCFunction)__pyx_pw_5sdcit_9blossom_v_12cy_blossom_v_3cy_post_2_2_2_to_3_3, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sdcit_9blossom_v_12cy_blossom_v_3cy_post_2_2_2_to_3_3(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_D = 0;
   PyArrayObject *__pyx_v_comps_of_2 = 0;
   PyArrayObject *__pyx_v_abcdefs = 0;
@@ -1679,14 +1679,14 @@ static PyObject *__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_3cy_post_2_2_2_to_3_3
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("cy_post_2_2_2_to_3_3", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 17, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("kcipt.blossom_v.cy_blossom_v.cy_post_2_2_2_to_3_3", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("sdcit.blossom_v.cy_blossom_v.cy_post_2_2_2_to_3_3", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_D), __pyx_ptype_5numpy_ndarray, 0, "D", 0))) __PYX_ERR(0, 17, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_comps_of_2), __pyx_ptype_5numpy_ndarray, 0, "comps_of_2", 0))) __PYX_ERR(0, 18, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_abcdefs), __pyx_ptype_5numpy_ndarray, 0, "abcdefs", 0))) __PYX_ERR(0, 19, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_2cy_post_2_2_2_to_3_3(__pyx_self, __pyx_v_D, __pyx_v_comps_of_2, __pyx_v_abcdefs);
+  __pyx_r = __pyx_pf_5sdcit_9blossom_v_12cy_blossom_v_2cy_post_2_2_2_to_3_3(__pyx_self, __pyx_v_D, __pyx_v_comps_of_2, __pyx_v_abcdefs);
 
   /* function exit code */
   goto __pyx_L0;
@@ -1697,7 +1697,7 @@ static PyObject *__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_3cy_post_2_2_2_to_3_3
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_2cy_post_2_2_2_to_3_3(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_D, PyArrayObject *__pyx_v_comps_of_2, PyArrayObject *__pyx_v_abcdefs) {
+static PyObject *__pyx_pf_5sdcit_9blossom_v_12cy_blossom_v_2cy_post_2_2_2_to_3_3(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_D, PyArrayObject *__pyx_v_comps_of_2, PyArrayObject *__pyx_v_abcdefs) {
   __Pyx_LocalBuf_ND __pyx_pybuffernd_D;
   __Pyx_Buffer __pyx_pybuffer_D;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_abcdefs;
@@ -1741,7 +1741,7 @@ static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_2cy_post_2_2_2_to_3_3
   }
   __pyx_pybuffernd_abcdefs.diminfo[0].strides = __pyx_pybuffernd_abcdefs.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_abcdefs.diminfo[0].shape = __pyx_pybuffernd_abcdefs.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_abcdefs.diminfo[1].strides = __pyx_pybuffernd_abcdefs.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_abcdefs.diminfo[1].shape = __pyx_pybuffernd_abcdefs.rcbuffer->pybuffer.shape[1];
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":20
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":20
  *                          np.ndarray[int, ndim=1, mode="c"] comps_of_2 not None,
  *                          np.ndarray[int, ndim=2, mode="c"] abcdefs not None):
  *     c_cy_post_2_2_2_to_3_3(&D[0, 0], &comps_of_2[0], &abcdefs[0, 0], len(comps_of_2) / 2, D.shape[0])             # <<<<<<<<<<<<<<
@@ -1756,7 +1756,7 @@ static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_2cy_post_2_2_2_to_3_3
   __pyx_t_6 = PyObject_Length(((PyObject *)__pyx_v_comps_of_2)); if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 20, __pyx_L1_error)
   c_cy_post_2_2_2_to_3_3((&(*__Pyx_BufPtrCContig2d(double *, __pyx_pybuffernd_D.rcbuffer->pybuffer.buf, __pyx_t_1, __pyx_pybuffernd_D.diminfo[0].strides, __pyx_t_2, __pyx_pybuffernd_D.diminfo[1].strides))), (&(*__Pyx_BufPtrCContig1d(int *, __pyx_pybuffernd_comps_of_2.rcbuffer->pybuffer.buf, __pyx_t_3, __pyx_pybuffernd_comps_of_2.diminfo[0].strides))), (&(*__Pyx_BufPtrCContig2d(int *, __pyx_pybuffernd_abcdefs.rcbuffer->pybuffer.buf, __pyx_t_4, __pyx_pybuffernd_abcdefs.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_abcdefs.diminfo[1].strides))), __Pyx_div_Py_ssize_t(__pyx_t_6, 2), (__pyx_v_D->dimensions[0]));
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":17
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":17
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * def cy_post_2_2_2_to_3_3(np.ndarray[double, ndim=2, mode="c"] D not None,             # <<<<<<<<<<<<<<
@@ -1776,7 +1776,7 @@ static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_2cy_post_2_2_2_to_3_3
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_abcdefs.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_comps_of_2.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("kcipt.blossom_v.cy_blossom_v.cy_post_2_2_2_to_3_3", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("sdcit.blossom_v.cy_blossom_v.cy_post_2_2_2_to_3_3", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -1789,7 +1789,7 @@ static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_2cy_post_2_2_2_to_3_3
   return __pyx_r;
 }
 
-/* "kcipt/blossom_v/cy_blossom_v.pyx":24
+/* "sdcit/blossom_v/cy_blossom_v.pyx":24
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * def cy_post_2_3_to_5(np.ndarray[double, ndim=2, mode="c"] D not None,             # <<<<<<<<<<<<<<
@@ -1798,9 +1798,9 @@ static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_2cy_post_2_2_2_to_3_3
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_5cy_post_2_3_to_5(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5kcipt_9blossom_v_12cy_blossom_v_5cy_post_2_3_to_5 = {"cy_post_2_3_to_5", (PyCFunction)__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_5cy_post_2_3_to_5, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_5cy_post_2_3_to_5(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5sdcit_9blossom_v_12cy_blossom_v_5cy_post_2_3_to_5(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5sdcit_9blossom_v_12cy_blossom_v_5cy_post_2_3_to_5 = {"cy_post_2_3_to_5", (PyCFunction)__pyx_pw_5sdcit_9blossom_v_12cy_blossom_v_5cy_post_2_3_to_5, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5sdcit_9blossom_v_12cy_blossom_v_5cy_post_2_3_to_5(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_D = 0;
   PyArrayObject *__pyx_v_comps_of_2 = 0;
   PyArrayObject *__pyx_v_comps_of_3 = 0;
@@ -1863,7 +1863,7 @@ static PyObject *__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_5cy_post_2_3_to_5(PyO
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("cy_post_2_3_to_5", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 24, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("kcipt.blossom_v.cy_blossom_v.cy_post_2_3_to_5", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("sdcit.blossom_v.cy_blossom_v.cy_post_2_3_to_5", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
@@ -1871,7 +1871,7 @@ static PyObject *__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_5cy_post_2_3_to_5(PyO
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_comps_of_2), __pyx_ptype_5numpy_ndarray, 0, "comps_of_2", 0))) __PYX_ERR(0, 25, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_comps_of_3), __pyx_ptype_5numpy_ndarray, 0, "comps_of_3", 0))) __PYX_ERR(0, 26, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_abcdes), __pyx_ptype_5numpy_ndarray, 0, "abcdes", 0))) __PYX_ERR(0, 27, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_4cy_post_2_3_to_5(__pyx_self, __pyx_v_D, __pyx_v_comps_of_2, __pyx_v_comps_of_3, __pyx_v_abcdes);
+  __pyx_r = __pyx_pf_5sdcit_9blossom_v_12cy_blossom_v_4cy_post_2_3_to_5(__pyx_self, __pyx_v_D, __pyx_v_comps_of_2, __pyx_v_comps_of_3, __pyx_v_abcdes);
 
   /* function exit code */
   goto __pyx_L0;
@@ -1882,7 +1882,7 @@ static PyObject *__pyx_pw_5kcipt_9blossom_v_12cy_blossom_v_5cy_post_2_3_to_5(PyO
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_4cy_post_2_3_to_5(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_D, PyArrayObject *__pyx_v_comps_of_2, PyArrayObject *__pyx_v_comps_of_3, PyArrayObject *__pyx_v_abcdes) {
+static PyObject *__pyx_pf_5sdcit_9blossom_v_12cy_blossom_v_4cy_post_2_3_to_5(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_D, PyArrayObject *__pyx_v_comps_of_2, PyArrayObject *__pyx_v_comps_of_3, PyArrayObject *__pyx_v_abcdes) {
   __Pyx_LocalBuf_ND __pyx_pybuffernd_D;
   __Pyx_Buffer __pyx_pybuffer_D;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_abcdes;
@@ -1939,7 +1939,7 @@ static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_4cy_post_2_3_to_5(CYT
   }
   __pyx_pybuffernd_abcdes.diminfo[0].strides = __pyx_pybuffernd_abcdes.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_abcdes.diminfo[0].shape = __pyx_pybuffernd_abcdes.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_abcdes.diminfo[1].strides = __pyx_pybuffernd_abcdes.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_abcdes.diminfo[1].shape = __pyx_pybuffernd_abcdes.rcbuffer->pybuffer.shape[1];
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":28
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":28
  *                      np.ndarray[int, ndim=1, mode="c"] comps_of_3 not None,
  *                      np.ndarray[int, ndim=2, mode="c"] abcdes not None):
  *     c_cy_post_2_3_to_5(&D[0, 0], &comps_of_2[0], &comps_of_3[0], &abcdes[0, 0], len(comps_of_2) / 2,             # <<<<<<<<<<<<<<
@@ -1953,14 +1953,14 @@ static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_4cy_post_2_3_to_5(CYT
   __pyx_t_6 = 0;
   __pyx_t_7 = PyObject_Length(((PyObject *)__pyx_v_comps_of_2)); if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 28, __pyx_L1_error)
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":29
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":29
  *                      np.ndarray[int, ndim=2, mode="c"] abcdes not None):
  *     c_cy_post_2_3_to_5(&D[0, 0], &comps_of_2[0], &comps_of_3[0], &abcdes[0, 0], len(comps_of_2) / 2,
  *                        len(comps_of_3) / 3, D.shape[0])             # <<<<<<<<<<<<<<
  */
   __pyx_t_8 = PyObject_Length(((PyObject *)__pyx_v_comps_of_3)); if (unlikely(__pyx_t_8 == -1)) __PYX_ERR(0, 29, __pyx_L1_error)
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":28
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":28
  *                      np.ndarray[int, ndim=1, mode="c"] comps_of_3 not None,
  *                      np.ndarray[int, ndim=2, mode="c"] abcdes not None):
  *     c_cy_post_2_3_to_5(&D[0, 0], &comps_of_2[0], &comps_of_3[0], &abcdes[0, 0], len(comps_of_2) / 2,             # <<<<<<<<<<<<<<
@@ -1968,7 +1968,7 @@ static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_4cy_post_2_3_to_5(CYT
  */
   c_cy_post_2_3_to_5((&(*__Pyx_BufPtrCContig2d(double *, __pyx_pybuffernd_D.rcbuffer->pybuffer.buf, __pyx_t_1, __pyx_pybuffernd_D.diminfo[0].strides, __pyx_t_2, __pyx_pybuffernd_D.diminfo[1].strides))), (&(*__Pyx_BufPtrCContig1d(int *, __pyx_pybuffernd_comps_of_2.rcbuffer->pybuffer.buf, __pyx_t_3, __pyx_pybuffernd_comps_of_2.diminfo[0].strides))), (&(*__Pyx_BufPtrCContig1d(int *, __pyx_pybuffernd_comps_of_3.rcbuffer->pybuffer.buf, __pyx_t_4, __pyx_pybuffernd_comps_of_3.diminfo[0].strides))), (&(*__Pyx_BufPtrCContig2d(int *, __pyx_pybuffernd_abcdes.rcbuffer->pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_abcdes.diminfo[0].strides, __pyx_t_6, __pyx_pybuffernd_abcdes.diminfo[1].strides))), __Pyx_div_Py_ssize_t(__pyx_t_7, 2), __Pyx_div_Py_ssize_t(__pyx_t_8, 3), (__pyx_v_D->dimensions[0]));
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":24
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":24
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * def cy_post_2_3_to_5(np.ndarray[double, ndim=2, mode="c"] D not None,             # <<<<<<<<<<<<<<
@@ -1989,7 +1989,7 @@ static PyObject *__pyx_pf_5kcipt_9blossom_v_12cy_blossom_v_4cy_post_2_3_to_5(CYT
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_comps_of_2.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_comps_of_3.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("kcipt.blossom_v.cy_blossom_v.cy_post_2_3_to_5", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("sdcit.blossom_v.cy_blossom_v.cy_post_2_3_to_5", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -4556,7 +4556,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_cy_post_2_2_2_to_3_3, __pyx_k_cy_post_2_2_2_to_3_3, sizeof(__pyx_k_cy_post_2_2_2_to_3_3), 0, 0, 1, 1},
   {&__pyx_n_s_cy_post_2_3_to_5, __pyx_k_cy_post_2_3_to_5, sizeof(__pyx_k_cy_post_2_3_to_5), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
-  {&__pyx_n_s_kcipt_blossom_v_cy_blossom_v, __pyx_k_kcipt_blossom_v_cy_blossom_v, sizeof(__pyx_k_kcipt_blossom_v_cy_blossom_v), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_kp_u_ndarray_is_not_C_contiguous, __pyx_k_ndarray_is_not_C_contiguous, sizeof(__pyx_k_ndarray_is_not_C_contiguous), 0, 1, 0, 0},
   {&__pyx_kp_u_ndarray_is_not_Fortran_contiguou, __pyx_k_ndarray_is_not_Fortran_contiguou, sizeof(__pyx_k_ndarray_is_not_Fortran_contiguou), 0, 1, 0, 0},
@@ -4566,6 +4565,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_numpy_core_umath_failed_to_impor, __pyx_k_numpy_core_umath_failed_to_impor, sizeof(__pyx_k_numpy_core_umath_failed_to_impor), 0, 0, 1, 0},
   {&__pyx_n_s_output, __pyx_k_output, sizeof(__pyx_k_output), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
+  {&__pyx_n_s_sdcit_blossom_v_cy_blossom_v, __pyx_k_sdcit_blossom_v_cy_blossom_v, sizeof(__pyx_k_sdcit_blossom_v_cy_blossom_v), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_kp_u_unknown_dtype_code_in_numpy_pxd, __pyx_k_unknown_dtype_code_in_numpy_pxd, sizeof(__pyx_k_unknown_dtype_code_in_numpy_pxd), 0, 1, 0, 0},
   {0, 0, 0, 0, 0, 0, 0}
@@ -4681,7 +4681,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__9);
   __Pyx_GIVEREF(__pyx_tuple__9);
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":12
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":12
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * def cy_blossom_v(np.ndarray[double, ndim=2, mode="c"] D not None, np.ndarray[int, ndim=1, mode="c"] output not None):             # <<<<<<<<<<<<<<
@@ -4693,7 +4693,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__10);
   __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_sanghacklee_Dropbox_resea, __pyx_n_s_cy_blossom_v, 12, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 12, __pyx_L1_error)
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":17
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":17
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * def cy_post_2_2_2_to_3_3(np.ndarray[double, ndim=2, mode="c"] D not None,             # <<<<<<<<<<<<<<
@@ -4705,7 +4705,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__12);
   __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(3, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_sanghacklee_Dropbox_resea, __pyx_n_s_cy_post_2_2_2_to_3_3, 17, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 17, __pyx_L1_error)
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":24
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":24
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * def cy_post_2_3_to_5(np.ndarray[double, ndim=2, mode="c"] D not None,             # <<<<<<<<<<<<<<
@@ -4795,14 +4795,14 @@ PyMODINIT_FUNC PyInit_cy_blossom_v(void)
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_kcipt__blossom_v__cy_blossom_v) {
+  if (__pyx_module_is_main_sdcit__blossom_v__cy_blossom_v) {
     if (PyObject_SetAttrString(__pyx_m, "__name__", __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "kcipt.blossom_v.cy_blossom_v")) {
-      if (unlikely(PyDict_SetItemString(modules, "kcipt.blossom_v.cy_blossom_v", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "sdcit.blossom_v.cy_blossom_v")) {
+      if (unlikely(PyDict_SetItemString(modules, "sdcit.blossom_v.cy_blossom_v", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -4834,7 +4834,7 @@ PyMODINIT_FUNC PyInit_cy_blossom_v(void)
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":3
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":3
  * cimport numpy as np
  * import cython
  * import numpy as np             # <<<<<<<<<<<<<<
@@ -4846,43 +4846,43 @@ PyMODINIT_FUNC PyInit_cy_blossom_v(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":12
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":12
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * def cy_blossom_v(np.ndarray[double, ndim=2, mode="c"] D not None, np.ndarray[int, ndim=1, mode="c"] output not None):             # <<<<<<<<<<<<<<
  *     c_cy_blossom_v(&D[0, 0], &output[0], D.shape[0])
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5kcipt_9blossom_v_12cy_blossom_v_1cy_blossom_v, NULL, __pyx_n_s_kcipt_blossom_v_cy_blossom_v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5sdcit_9blossom_v_12cy_blossom_v_1cy_blossom_v, NULL, __pyx_n_s_sdcit_blossom_v_cy_blossom_v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_cy_blossom_v, __pyx_t_1) < 0) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":17
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":17
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * def cy_post_2_2_2_to_3_3(np.ndarray[double, ndim=2, mode="c"] D not None,             # <<<<<<<<<<<<<<
  *                          np.ndarray[int, ndim=1, mode="c"] comps_of_2 not None,
  *                          np.ndarray[int, ndim=2, mode="c"] abcdefs not None):
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5kcipt_9blossom_v_12cy_blossom_v_3cy_post_2_2_2_to_3_3, NULL, __pyx_n_s_kcipt_blossom_v_cy_blossom_v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5sdcit_9blossom_v_12cy_blossom_v_3cy_post_2_2_2_to_3_3, NULL, __pyx_n_s_sdcit_blossom_v_cy_blossom_v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_cy_post_2_2_2_to_3_3, __pyx_t_1) < 0) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":24
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":24
  * @cython.boundscheck(False)
  * @cython.wraparound(False)
  * def cy_post_2_3_to_5(np.ndarray[double, ndim=2, mode="c"] D not None,             # <<<<<<<<<<<<<<
  *                      np.ndarray[int, ndim=1, mode="c"] comps_of_2 not None,
  *                      np.ndarray[int, ndim=1, mode="c"] comps_of_3 not None,
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5kcipt_9blossom_v_12cy_blossom_v_5cy_post_2_3_to_5, NULL, __pyx_n_s_kcipt_blossom_v_cy_blossom_v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5sdcit_9blossom_v_12cy_blossom_v_5cy_post_2_3_to_5, NULL, __pyx_n_s_sdcit_blossom_v_cy_blossom_v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_cy_post_2_3_to_5, __pyx_t_1) < 0) __PYX_ERR(0, 24, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "kcipt/blossom_v/cy_blossom_v.pyx":1
+  /* "sdcit/blossom_v/cy_blossom_v.pyx":1
  * cimport numpy as np             # <<<<<<<<<<<<<<
  * import cython
  * import numpy as np
@@ -4907,11 +4907,11 @@ PyMODINIT_FUNC PyInit_cy_blossom_v(void)
   __Pyx_XDECREF(__pyx_t_1);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init kcipt.blossom_v.cy_blossom_v", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init sdcit.blossom_v.cy_blossom_v", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_DECREF(__pyx_m); __pyx_m = 0;
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init kcipt.blossom_v.cy_blossom_v");
+    PyErr_SetString(PyExc_ImportError, "init sdcit.blossom_v.cy_blossom_v");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

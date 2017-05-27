@@ -8,7 +8,7 @@ from tqdm import tqdm
 from tqdm import trange
 
 from UAI_2017_SDCIT_experiments.testing_utils import *
-from sdcit.algo import c_KCIPT
+from sdcit.kcipt import c_KCIPT
 from sdcit.utils import *
 
 

@@ -7,6 +7,14 @@ from numpy.matlib import repmat
 from sklearn.metrics import euclidean_distances
 
 
+def centering(M):
+    nr, nc = M.shape
+    assert nr == nc
+    n = nr
+    H = np.eye(n) - np.ones((n, n)) / n
+    return H @ M @ H
+
+
 def median_heuristic(data, *args):
     """A list of RBF kernel matrices for data sets in arguments based on median heuristic"""
     if args is None:

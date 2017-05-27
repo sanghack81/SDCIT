@@ -1,4 +1,5 @@
 from sdcit.algo import c_KCIPT
+
 from sdcit.cython_impl.cy_kcipt import cy_sdcit
 from sdcit.permutation import permuted
 from sdcit.utils import *
@@ -61,12 +62,8 @@ def emp_MMSD(kxz, ky, Dz, b):
     return 0.5 * (empirical_distr - empirical_distr.mean()) + empirical_distr.mean()
 
 
-def SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, adjust_null=True, adjust_statistic_factor=0):
+def SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, adjust_null=True):
     print('deprecated, use SDCIT2')
-    if adjust_statistic_factor and not adjust_null:
-        warnings.warn('test statistic is only adjusted if null is adjusted (set adjust_null=True)')
-    if adjust_statistic_factor < 0:
-        warnings.warn('0 <= adjust_statistic_factor <= 1.0, (Recommended: 0.5)')
 
     if seed is not None:
         np.random.seed(seed)
@@ -88,8 +85,6 @@ def SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=N
     null_bias = raw_null.mean()
     if adjust_null:
         null = raw_null - raw_null.mean()
-        if adjust_statistic_factor:
-            test_statistic -= adjust_statistic_factor * null_bias
     else:
         null = raw_null
 
