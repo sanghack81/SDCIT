@@ -1,6 +1,6 @@
-from sdcit.algo import c_KCIPT
+from sdcit.kcipt import c_KCIPT
 
-from sdcit.cython_impl.cy_kcipt import cy_sdcit
+from sdcit.cython_impl.cy_sdcit import cy_sdcit
 from sdcit.permutation import permuted
 from sdcit.utils import *
 
@@ -82,7 +82,6 @@ def SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=N
                         penalized_distance(Dz, mask),
                         size_of_null_sample)
 
-    null_bias = raw_null.mean()
     if adjust_null:
         null = raw_null - raw_null.mean()
     else:

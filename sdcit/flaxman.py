@@ -85,6 +85,7 @@ def normalize(X):
 
 
 def check_cond_indep_real(X, Y, Z=None):
+    """Flaxman et al. Residualization-based CI Test"""
     if Z is not None:
         X = normalize(X)
         Y = normalize(Y)
@@ -122,30 +123,3 @@ def check_cond_indep_real(X, Y, Z=None):
         R1 = np.exp(-D1_sq / 2 / D1_sq_median)
         R2 = np.exp(-D2_sq / 2 / D2_sq_median)
         return HSIC(R1, R2)
-
-
-if __name__ == '__main__':
-    n = 500
-    for mix in [0.0, 0.1, 0.2, 0.5, 1.0]:
-        X = np.random.randn(n, 1)
-        Y = mix * X + np.random.randn(n, 1)
-        Z = X + np.random.randn(n, 1)
-
-        DX = pairwise_distances(X, metric='sqeuclidean')
-        DY = pairwise_distances(Y, metric='sqeuclidean')
-        DZ = pairwise_distances(Z, metric='sqeuclidean')
-        KX = np.exp(-DX / 2)
-        KY = np.exp(-DY / 2)
-        KZ = np.exp(-DZ / 2)
-
-        I = np.eye(len(KX))
-        sigma = 0.5
-
-        phi = np.random.randn(n, 1)
-
-        # assert np.allclose(KX - KX @ inv(KX + sigma ** 2 * I) @ KX, KX @ inv(I + sigma ** (-2) * KX))  # check Eq 15.
-        # assert np.allclose(KX @ inv(KX + sigma ** 2 * I) @ phi - phi, -inv(I + sigma ** (-2) * KX) @ phi)  # check Eq 16
-        print('{:.4f} {:.4f}'.format(mix, HSIC(KX, KY)))
-        print('{:.4f} {:.4f}'.format(mix, check_cond_indep(KX, KY, KZ, 1.0e-4, 1.0e-4)))
-        print('{:.4f} {:.4f}'.format(mix, check_cond_indep_real(X, Y, Z)))
-        print()

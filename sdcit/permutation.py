@@ -1,6 +1,6 @@
 import numpy as np
 
-from sdcit.cython_impl.cy_kcipt import cy_split_permutation, cy_dense_permutation
+from sdcit.cython_impl.cy_sdcit import cy_split_permutation, cy_dense_permutation
 
 
 def permuted(D, dense=True):

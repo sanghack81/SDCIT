@@ -2,7 +2,7 @@ import numpy as np
 import numpy.ma as ma
 from sklearn.linear_model import LinearRegression
 
-from sdcit.cython_impl.cy_kcipt import cy_sdcit2
+from sdcit.cython_impl.cy_sdcit import cy_sdcit2
 from sdcit.sdcit import penalized_distance, perm_and_mask
 from sdcit.utils import K2D, p_value_of, random_seeds
 
@@ -37,12 +37,16 @@ def emp_MMSD(kxz: np.ndarray, ky: np.ndarray, kz: np.ndarray, Dz: np.ndarray, b:
     return 0.5 * (empirical_distr - empirical_distr.mean()) + empirical_distr.mean(), 0.5 * (empirical_error_distr - empirical_error_distr.mean()) + empirical_error_distr.mean()
 
 
-def _adjust_errors(null_errors, null, error, test_statistic):
+def adjust_errors(null_errors, null, error=None, test_statistic=None):
+    if error is not None:
+        assert test_statistic is not None
     model = LinearRegression().fit(null_errors[:, None], null[:, None])
     beta = model.coef_[0, 0]
     beta = max(0, beta)
-    return null - null_errors * beta, test_statistic - error * beta
-
+    if error is not None:
+        return null - null_errors * beta, test_statistic - error * beta
+    else:
+        return null - null_errors * beta
 
 def bias_reduced_SDCIT(kx: np.ndarray, ky: np.ndarray, kz: np.ndarray, Dz=None, size_of_null_sample=1000, with_null=False, seed=None):
     if seed is not None:
@@ -63,7 +67,7 @@ def bias_reduced_SDCIT(kx: np.ndarray, ky: np.ndarray, kz: np.ndarray, Dz=None, 
                                         penalized_distance(Dz, mask),
                                         size_of_null_sample)
 
-    fix_null, fix_test_statistic = _adjust_errors(raw_null_error, raw_null, error_statistic, test_statistic)
+    fix_null, fix_test_statistic = adjust_errors(raw_null_error, raw_null, error_statistic, test_statistic)
     fix_null = fix_null - fix_null.mean()  # why? why not?
     if with_null:
         return fix_test_statistic, p_value_of(fix_test_statistic, fix_null), fix_null
@@ -85,6 +89,7 @@ def c_SDCIT2(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, see
 
     kxz = kx * kz
 
+    # prepare parameters & output variables
     K_XZ = np.ascontiguousarray(kxz, dtype=np.float64)
     K_Y = np.ascontiguousarray(ky, dtype=np.float64)
     K_Z = np.ascontiguousarray(kz, dtype=np.float64)
@@ -94,14 +99,15 @@ def c_SDCIT2(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, see
     mmsd = np.zeros((1,), dtype='float64')
     error_mmsd = np.zeros((1,), dtype='float64')
 
+    # run SDCIT
     cy_sdcit2(K_XZ, K_Y, K_Z, D_Z, size_of_null_sample, seed, n_jobs, mmsd, error_mmsd, raw_null, error_raw_null)
-    raw_null = 0.5 * (raw_null - raw_null.mean()) + raw_null.mean()
-    error_raw_null = 0.5 * (error_raw_null - error_raw_null.mean()) + error_raw_null.mean()
 
+    # postprocess outputs
     test_statistic = mmsd[0]
     error_statistic = error_mmsd[0]
-
-    fixed_null, fix_test_statistic = _adjust_errors(error_raw_null, raw_null, error_statistic, test_statistic)
+    raw_null = 0.5 * (raw_null - raw_null.mean()) + raw_null.mean()
+    error_raw_null = 0.5 * (error_raw_null - error_raw_null.mean()) + error_raw_null.mean()
+    fixed_null, fix_test_statistic = adjust_errors(error_raw_null, raw_null, error_statistic, test_statistic)
     fixed_null = fixed_null - fixed_null.mean()  # why? why not?
     if with_null:
         return fix_test_statistic, p_value_of(fix_test_statistic, fixed_null), fixed_null

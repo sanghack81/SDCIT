@@ -8,6 +8,7 @@ from sklearn.metrics import euclidean_distances
 
 
 def centering(M):
+    """Matrix Centering"""
     nr, nc = M.shape
     assert nr == nc
     n = nr
@@ -15,7 +16,7 @@ def centering(M):
     return H @ M @ H
 
 
-def median_heuristic(data, *args):
+def rbf_kernel_with_median_heuristic(data, *args):
     """A list of RBF kernel matrices for data sets in arguments based on median heuristic"""
     if args is None:
         args = []

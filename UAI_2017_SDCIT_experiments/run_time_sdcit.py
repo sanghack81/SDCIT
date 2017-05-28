@@ -5,19 +5,20 @@ from os.path import exists
 import pandas as pd
 import scipy.io
 
+from UAI_2017_SDCIT_experiments.exp_setup import *
 from sdcit.sdcit2 import c_SDCIT2
-from sdcit.utils import median_heuristic, K2D
+from sdcit.utils import rbf_kernel_with_median_heuristic, K2D
 
 if __name__ == '__main__':
     # experiments
-    fname = 'results/c_sdcit_time.csv'
+    fname = SDCIT_RESULT_DIR + '/c_sdcit_time.csv'
     independent = 1
     if not exists(fname):
         with open(fname, 'w') as f:
             for N in [200, 400]:
                 for b in [500, 1000]:
                     for trial in range(300):
-                        mat_load = scipy.io.loadmat(os.path.expanduser('~/kcipt_data/{}_{}_{}_{}_chaotic.mat'.format('0.0', trial, independent, N)), squeeze_me=True, struct_as_record=False)
+                        mat_load = scipy.io.loadmat(os.path.expanduser(SDCIT_DATA_DIR + '/{}_{}_{}_{}_chaotic.mat'.format('0.0', trial, independent, N)), squeeze_me=True, struct_as_record=False)
                         data = mat_load['data']
                         X = data.Yt1
                         Y = data.Xt
@@ -25,9 +26,8 @@ if __name__ == '__main__':
 
                         start = time.time()
 
-                        kkk = median_heuristic(X, Y, Z)
+                        kkk = rbf_kernel_with_median_heuristic(X, Y, Z)
                         Dz = K2D(kkk[-1])
-                        # c_SDCIT(*kkk, Dz=Dz, size_of_null_sample=b, seed=trial)
                         c_SDCIT2(*kkk, Dz=Dz, size_of_null_sample=b, seed=trial)
 
                         endtime = time.time()
@@ -42,15 +42,16 @@ if __name__ == '__main__':
     for key, gdf in df.groupby(by=['N', 'b']):
         print('{}: {:.5f} +- {:.5f}'.format(key, gdf['time'].mean(), gdf['time'].std()))
 
-    # print()
-    # print('KCIT')
-    # df_kcit = pd.read_csv('results/kcit_chaotic_timing.csv', names=['independent', 'gamma', 'noise', 'trial', 'N', 'runtime', 'statistic', 'boot_p_value', 'appr_p_value'])
-    # df_kcit = df_kcit[df_kcit['independent'] == independent]
-    # df_kcit = df_kcit[df_kcit['gamma'] == 0.0]
-    # for key, gdf in df_kcit.groupby(by=['N']):
-    #     assert len(gdf) == 300
-    #     print('{}: {:.2f} +- {:.2f}'.format(key, gdf['runtime'].mean(), gdf['runtime'].std()))
-    #
-    # for key, gdf in df_kcit.groupby(by=['N']):
-    #     assert len(gdf) == 300
-    #     print('{}: {:.5f} +- {:.5f}'.format(key, gdf['runtime'].mean(), gdf['runtime'].std()))
+    if exists(SDCIT_RESULT_DIR + '/kcit_chaotic_timing.csv'):
+        print()
+        print('KCIT')
+        df_kcit = pd.read_csv(SDCIT_RESULT_DIR + '/kcit_chaotic_timing.csv', names=['independent', 'gamma', 'noise', 'trial', 'N', 'runtime', 'statistic', 'boot_p_value', 'appr_p_value'])
+        df_kcit = df_kcit[df_kcit['independent'] == independent]
+        df_kcit = df_kcit[df_kcit['gamma'] == 0.0]
+        for key, gdf in df_kcit.groupby(by=['N']):
+            assert len(gdf) == 300
+            print('{}: {:.2f} +- {:.2f}'.format(key, gdf['runtime'].mean(), gdf['runtime'].std()))
+
+        for key, gdf in df_kcit.groupby(by=['N']):
+            assert len(gdf) == 300
+            print('{}: {:.5f} +- {:.5f}'.format(key, gdf['runtime'].mean(), gdf['runtime'].std()))

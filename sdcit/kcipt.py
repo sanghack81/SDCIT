@@ -1,4 +1,4 @@
-from sdcit.cython_impl.cy_kcipt import cy_kcipt, cy_adj_kcipt
+from sdcit.cython_impl.cy_sdcit import cy_kcipt, cy_adj_kcipt
 
 from sdcit.utils import *
 

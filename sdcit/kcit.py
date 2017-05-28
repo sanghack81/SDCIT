@@ -57,9 +57,12 @@ def kcit_lee(Kx, Ky, Kz, seed=None, mateng=None, installed_at='~/Dropbox/researc
             mateng.quit()
 
 
-def reduce_eig(eig_Ky, eiy, Thresh):
+def reduce_eig(eig_Ky, eiy=None, Thresh=1e-5):
     IIy = np.where(eig_Ky > max(eig_Ky) * Thresh)[0]
-    return eig_Ky[IIy], eiy[:, IIy]
+    if eiy is not None:
+        return eig_Ky[IIy], eiy[:, IIy]
+    else:
+        return eig_Ky[IIy]
 
 
 def normalizes(xs):
@@ -113,32 +116,23 @@ def kernel(x, xKern=None, theta=0):
     return kx
 
 
-def python_kcit(x: np.ndarray, y: np.ndarray, z: np.ndarray, alpha=0.05, width=0.0, with_gp=False, lambda_=1e-3, T_BS=5000, Thresh=1E-5):
-    warnings.warn('under development :).. requires GPflow on the top of TensorFlow')
+def python_kcit(x: np.ndarray, y: np.ndarray, z: np.ndarray, alpha=0.05, width=0.0, with_gp=False, noise=1e-3, num_bootstrap_for_null=5000):
     Num_eig = T = len(y)
 
     x, y, z = normalize(x), normalize(y), normalize(z)
     D = z.shape[1]
 
-    if width == 0:
-        if T <= 200:
-            width = 1.2
-        elif T < 1200:
-            width = 0.7
-        else:
-            width = 0.4
+    width = width_heuristic_by_zhang(T, width)
 
     theta = 1 / (width ** 2 * D)
     Kx = centering(kernel(np.hstack([x, z / 2]), theta=theta))
     Ky = centering(kernel(y, theta=theta))
 
+    I = eye(T)
     if with_gp:
         import GPflow
-        eig_Kx, eix = eigdec((Kx + Kx.T) / 2, min(400, int(T / 4)))
-        eig_Ky, eiy = eigdec((Ky + Ky.T) / 2, min(200, int(T / 5)))
-
-        eig_Kx, eix = reduce_eig(eig_Kx, eix, Thresh)
-        eig_Ky, eiy = reduce_eig(eig_Ky, eiy, Thresh)
+        eig_Kx, eix = reduce_eig(*eigdec((Kx + Kx.T) / 2, min(400, int(T / 4))))
+        eig_Ky, eiy = reduce_eig(*eigdec((Ky + Ky.T) / 2, min(200, int(T / 5))))
 
         gp_x = GPflow.gpr.GPR(z, 2 * sqrt(T) * eix @ diag(sqrt(eig_Kx)) / sqrt(eig_Kx[0]), GPflow.kernels.RBF(D) + GPflow.kernels.White(D))
         gp_y = GPflow.gpr.GPR(z, 2 * sqrt(T) * eiy @ diag(sqrt(eig_Ky)) / sqrt(eig_Ky[0]), GPflow.kernels.RBF(D) + GPflow.kernels.White(D))
@@ -148,52 +142,52 @@ def python_kcit(x: np.ndarray, y: np.ndarray, z: np.ndarray, alpha=0.05, width=0
         Kz_x = gp_x.kern.rbf.compute_K_symm(z)
         Kz_y = gp_y.kern.rbf.compute_K_symm(z)
 
-        P1_x = (eye(T) - Kz_x @ pdinv(Kz_x + gp_x.kern.white.variance.value[0] * eye(T)))
-        Kxz = P1_x @ Kx @ P1_x.T
-        P1_y = (eye(T) - Kz_y @ pdinv(Kz_y + gp_y.kern.white.variance.value[0] * eye(T)))
-        Kyz = P1_y @ Ky @ P1_y.T
-
-        Sta = trace(Kxz @ Kyz)
+        P1_x = I - Kz_x @ pdinv(Kz_x + gp_x.kern.white.variance.value[0] * I)
+        P1_y = I - Kz_y @ pdinv(Kz_y + gp_y.kern.white.variance.value[0] * I)
     else:
         Kz = centering(kernel(z, theta=theta))
-        P1 = (eye(T) - Kz @ pdinv(Kz + lambda_ * eye(T)))
-        Kxz = P1 @ Kx @ P1.T
-        Kyz = P1 @ Ky @ P1.T
-        Sta = trace(Kxz @ Kyz)
+        P1_x = P1_y = (I - Kz @ pdinv(Kz + noise * I))
 
-    eig_Kxz, eivx = eigdec((Kxz + Kxz.T) / 2, Num_eig)
-    eig_Kyz, eivy = eigdec((Kyz + Kyz.T) / 2, Num_eig)
+    Kxz = P1_x @ Kx @ P1_x.T
+    Kyz = P1_y @ Ky @ P1_y.T
+    test_statistic = trace(Kxz @ Kyz)
 
-    eig_Kxz, eivx = reduce_eig(eig_Kxz, eivx, Thresh)
-    eig_Kyz, eivy = reduce_eig(eig_Kyz, eivy, Thresh)
+    eig_Kxz, eivx = reduce_eig(*eigdec((Kxz + Kxz.T) / 2, Num_eig))
+    eig_Kyz, eivy = reduce_eig(*eigdec((Kyz + Kyz.T) / 2, Num_eig))
 
     eiv_prodx = eivx @ diag(sqrt(eig_Kxz))
     eiv_prody = eivy @ diag(sqrt(eig_Kyz))
 
-    Num_eigx = eiv_prodx.shape[1]  # size(eiv_prodx, 2)
-    Num_eigy = eiv_prody.shape[1]  # size(eiv_prody, 2)
-    Size_u = Num_eigx * Num_eigy
-    uu = zeros((T, Size_u))
-    for i in range(Num_eigx):
-        for j in range(Num_eigy):
-            uu[:, i * Num_eigy + j] = eiv_prodx[:, i] * eiv_prody[:, j]
+    num_eigx = eiv_prodx.shape[1]  # size(eiv_prodx, 2)
+    num_eigy = eiv_prody.shape[1]  # size(eiv_prody, 2)
+    size_u = num_eigx * num_eigy
+    uu = zeros((T, size_u))
+    for i in range(num_eigx):
+        for j in range(num_eigy):
+            uu[:, i * num_eigy + j] = eiv_prodx[:, i] * eiv_prody[:, j]
 
-    if Size_u > T:
-        uu_prod = uu @ uu.T
-    else:
-        uu_prod = uu.T @ uu
+    uu_prod = uu @ uu.T if size_u > T else uu.T @ uu
+    eig_uu = reduce_eig(eigdec(uu_prod, min(T, size_u))[0])
 
-    eig_uu, _ = eigdec(uu_prod, min(T, Size_u))
-    eig_uu = eig_uu[eig_uu > np.max(eig_uu) * Thresh]
-    eig_uu = eig_uu[:, None]
+    critical_val, p_val = null_by_bootstrap(test_statistic, num_bootstrap_for_null, alpha, eig_uu[:, None])
+    approx_critical_val, approx_p_val = null_by_gamma_approx(test_statistic, alpha, uu_prod)
 
-    Cri, p_val = null_by_bootstrap(Sta, T_BS, alpha, eig_uu)
-    Cri_appr, p_appr = null_by_gamma_approx(Sta, alpha, uu_prod)
+    return test_statistic, critical_val, p_val, approx_critical_val, approx_p_val
 
-    return [Sta, Cri, p_val, Cri_appr, p_appr]
+
+def width_heuristic_by_zhang(T, width):
+    if width == 0:
+        if T <= 200:
+            width = 1.2
+        elif T < 1200:
+            width = 0.7
+        else:
+            width = 0.4
+    return width
 
 
 def null_by_gamma_approx(Sta, alpha, uu_prod):
+    """critical value and p-value based on Gamma distribution approximation"""
     mean_appr = trace(uu_prod)
     var_appr = 2 * trace(uu_prod ** 2)
     k_appr = mean_appr ** 2 / var_appr
@@ -204,6 +198,7 @@ def null_by_gamma_approx(Sta, alpha, uu_prod):
 
 
 def null_by_bootstrap(Sta, T_BS, alpha, eig_uu):
+    """critical value and p-value based on bootstrapping"""
     null_dstr = eig_uu.T @ chi2rnd(1, len(eig_uu), T_BS)
     null_dstr = np.sort(null_dstr.squeeze())
 

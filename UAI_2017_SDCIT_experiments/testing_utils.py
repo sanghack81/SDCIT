@@ -5,7 +5,7 @@ import numpy as np
 import scipy
 import scipy.io
 
-from sdcit.utils import median_heuristic, K2D
+from sdcit.utils import rbf_kernel_with_median_heuristic, K2D
 
 
 def chaotic_configs():
@@ -29,7 +29,7 @@ def read_chaotic(independent, gamma, trial, N, dir_at='~/kcipt_data/'):
         Y = data.Xt
         Z = data.Yt[:, 0: 2]
 
-    kx, ky, kz = median_heuristic(X, Y, Z)
+    kx, ky, kz = rbf_kernel_with_median_heuristic(X, Y, Z)
     Dz = K2D(kz)
 
     return kx, ky, kz, Dz
@@ -43,7 +43,7 @@ def read_postnonlinear_noise(independent, noise, trial, N, dir_at='~/kcipt_data/
     Y = np.array(data.Y).reshape((len(data.Y), -1))
     Z = np.array(data.Z).reshape((len(data.Z), -1))
 
-    kx, ky, kz = median_heuristic(X, Y, Z)
+    kx, ky, kz = rbf_kernel_with_median_heuristic(X, Y, Z)
 
     dist_mat_file = os.path.expanduser(dir_at + 'dist_{}_{}_{}_{}_postnonlinear.mat'.format(noise, trial, independent, N))
     mat_load = scipy.io.loadmat(dist_mat_file, squeeze_me=True, struct_as_record=False)
