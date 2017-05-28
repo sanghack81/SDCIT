@@ -13,7 +13,7 @@ kcit/algorithms
 kcit/gpml-matlab
 blossom5-v2.05.src.tar.gz
 KCI-test.zip
-sdcit/cython_impl/cy_kcipt.cpython-36m-darwin.so
+sdcit/cython_impl/cy_sdcit.cpython-36m-darwin.so
 sdcit/blossom_v/cy_blossom_v.cpython-36m-darwin.so
 sdcit/cython_impl/cy_sdcit.cpp
 sdcit/blossom_v/cy_blossom_v.cpp
