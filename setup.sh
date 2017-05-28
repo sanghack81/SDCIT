@@ -15,5 +15,4 @@ wget ${KCITURL} -O ${KCITZIPFILE}
 unzip ${KCITZIPFILE} algorithms/* gpml-matlab/*
 mv gpml-matlab kcit
 mv algorithms kcit
-rmdir algorithms
 cp kcit/CInd_test_new_withGP_Lee.m kcit/algorithms/
