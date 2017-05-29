@@ -20,7 +20,7 @@ def test_sdcit_henon():
         ps = Parallel(4)(delayed(para)(trial, gamma) for trial in range(n_trial))
         aupc_gamma = aupc(ps)
         if gamma == 0.0:
-            assert 0.45 <= aupc_gamma <= 0.55   # 0.4785
+            assert 0.45 <= aupc_gamma <= 0.55   # 0.4785 0.47761
         if gamma == 0.3:
             assert 0.925 <= aupc_gamma  # 0.97403
         if gamma == 0.5:

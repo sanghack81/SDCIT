@@ -18,8 +18,7 @@ using std::mt19937;
 
 
 std::pair<vector<int>, vector<std::pair<int, int> >> perm_and_mask(const vector<double> &D_Z, const int n, const vector<int> &sample, mt19937 &generator) {
-    const vector<int>& permutation = split_permutation(&D_Z[0], n, sample, generator);
-
+    const vector<int>& permutation = dense_2n_permutation(&D_Z[0], n, sample, generator);
     // mask to hide!
     std::set<pair<int, int> > setmask;  // relative index
     const int sample_size = sample.size();

@@ -1,6 +1,5 @@
-from sdcit.kcipt import c_KCIPT
-
 from sdcit.cython_impl.cy_sdcit import cy_sdcit
+from sdcit.kcipt import c_KCIPT
 from sdcit.permutation import permuted
 from sdcit.utils import *
 
@@ -33,20 +32,6 @@ def perm_and_mask(Dz):
     mask[perm, full_idx] = 1  # i = pi_j
 
     return mask, perm
-
-
-def jackknife_MMSD(kxz, ky, Dz):
-    """Jackknife-based estiamte of MMSD"""
-    n = len(kxz)
-    jack = np.zeros((n // 2,))
-
-    test_statistic, mask, Pidx = MMSD(kxz, ky, Dz)
-    for i, offset in enumerate(range(0, n, 2)):
-        idx1 = list(set(range(n)) - {offset, offset + 1})
-        _11 = np.ix_(idx1, idx1)
-        jack[i], _, _ = MMSD(kxz[_11], ky[_11], Dz[_11])
-
-    return jack.mean(), mask, Pidx
 
 
 def emp_MMSD(kxz, ky, Dz, b):
@@ -86,38 +71,6 @@ def SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=N
         null = raw_null - raw_null.mean()
     else:
         null = raw_null
-
-    if with_null:
-        return test_statistic, p_value_of(test_statistic, null), null
-    else:
-        return test_statistic, p_value_of(test_statistic, null)
-
-
-def jackknife_SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None):
-    if seed is not None:
-        np.random.seed(seed)
-
-    if Dz is None:
-        Dz = K2D(kz)
-
-    n = len(kx)
-    shuf = np.arange(n)
-    np.random.shuffle(shuf)
-    shufidx = np.ix_(shuf, shuf)
-    kx, ky, kz, Dz = kx[shufidx], ky[shufidx], kz[shufidx], Dz[shufidx]
-
-    kxz = kx * kz
-
-    test_statistic, mask, Pidx = jackknife_MMSD(kxz, ky, Dz)
-    mask, Pidx = perm_and_mask(penalized_distance(Dz, mask))
-
-    # avoid permutation between already permuted pairs.
-    raw_null = emp_MMSD(kxz,
-                        ky[np.ix_(Pidx, Pidx)],
-                        penalized_distance(Dz, mask),
-                        size_of_null_sample)
-
-    null = raw_null - raw_null.mean()
 
     if with_null:
         return test_statistic, p_value_of(test_statistic, null), null

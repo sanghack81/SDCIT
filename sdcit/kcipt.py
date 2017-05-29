@@ -4,6 +4,9 @@ from sdcit.utils import *
 
 
 def c_KCIPT(K_X, K_Y, K_Z, D_Z, B, b, M, n_jobs=1, seed=None):
+    if seed is None:
+        seed = random_seeds()
+
     K_X = np.ascontiguousarray(K_X, 'float64')
     K_Y = np.ascontiguousarray(K_Y, 'float64')
     K_Z = np.ascontiguousarray(K_Z, 'float64')
@@ -13,7 +16,7 @@ def c_KCIPT(K_X, K_Y, K_Z, D_Z, B, b, M, n_jobs=1, seed=None):
     outer_null = np.zeros((M,), dtype='float64')
     mmds = np.zeros((B,), dtype='float64')
 
-    cy_kcipt(K_X, K_Y, K_Z, D_Z, B, b, inner_null, mmds, random_seeds() if seed is None else seed, n_jobs, outer_null, M)
+    cy_kcipt(K_X, K_Y, K_Z, D_Z, B, b, inner_null, mmds, seed, n_jobs, outer_null, M)
 
     if M > 0:
         outer_null -= outer_null.mean()
@@ -24,6 +27,9 @@ def c_KCIPT(K_X, K_Y, K_Z, D_Z, B, b, M, n_jobs=1, seed=None):
 
 
 def c_adj_KCIPT(K_X, K_Y, K_Z, D_Z, B, b, M, n_jobs=1, seed=None):
+    if seed is None:
+        seed = random_seeds()
+
     K_X = np.ascontiguousarray(K_X, 'float64')
     K_Y = np.ascontiguousarray(K_Y, 'float64')
     K_Z = np.ascontiguousarray(K_Z, 'float64')
@@ -34,7 +40,7 @@ def c_adj_KCIPT(K_X, K_Y, K_Z, D_Z, B, b, M, n_jobs=1, seed=None):
     outer_null = np.zeros((M,), dtype='float64')
     mmds = np.zeros((B,), dtype='float64')
 
-    cy_adj_kcipt(K_X, K_Y, K_Z, K_XYZ, D_Z, B, b, inner_null, mmds, random_seeds() if seed is None else seed, n_jobs, outer_null, M, 1)
+    cy_adj_kcipt(K_X, K_Y, K_Z, K_XYZ, D_Z, B, b, inner_null, mmds, seed, n_jobs, outer_null, M, 1)
 
     if M > 0:
         outer_null -= outer_null.mean()

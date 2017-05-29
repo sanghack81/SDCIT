@@ -5,6 +5,7 @@ import numpy as np
 import scipy
 import scipy.io
 
+from UAI_2017_SDCIT_experiments.exp_setup import SDCIT_DATA_DIR
 from sdcit.utils import rbf_kernel_with_median_heuristic, K2D
 
 
@@ -17,7 +18,7 @@ def postnonlinear_noise_configs():
            list(itertools.product([9, 19, 49], [0, 1], [400]))  # high-dimensional
 
 
-def read_chaotic(independent, gamma, trial, N, dir_at='~/kcipt_data/'):
+def read_chaotic(independent, gamma, trial, N, dir_at=SDCIT_DATA_DIR + '/'):
     mat_load = scipy.io.loadmat(os.path.expanduser(dir_at + '{}_{}_{}_{}_chaotic.mat'.format(gamma, trial, independent, N)), squeeze_me=True, struct_as_record=False)
     data = mat_load['data']
     if independent:
@@ -35,7 +36,7 @@ def read_chaotic(independent, gamma, trial, N, dir_at='~/kcipt_data/'):
     return kx, ky, kz, Dz
 
 
-def read_postnonlinear_noise(independent, noise, trial, N, dir_at='~/kcipt_data/'):
+def read_postnonlinear_noise(independent, noise, trial, N, dir_at=SDCIT_DATA_DIR + '/'):
     data_file = os.path.expanduser(dir_at + '{}_{}_{}_{}_postnonlinear.mat'.format(noise, trial, independent, N))
     mat_load = scipy.io.loadmat(data_file, squeeze_me=True, struct_as_record=False)
     data = mat_load['data']

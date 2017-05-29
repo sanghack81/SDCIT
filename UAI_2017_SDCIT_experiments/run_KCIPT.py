@@ -7,7 +7,7 @@ from joblib import Parallel
 from joblib import delayed
 from tqdm import trange
 
-from UAI_2017_SDCIT_experiments.exp_setup import SDCIT_RESULT_DIR
+from UAI_2017_SDCIT_experiments.exp_setup import SDCIT_RESULT_DIR, PARALLEL_JOBS
 from UAI_2017_SDCIT_experiments.testing_utils import *
 from sdcit.kcipt import c_KCIPT
 from sdcit.utils import *
@@ -48,7 +48,7 @@ def main():
         for independent, N, gamma in chaotic_configs():
             print(independent, N, gamma)
             time.sleep(1)
-            outs = Parallel(-1)(delayed(test_chaotic)(independent, gamma, trial, N, 25) for trial in range(300))
+            outs = Parallel(PARALLEL_JOBS)(delayed(test_chaotic)(independent, gamma, trial, N, 25) for trial in range(300))
             with open(SDCIT_RESULT_DIR + '/kcipt_chaotic.csv', 'a') as f:
                 for out in outs:
                     if out is not None:
@@ -61,7 +61,7 @@ def main():
         for noise, independent, N in postnonlinear_noise_configs():
             print(noise, independent, N)
             time.sleep(1)
-            outs = Parallel(-1)(delayed(test_postnonlinear)(independent, noise, trial, N, 25) for trial in range(300))
+            outs = Parallel(PARALLEL_JOBS)(delayed(test_postnonlinear)(independent, noise, trial, N, 25) for trial in range(300))
             with open(SDCIT_RESULT_DIR + '/kcipt_postnonlinear.csv', 'a') as f:
                 for out in outs:
                     print(*out, sep=',', file=f, flush=True)
@@ -74,7 +74,7 @@ def main():
             print(independent, gamma, N, B)
             time.sleep(1)
             for trial in trange(300):
-                out = test_chaotic(independent, gamma, trial, N, B=B, n_jobs=32)
+                out = test_chaotic(independent, gamma, trial, N, B=B, n_jobs=PARALLEL_JOBS)
                 with open(SDCIT_RESULT_DIR + '/kcipt_chaotic_{}.csv'.format(B), 'a') as f:
                     print(*out, sep=',', file=f, flush=True)
         else:

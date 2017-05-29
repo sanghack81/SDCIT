@@ -32,7 +32,7 @@ def experiment(obj_filename):
         print('SDCIT ... ')
         sdcit_mmd, sdcit_pval, sdcit_null = bias_reduced_SDCIT(kx, ky, kz, with_null=True, seed=trial)
         print('KCIPT {} ... '.format(initial_B))
-        _, mmds100, _, outer_null100 = c_KCIPT(kx, ky, kz, K2D(kz), initial_B, 10000, 10000, n_jobs=32, seed=trial)
+        _, mmds100, _, outer_null100 = c_KCIPT(kx, ky, kz, K2D(kz), initial_B, 10000, 10000, n_jobs=PARALLEL_JOBS, seed=trial)
 
         # Infer desired B
         desired_B = int(initial_B * (outer_null100.std() / sdcit_null.std()) ** 2)
@@ -40,20 +40,20 @@ def experiment(obj_filename):
 
         # Prepare outer null distribution
         print('KCIPT {} ... '.format(desired_B))
-        _, mmds_B, _, outer_null_B = c_KCIPT(kx, ky, kz, K2D(kz), desired_B, 10000, 10000, n_jobs=32, seed=trial)
+        _, mmds_B, _, outer_null_B = c_KCIPT(kx, ky, kz, K2D(kz), desired_B, 10000, 10000, n_jobs=PARALLEL_JOBS, seed=trial)
 
         print('TS distributions for KCIPT {} ... '.format(desired_B))
         time.sleep(1)
         distr_boot = np.zeros((1000,))
         for ii in trange(len(distr_boot)):
-            _, mmds_B, _, _ = c_KCIPT(kx, ky, kz, K2D(kz), desired_B, 0, 0, n_jobs=32, seed=ii)
+            _, mmds_B, _, _ = c_KCIPT(kx, ky, kz, K2D(kz), desired_B, 0, 0, n_jobs=PARALLEL_JOBS, seed=ii)
             distr_boot[ii] = mmds_B.mean()
 
         with open(obj_filename, 'wb') as f:  # Python 3: open(..., 'wb')
             pickle.dump([sdcit_mmd, sdcit_null, mmds100, outer_null100, desired_B, mmds_B, outer_null_B, distr_boot], f)
 
         print(independent, gamma_param, N)
-        outs = [test_chaotic(independent, gamma_param, tt, N, B=desired_B, n_jobs=32) for tt in trange(300)]
+        outs = [test_chaotic(independent, gamma_param, tt, N, B=desired_B, n_jobs=PARALLEL_JOBS) for tt in trange(300)]
         with open(SDCIT_RESULT_DIR + '/kcipt_chaotic_{}.csv'.format(desired_B), 'a') as f:
             for out in outs:
                 print(*out, sep=',', file=f, flush=True)

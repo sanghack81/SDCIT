@@ -1,20 +1,23 @@
 import os
 import warnings
 
+import GPflow
 import numpy as np
-import scipy
-import scipy.linalg
 from numpy import eye, exp, sqrt, trace, diag, zeros
 from scipy.stats import chi2, gamma
 from sklearn.metrics import pairwise_distances
 
-from sdcit.utils import centering
+from sdcit.utils import centering, pdinv, reduced_eig, eigdec, columnwise_normalizes
 
 
 def np2matlab(arr):
     import matlab.engine
 
     return matlab.double([[float(v) for v in row] for row in arr])
+
+
+def kcit_original_matlab(x, y, z, seed=None, mateng=None, installed_at='~/Dropbox/research/2014 rcm/workspace/python/SDCIT/kcit'):
+    return kcit(x, y, z, seed, mateng, installed_at)
 
 
 def kcit(x, y, z, seed=None, mateng=None, installed_at='~/Dropbox/research/2014 rcm/workspace/python/SDCIT/kcit'):
@@ -57,25 +60,6 @@ def kcit_lee(Kx, Ky, Kz, seed=None, mateng=None, installed_at='~/Dropbox/researc
             mateng.quit()
 
 
-def reduce_eig(eig_Ky, eiy=None, Thresh=1e-5):
-    IIy = np.where(eig_Ky > max(eig_Ky) * Thresh)[0]
-    if eiy is not None:
-        return eig_Ky[IIy], eiy[:, IIy]
-    else:
-        return eig_Ky[IIy]
-
-
-def normalizes(xs):
-    return [normalize(x) for x in xs]
-
-
-def normalize(x: np.ndarray) -> np.ndarray:
-    """normalize per column"""
-    x = x - np.vstack([np.mean(x, 0)] * len(x))
-    x = x / np.std(x, 0)  # broadcast
-    return x
-
-
 def gamcdf(t, a, b):
     return gamma.cdf(t, a, scale=b)
 
@@ -86,22 +70,6 @@ def gaminv(q, a, b):
 
 def chi2rnd(df, m, n):
     return chi2.rvs(df, size=m * n).reshape((m, n))
-
-
-def eigdec(x: np.ndarray, N: int):
-    M = len(x)
-    # ascending M-1-N <= <= M-1
-    w, v = scipy.linalg.eigh(x, eigvals=(M - 1 - N + 1, M - 1))
-    w = w[::-1]
-    v = v[:, ::-1]
-    return w, v
-
-
-# inverse of a positive definite matrix
-def pdinv(x):
-    L = scipy.linalg.cholesky(x)
-    Linv = scipy.linalg.inv(L)
-    return Linv.T @ Linv
 
 
 def kernel(x, xKern=None, theta=0):
@@ -116,10 +84,33 @@ def kernel(x, xKern=None, theta=0):
     return kx
 
 
-def python_kcit(x: np.ndarray, y: np.ndarray, z: np.ndarray, alpha=0.05, width=0.0, with_gp=False, noise=1e-3, num_bootstrap_for_null=5000):
-    Num_eig = T = len(y)
 
-    x, y, z = normalize(x), normalize(y), normalize(z)
+
+def residual_kernel_matrix_kernel_real(Kx, Z, num_eig):
+    """K_X|Z"""
+    assert len(Kx) == len(Z)
+    assert num_eig <= len(Kx)
+    T = len(Kx)
+    D = Z.shape[1]
+    I = eye(T)
+    eig_Kx, eix = reduced_eig(*eigdec(Kx, num_eig))
+
+    gp_x = GPflow.gpr.GPR(Z,
+                          2 * sqrt(T) * eix @ diag(sqrt(eig_Kx)) / sqrt(eig_Kx[0]),
+                          GPflow.kernels.RBF(D) + GPflow.kernels.White(D))
+    gp_x.optimize()
+
+    Kz_x = gp_x.kern.rbf.compute_K_symm(Z)
+
+    P1_x = I - Kz_x @ pdinv(Kz_x + gp_x.kern.white.variance.value[0] * I)
+    Kxz = P1_x @ Kx @ P1_x.T
+    return Kxz
+
+
+def python_kcit(x: np.ndarray, y: np.ndarray, z: np.ndarray, alpha=0.05, width=0.0, with_gp=False, noise=1e-3, num_bootstrap_for_null=5000):
+    T = len(y)
+
+    x, y, z = columnwise_normalizes(x, y, z)
     D = z.shape[1]
 
     width = width_heuristic_by_zhang(T, width)
@@ -128,38 +119,26 @@ def python_kcit(x: np.ndarray, y: np.ndarray, z: np.ndarray, alpha=0.05, width=0
     Kx = centering(kernel(np.hstack([x, z / 2]), theta=theta))
     Ky = centering(kernel(y, theta=theta))
 
-    I = eye(T)
     if with_gp:
-        import GPflow
-        eig_Kx, eix = reduce_eig(*eigdec((Kx + Kx.T) / 2, min(400, int(T / 4))))
-        eig_Ky, eiy = reduce_eig(*eigdec((Ky + Ky.T) / 2, min(200, int(T / 5))))
-
-        gp_x = GPflow.gpr.GPR(z, 2 * sqrt(T) * eix @ diag(sqrt(eig_Kx)) / sqrt(eig_Kx[0]), GPflow.kernels.RBF(D) + GPflow.kernels.White(D))
-        gp_y = GPflow.gpr.GPR(z, 2 * sqrt(T) * eiy @ diag(sqrt(eig_Ky)) / sqrt(eig_Ky[0]), GPflow.kernels.RBF(D) + GPflow.kernels.White(D))
-        gp_x.optimize()
-        gp_y.optimize()
-
-        Kz_x = gp_x.kern.rbf.compute_K_symm(z)
-        Kz_y = gp_y.kern.rbf.compute_K_symm(z)
-
-        P1_x = I - Kz_x @ pdinv(Kz_x + gp_x.kern.white.variance.value[0] * I)
-        P1_y = I - Kz_y @ pdinv(Kz_y + gp_y.kern.white.variance.value[0] * I)
+        Kxz = residual_kernel_matrix_kernel_real(Kx, z, min(400, T // 4))
+        Kyz = residual_kernel_matrix_kernel_real(Ky, z, min(200, T // 5))
     else:
         Kz = centering(kernel(z, theta=theta))
-        P1_x = P1_y = (I - Kz @ pdinv(Kz + noise * I))
+        P1_x = P1_y = (eye(T) - Kz @ pdinv(Kz + noise * eye(T)))
+        Kxz = P1_x @ Kx @ P1_x.T
+        Kyz = P1_y @ Ky @ P1_y.T
 
-    Kxz = P1_x @ Kx @ P1_x.T
-    Kyz = P1_y @ Ky @ P1_y.T
-    test_statistic = trace(Kxz @ Kyz)
+    test_statistic = (Kxz * Kyz).sum()  # trace(Kxz @ Kyz)
 
-    eig_Kxz, eivx = reduce_eig(*eigdec((Kxz + Kxz.T) / 2, Num_eig))
-    eig_Kyz, eivy = reduce_eig(*eigdec((Kyz + Kyz.T) / 2, Num_eig))
+    # null computation
+    eig_Kxz, eivx = reduced_eig(*eigdec(Kxz))
+    eig_Kyz, eivy = reduced_eig(*eigdec(Kyz))
 
     eiv_prodx = eivx @ diag(sqrt(eig_Kxz))
     eiv_prody = eivy @ diag(sqrt(eig_Kyz))
 
-    num_eigx = eiv_prodx.shape[1]  # size(eiv_prodx, 2)
-    num_eigy = eiv_prody.shape[1]  # size(eiv_prody, 2)
+    num_eigx = eiv_prodx.shape[1]
+    num_eigy = eiv_prody.shape[1]
     size_u = num_eigx * num_eigy
     uu = zeros((T, size_u))
     for i in range(num_eigx):
@@ -167,12 +146,12 @@ def python_kcit(x: np.ndarray, y: np.ndarray, z: np.ndarray, alpha=0.05, width=0
             uu[:, i * num_eigy + j] = eiv_prodx[:, i] * eiv_prody[:, j]
 
     uu_prod = uu @ uu.T if size_u > T else uu.T @ uu
-    eig_uu = reduce_eig(eigdec(uu_prod, min(T, size_u))[0])
+    eig_uu = reduced_eig(eigdec(uu_prod, min(T, size_u))[0])
 
-    critical_val, p_val = null_by_bootstrap(test_statistic, num_bootstrap_for_null, alpha, eig_uu[:, None])
-    approx_critical_val, approx_p_val = null_by_gamma_approx(test_statistic, alpha, uu_prod)
+    boot_critical_val, boot_p_val = null_by_bootstrap(test_statistic, num_bootstrap_for_null, alpha, eig_uu[:, None])
+    appr_critical_val, appr_p_val = null_by_gamma_approx(test_statistic, alpha, uu_prod)
 
-    return test_statistic, critical_val, p_val, approx_critical_val, approx_p_val
+    return test_statistic, boot_critical_val, boot_p_val, appr_critical_val, appr_p_val
 
 
 def width_heuristic_by_zhang(T, width):
