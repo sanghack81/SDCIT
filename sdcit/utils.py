@@ -4,6 +4,7 @@ import GPflow
 import numpy as np
 import numpy.ma as ma
 import scipy.linalg
+import scipy.optimize
 import tensorflow as tf
 from numpy import diag, exp, sqrt
 from numpy.matlib import repmat
@@ -16,15 +17,17 @@ def columnwise_normalizes(*xs):
 
 def columnwise_normalize(x: np.ndarray) -> np.ndarray:
     """normalize per column"""
-    x = x - np.vstack([np.mean(x, 0)] * len(x))
-    x = x / np.std(x, 0)  # broadcast
-    return x
+    if x is None:
+        return None
+    return (x - np.mean(x, 0)) / np.std(x, 0)  # broadcast
 
 
 def noise_variance(K_Y, K_X):
     T = len(K_Y)
     eig_Kx, eix = reduced_eig(*eigdec(K_Y, min(100, int(T / 5))))
-    gp_x = GPflow.gpr.GPR(np.arange(len(K_X))[:, None], 2 * sqrt(T) * eix @ diag(sqrt(eig_Kx)) / sqrt(eig_Kx[0]), PrecomputedKernel(K_X) + GPflow.kernels.White(1))
+    gp_x = GPflow.gpr.GPR(np.arange(len(K_X))[:, None],
+                          2 * sqrt(T) * eix @ diag(sqrt(eig_Kx)) / sqrt(eig_Kx[0]),
+                          PrecomputedKernel(K_X) + GPflow.kernels.White(1))
     gp_x.optimize()
     return gp_x.kern.white.variance.value[0]
 
@@ -70,10 +73,17 @@ def pdinv(x):
     return Linv.T @ Linv
 
 
-def residualize_real_and_kernel(Y, K_X, sigma=1.0):
+def residualize_real_and_kernel(Y, K_X, sigma=None):
     # Y_i - E[Y_i|X_i]
+    # variance = sigma**2
+    if sigma is None:
+        gp_kernel = PrecomputedKernel(K_X) + GPflow.kernels.White(1)
+        m = GPflow.gpr.GPR(np.arange(len(K_X))[:, None], Y, gp_kernel)
+        m.optimize()
+        sigma = sqrt(m.kern.white.variance.value[0])
+
     I = np.eye(len(K_X))
-    return (pdinv(I + sigma ** (-2) * K_X) @ Y).squeeze()
+    return pdinv(I + sigma ** (-2) * K_X) @ Y
 
 
 def residualize(Y, X, gp_kernel=None):
@@ -89,17 +99,17 @@ def residualize(Y, X, gp_kernel=None):
     return Y - Yhat
 
 
-def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, sigma=None):
-    K_Y, K_X = centering(K_Y), centering(K_X)
+def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, sigma=None, eq_17_as_is=False):
     # R_Y|X
+    K_Y, K_X = centering(K_Y), centering(K_X)
     if sigma is None:
-        sigma = noise_variance(K_Y, K_X)
+        sigma = sqrt(noise_variance(K_Y, K_X))
     I = np.eye(len(K_X))
     IK = pdinv(I + sigma ** (-2) * K_X)
-    # TODO WHY WHY?
-    warnings.warn('original K@IK + IK@L@IK does not work... remove covariance part.')
-    # return (K_X + IK @ K_Y) @ IK
-    return (IK @ K_Y) @ IK
+    if eq_17_as_is:
+        return (K_X + IK @ K_Y) @ IK
+    else:
+        return IK @ K_Y @ IK
 
 
 def rbf_kernel_with_median_heuristic(data, *args):
@@ -109,11 +119,11 @@ def rbf_kernel_with_median_heuristic(data, *args):
 
     outs = []
     for x in [data, *args]:
-        squared_distances = euclidean_distances(x, squared=True)
+        D_squared = euclidean_distances(x, squared=True)
         # masking upper triangle and the diagonal.
-        mask = np.triu(np.ones(squared_distances.shape), 0)
-        median_squared_distance = ma.median(ma.array(squared_distances, mask=mask))
-        kx = exp(-0.5 * squared_distances / median_squared_distance)
+        mask = np.triu(np.ones(D_squared.shape), 0)
+        median_squared_distance = ma.median(ma.array(D_squared, mask=mask))
+        kx = exp(-0.5 * D_squared / median_squared_distance)
         outs.append(kx)
 
     if len(outs) == 1:

@@ -5,7 +5,16 @@ from sdcit.kcit import centering
 from sdcit.utils import p_value_of
 
 
-def HSIC(K: np.ndarray, L: np.ndarray) -> float:
+def HSIC(K: np.ndarray, L: np.ndarray, p_val_method='bootstrap', num_boot=1000):
+    if p_val_method == 'bootstrap':
+        return HSIC_boot(K, L, num_boot)
+    elif p_val_method == 'gamma':
+        return HSIC_gamma_approx(K, L)
+    else:
+        raise ValueError('unknown p value computation method: {}'.format(p_val_method))
+
+
+def HSIC_gamma_approx(K: np.ndarray, L: np.ndarray) -> float:
     """A Hilbert-Schmidt Independence Criterion
     :type K: np.ndarray
         Kernel matrix

@@ -7,7 +7,7 @@ from numpy import eye, exp, sqrt, trace, diag, zeros
 from scipy.stats import chi2, gamma
 from sklearn.metrics import pairwise_distances
 
-from sdcit.utils import centering, pdinv, reduced_eig, eigdec, columnwise_normalizes
+from sdcit.utils import centering, pdinv, reduced_eig, eigdec, columnwise_normalizes, residual_kernel, rbf_kernel_with_median_heuristic
 
 
 def np2matlab(arr):
@@ -84,8 +84,6 @@ def kernel(x, xKern=None, theta=0):
     return kx
 
 
-
-
 def residual_kernel_matrix_kernel_real(Kx, Z, num_eig):
     """K_X|Z"""
     assert len(Kx) == len(Z)
@@ -101,35 +99,55 @@ def residual_kernel_matrix_kernel_real(Kx, Z, num_eig):
     gp_x.optimize()
 
     Kz_x = gp_x.kern.rbf.compute_K_symm(Z)
+    sigma_squared = gp_x.kern.white.variance.value[0]
 
-    P1_x = I - Kz_x @ pdinv(Kz_x + gp_x.kern.white.variance.value[0] * I)
+    P1_x = I - Kz_x @ pdinv(Kz_x + sigma_squared * I)
     Kxz = P1_x @ Kx @ P1_x.T
     return Kxz
 
 
-def python_kcit(x: np.ndarray, y: np.ndarray, z: np.ndarray, alpha=0.05, width=0.0, with_gp=False, noise=1e-3, num_bootstrap_for_null=5000):
+def python_kcit(x: np.ndarray, y: np.ndarray, z: np.ndarray, alpha=0.05, with_gp=True, noise=1e-3, num_bootstrap_for_null=5000, normalize=True, kern=rbf_kernel_with_median_heuristic):
     T = len(y)
 
-    x, y, z = columnwise_normalizes(x, y, z)
-    D = z.shape[1]
+    if normalize:
+        x, y, z = columnwise_normalizes(x, y, z)
 
-    width = width_heuristic_by_zhang(T, width)
-
-    theta = 1 / (width ** 2 * D)
-    Kx = centering(kernel(np.hstack([x, z / 2]), theta=theta))
-    Ky = centering(kernel(y, theta=theta))
+    Kx = centering(kern(np.hstack([x, z / 2])))
+    Ky = centering(kern(y))
 
     if with_gp:
         Kxz = residual_kernel_matrix_kernel_real(Kx, z, min(400, T // 4))
         Kyz = residual_kernel_matrix_kernel_real(Ky, z, min(200, T // 5))
     else:
-        Kz = centering(kernel(z, theta=theta))
+        Kz = centering(kern(z))
+        P1_x = P1_y = (eye(T) - Kz @ pdinv(Kz + noise * eye(T)))
+        Kxz = P1_x @ Kx @ P1_x.T
+        Kyz = P1_y @ Ky @ P1_y.T
+
+    test_statistic = (Kxz * Kyz).sum()  # trace(Kxz @ Kyz)
+    # null computation
+    return kcit_null(Kxz, Kyz, T, alpha, num_bootstrap_for_null, test_statistic)
+
+
+def python_kcit_K(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, alpha=0.05, with_gp=True, noise=1e-3, num_bootstrap_for_null=5000, eq_17_as_is=False):
+    T = len(Kx)
+
+    Kx, Ky, Kz = centering(Kx * Kz), centering(Ky), centering(Kz)
+
+    if with_gp:
+        Kxz = residual_kernel(Kx, Kz, eq_17_as_is=eq_17_as_is)
+        Kyz = residual_kernel(Ky, Kz, eq_17_as_is=eq_17_as_is)
+    else:
         P1_x = P1_y = (eye(T) - Kz @ pdinv(Kz + noise * eye(T)))
         Kxz = P1_x @ Kx @ P1_x.T
         Kyz = P1_y @ Ky @ P1_y.T
 
     test_statistic = (Kxz * Kyz).sum()  # trace(Kxz @ Kyz)
 
+    return kcit_null(Kxz, Kyz, T, alpha, num_bootstrap_for_null, test_statistic)
+
+
+def kcit_null(Kxz, Kyz, T, alpha, num_bootstrap_for_null, test_statistic):
     # null computation
     eig_Kxz, eivx = reduced_eig(*eigdec(Kxz))
     eig_Kyz, eivy = reduced_eig(*eigdec(Kyz))
