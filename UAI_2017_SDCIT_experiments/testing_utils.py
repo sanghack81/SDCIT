@@ -55,3 +55,28 @@ def read_postnonlinear_noise(independent, noise, trial, N, dir_at=SDCIT_DATA_DIR
     kz = np.ascontiguousarray(kz, 'float64')
     Dz = np.ascontiguousarray(Dz, 'float64')
     return kx, ky, kz, Dz
+
+
+def read_chaotic_data(independent, gamma, trial, N, dir_at=SDCIT_DATA_DIR + '/'):
+    mat_load = scipy.io.loadmat(os.path.expanduser(dir_at + '{}_{}_{}_{}_chaotic.mat'.format(gamma, trial, independent, N)), squeeze_me=True, struct_as_record=False)
+    data = mat_load['data']
+    if independent:
+        X = data.Xt1
+        Y = data.Yt
+        Z = data.Xt[:, 0:2]
+    else:
+        X = data.Yt1
+        Y = data.Xt
+        Z = data.Yt[:, 0: 2]
+
+    return X, Y, Z
+
+
+def read_postnonlinear_noise_data(independent, noise, trial, N, dir_at=SDCIT_DATA_DIR + '/'):
+    data_file = os.path.expanduser(dir_at + '{}_{}_{}_{}_postnonlinear.mat'.format(noise, trial, independent, N))
+    mat_load = scipy.io.loadmat(data_file, squeeze_me=True, struct_as_record=False)
+    data = mat_load['data']
+    X = np.array(data.X).reshape((len(data.X), -1))
+    Y = np.array(data.Y).reshape((len(data.Y), -1))
+    Z = np.array(data.Z).reshape((len(data.Z), -1))
+    return X, Y, Z

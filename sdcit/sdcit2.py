@@ -48,6 +48,7 @@ def adjust_errors(null_errors, null, error=None, test_statistic=None):
     else:
         return null - null_errors * beta
 
+
 def bias_reduced_SDCIT(kx: np.ndarray, ky: np.ndarray, kz: np.ndarray, Dz=None, size_of_null_sample=1000, with_null=False, seed=None):
     if seed is not None:
         np.random.seed(seed)

@@ -5,7 +5,7 @@ import numpy as np
 import numpy.ma as ma
 import scipy.linalg
 import scipy.optimize
-import tensorflow as tf
+from GPflow.kernels import White, Linear, RBF
 from numpy import diag, exp, sqrt
 from numpy.matlib import repmat
 from sklearn.metrics import euclidean_distances
@@ -22,42 +22,33 @@ def columnwise_normalize(x: np.ndarray) -> np.ndarray:
     return (x - np.mean(x, 0)) / np.std(x, 0)  # broadcast
 
 
-def noise_variance(K_Y, K_X):
-    T = len(K_Y)
-    eig_Kx, eix = reduced_eig(*eigdec(K_Y, min(100, int(T / 5))))
-    gp_x = GPflow.gpr.GPR(np.arange(len(K_X))[:, None],
-                          2 * sqrt(T) * eix @ diag(sqrt(eig_Kx)) / sqrt(eig_Kx[0]),
-                          PrecomputedKernel(K_X) + GPflow.kernels.White(1))
-    gp_x.optimize()
-    return gp_x.kern.white.variance.value[0]
-
-
 def ensure_symmetric(x):
     return (x + x.T) / 2
 
 
-def reduced_eig(eig_Ky, eiy=None, Thresh=1e-5):
-    IIy = np.where(eig_Ky > max(eig_Ky) * Thresh)[0]
-    if eiy is not None:
-        return eig_Ky[IIy], eiy[:, IIy]
+def truncated_eigen(eig_vals, eig_vecs=None, relative_threshold=1e-5):
+    indices = np.where(eig_vals > max(eig_vals) * relative_threshold)[0]
+    if eig_vecs is not None:
+        return eig_vals[indices], eig_vecs[:, indices]
     else:
-        return eig_Ky[IIy]
+        return eig_vals[indices]
 
 
 def eigdec(x: np.ndarray, n: int = None):
     """Top N descending ordered eigenvalues and corresponding eigenvectors"""
     if n is None:
         n = len(x)
+
     x = ensure_symmetric(x)
     M = len(x)
+
     # ascending M-1-N <= <= M-1
     w, v = scipy.linalg.eigh(x, eigvals=(M - 1 - n + 1, M - 1))
-    w = w[::-1]
-    v = v[:, ::-1]
-    return w, v
+    # descending
+    return w[::-1], v[:, ::-1]
 
 
-def centering(M):
+def centering(M: np.ndarray) -> np.ndarray:
     """Matrix Centering"""
     nr, nc = M.shape
     assert nr == nc
@@ -68,29 +59,16 @@ def centering(M):
 
 # inverse of a positive definite matrix
 def pdinv(x):
-    L = scipy.linalg.cholesky(x)
-    Linv = scipy.linalg.inv(L)
-    return Linv.T @ Linv
-
-
-def residualize_real_and_kernel(Y, K_X, sigma=None):
-    # Y_i - E[Y_i|X_i]
-    # variance = sigma**2
-    if sigma is None:
-        gp_kernel = PrecomputedKernel(K_X) + GPflow.kernels.White(1)
-        m = GPflow.gpr.GPR(np.arange(len(K_X))[:, None], Y, gp_kernel)
-        m.optimize()
-        sigma = sqrt(m.kern.white.variance.value[0])
-
-    I = np.eye(len(K_X))
-    return pdinv(I + sigma ** (-2) * K_X) @ Y
+    U = scipy.linalg.cholesky(x)
+    Uinv = scipy.linalg.inv(U)
+    return Uinv @ Uinv.T
 
 
 def residualize(Y, X, gp_kernel=None):
     # Y_i - E[Y_i|X_i]
     if gp_kernel is None:
         _, n_feats = X.shape
-        gp_kernel = GPflow.kernels.RBF(n_feats) + GPflow.kernels.White(n_feats)
+        gp_kernel = RBF(n_feats) + White(n_feats)
 
     m = GPflow.gpr.GPR(X, Y, gp_kernel)
     m.optimize()
@@ -99,20 +77,39 @@ def residualize(Y, X, gp_kernel=None):
     return Y - Yhat
 
 
-def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, sigma=None, eq_17_as_is=False):
+def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, eq_17_as_is=True, with_gp=False, sigma_squared=1e-3):
     # R_Y|X
     K_Y, K_X = centering(K_Y), centering(K_X)
-    if sigma is None:
-        sigma = sqrt(noise_variance(K_Y, K_X))
+    T = len(K_Y)
+    if with_gp:
+        eig_Ky, eiy = truncated_eigen(*eigdec(K_Y, min(100, T // 5)))
+        eig_Kx, eix = truncated_eigen(*eigdec(K_X, min(100, T // 5)))
+
+        X = eix @ diag(sqrt(eig_Kx))
+        Y = eiy @ diag(sqrt(eig_Ky))
+        n_feats = X.shape[1]
+
+        # TODO ARD
+        gp_x = GPflow.gpr.GPR(X, Y, Linear(n_feats) + White(n_feats))
+        gp_x.optimize()
+
+        K_X = gp_x.kern.linear.compute_K_symm(X)
+        # TODO ARD, diag variance
+        sigma_squared = gp_x.kern.white.variance.value[0]
+
     I = np.eye(len(K_X))
-    IK = pdinv(I + sigma ** (-2) * K_X)
+    IK = pdinv(I + K_X / sigma_squared)  # I-K @ inv(K+Sigma)
     if eq_17_as_is:
         return (K_X + IK @ K_Y) @ IK
     else:
         return IK @ K_Y @ IK
 
 
-def rbf_kernel_with_median_heuristic(data, *args):
+def rbf_kernel_with_median_heuristic_wo2(data, *args):
+    return rbf_kernel_with_median_heuristic(data, *args, without_two=True)
+
+
+def rbf_kernel_with_median_heuristic(data, *args, without_two=False):
     """A list of RBF kernel matrices for data sets in arguments based on median heuristic"""
     if args is None:
         args = []
@@ -123,7 +120,10 @@ def rbf_kernel_with_median_heuristic(data, *args):
         # masking upper triangle and the diagonal.
         mask = np.triu(np.ones(D_squared.shape), 0)
         median_squared_distance = ma.median(ma.array(D_squared, mask=mask))
-        kx = exp(-0.5 * D_squared / median_squared_distance)
+        if without_two:
+            kx = exp(-D_squared / median_squared_distance)
+        else:
+            kx = exp(-0.5 * D_squared / median_squared_distance)
         outs.append(kx)
 
     if len(outs) == 1:
@@ -133,15 +133,7 @@ def rbf_kernel_with_median_heuristic(data, *args):
 
 
 def p_value_of(val, data) -> float:
-    """The percentile of a value given a data
-
-    Parameters
-    ----------
-    val: float
-        value to compute p-value
-    data: array_like
-        data representing a reference distribution
-    """
+    """The percentile of a value given a data"""
 
     data = np.sort(data)
     return 1 - np.searchsorted(data, val, side='right') / len(data)
@@ -172,19 +164,3 @@ def K2D(K):
             warnings.warn('K2D: negative values will be treated as zero. Observed: {}'.format(min_val))
         temp *= (temp > 0)
     return np.sqrt(temp)
-
-
-class PrecomputedKernel(GPflow.kernels.Kern):
-    def __init__(self, K):
-        warnings.warn('experimental. This kernel ignores the actual input, and just return the given precomputed kernel matrix.')
-        GPflow.kernels.Kern.__init__(self, input_dim=1)
-        self.variance = GPflow.param.Param(1.0, transform=GPflow.transforms.positive)
-        self.given_K = K
-
-    def K(self, X, X2=None):
-        if X2 is None:
-            X2 = X
-        return self.variance * tf.stack(self.given_K)
-
-    def Kdiag(self, X):
-        return self.variance * tf.stack(np.diag(self.given_K))

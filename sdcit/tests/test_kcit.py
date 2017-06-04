@@ -1,14 +1,22 @@
 import multiprocessing
 import os
+import time
 
 import numpy as np
 from joblib import Parallel, delayed
 from tqdm import trange
 
+from UAI_2017_SDCIT_experiments.testing_utils import read_chaotic_data
 from sdcit.kcit import python_kcit, kcit, python_kcit_K
 from sdcit.tests.synthetic import henon
 from sdcit.tests.t_utils import aupc
-from sdcit.utils import random_seeds, rbf_kernel_with_median_heuristic, columnwise_normalizes
+from sdcit.utils import random_seeds, rbf_kernel_with_median_heuristic
+
+
+def test_kcit_debug():
+    X, Y, Z = read_chaotic_data(0, 0.0, 0, 200, os.path.expanduser('~/Dropbox/research/2014 rcm/workspace/python/SDCIT/kcit/'))
+    outs = python_kcit(X, Y, Z, normalize=False, with_gp=False, noise=0.001)
+    return outs
 
 
 def para(trial, gamma, normalize):
@@ -20,59 +28,71 @@ def para(trial, gamma, normalize):
 
 def test_kcit_henon():
     """
-    True 0.0 0.488643
-    True 0.2 0.604434
-    True 0.4 0.999994
-    
-    False 0.0 0.497717
-    False 0.2 0.932756
-    False 0.4 0.999934
+    test_kcit_henon True 0.0 0.485895
+    test_kcit_henon True 0.2 0.644962
+
+    test_kcit_henon False 0.0 0.503069
+    test_kcit_henon False 0.2 0.967547
+
     """
     n_trial = 200
-    with Parallel(multiprocessing.cpu_count() // 2) as parallel:
+    with Parallel(multiprocessing.cpu_count() // 3) as parallel:
         for normalize in [True, False]:
-            for gamma in [0.0, 0.2, 0.4]:
-                ps = parallel(delayed(para)(trial, gamma, normalize) for trial in trange(n_trial))
+            for gamma in [0.0, 0.2]:
+                ps = parallel(delayed(para)(trial, gamma, normalize) for trial in range(n_trial))
                 aupc_gamma = aupc(ps)
-                print(normalize, gamma, aupc_gamma)
+                print('test_kcit_henon', normalize, gamma, aupc_gamma)
 
 
-def para_K(trial, gamma, normalize, eq_17_as_is):
+def para_K(trial, gamma, sigma_squared):
     np.random.seed(trial)
     X, Y, Z = henon(trial, 200, gamma, 0)
-    if normalize:
-        X, Y, Z = columnwise_normalizes(X, Y, Z)
     KX, KY, KZ = rbf_kernel_with_median_heuristic(X, Y, Z)
-    Sta, Cri, p_val, Cri_appr, p_appr = python_kcit_K(KX, KY, KZ, eq_17_as_is=eq_17_as_is)
+    Sta, Cri, p_val, Cri_appr, p_appr = python_kcit_K(KX, KY, KZ, with_gp=False, noise=sigma_squared)
     return p_val
 
 
 def test_kcit_henon_K():
     """
-    True True 0.0 1.0
-    True True 0.2 1.0
-    True True 0.4 1.0
+    test_kcit_henon_K 0.0 1.0 0.392629
+    test_kcit_henon_K 0.0 0.1 0.499575
+    test_kcit_henon_K 0.0 0.01 0.549117
+    test_kcit_henon_K 0.0 0.001 0.580488
 
-    True False 0.0 1.0
-    True False 0.2 1.0
-    True False 0.4 1.0
-
-    False True 0.0 0.59243
-    False True 0.2 0.810601
-    False True 0.4 0.966841
-
-    False False 0.0 0.565238
-    False False 0.2 0.915659
-    False False 0.4 0.997314
+    test_kcit_henon_K 0.2 1.0 0.99918
+    test_kcit_henon_K 0.2 0.1 0.999053
+    test_kcit_henon_K 0.2 0.01 0.99862
+    test_kcit_henon_K 0.2 0.001 0.996396
     """
     n_trial = 200
-    with Parallel(multiprocessing.cpu_count() // 2) as parallel:
-        for eq_17_as_is in [True, False]:
-            for normalize in [True, False]:
-                for gamma in [0.0, 0.2, 0.4]:
-                    ps = parallel(delayed(para_K)(trial, gamma, normalize, eq_17_as_is) for trial in trange(n_trial))
-                    aupc_gamma = aupc(ps)
-                    print(eq_17_as_is, normalize, gamma, aupc_gamma)
+    with Parallel(multiprocessing.cpu_count() // 3) as parallel:
+        for gamma in [0.0, 0.2]:
+            for sigma_squared in [1.0, 0.1, 0.01, 0.001]:
+                ps = parallel(delayed(para_K)(trial, gamma, sigma_squared) for trial in range(n_trial))
+                aupc_gamma = aupc(ps)
+                print('test_kcit_henon_K', gamma, sigma_squared, aupc_gamma)
+
+
+def para_K2(trial, gamma):
+    np.random.seed(trial)
+    X, Y, Z = henon(trial, 200, gamma, 0)
+    KX, KY, KZ = rbf_kernel_with_median_heuristic(X, Y, Z)
+    Sta, Cri, p_val, Cri_appr, p_appr = python_kcit_K(KX, KY, KZ, with_gp=True)
+    return p_val
+
+
+def test_kcit_henon_K2():
+    """
+    test_kcit_henon_K2 0.0 0.508071 31.19998335838318
+    test_kcit_henon_K2 0.2 0.998337 30.68874216079712
+    """
+    n_trial = 200
+    with Parallel(-1) as parallel:
+        for gamma in [0.0, 0.2]:
+            start = time.time()
+            ps = parallel(delayed(para_K2)(trial, gamma) for trial in trange(n_trial))
+            aupc_gamma = aupc(ps)
+            print('test_kcit_henon_K2', gamma, aupc_gamma, time.time() - start)
 
 
 def test_matlab_kcit_henon():
@@ -91,7 +111,7 @@ def test_matlab_kcit_henon():
 
     n_trial = 200
     for gamma in [0.0, 0.2, 0.4]:
-        ps = [kcit(*henon(trial, 200, gamma, 0), seed=trial, mateng=mateng)[2] for trial in trange(n_trial)]
+        ps = [kcit(*henon(trial, 200, gamma, 0), seed=trial, mateng=mateng)[2] for trial in range(n_trial)]
         aupc_gamma = aupc(ps)
         print(gamma, aupc_gamma)
 
@@ -99,8 +119,6 @@ def test_matlab_kcit_henon():
 
 
 if __name__ == '__main__':
-    test_matlab_kcit_henon()
-    print()
-    test_kcit_henon()
-    print()
-    test_kcit_henon_K()
+    # test_kcit_henon()
+    # test_kcit_henon_K()
+    test_kcit_henon_K2()

@@ -10,49 +10,23 @@ import seaborn as sns
 from UAI_2017_SDCIT_experiments.exp_setup import SDCIT_RESULT_DIR, SDCIT_FIGURE_DIR
 from sdcit.tests.t_utils import aupc
 
-names_chsic_chaotic = ['independent', 'gamma', 'noise', 'trial', 'N', 'runtime', 'statistic', 'pvalue']
-names_chsic_postnonlinear = ['independent', 'noise', 'trial', 'N', 'runtime', 'statistic', 'pvalue']
-names_kcit_chaotic = ['independent', 'gamma', 'noise', 'trial', 'N', 'runtime', 'statistic', 'boot_p_value', 'appr_p_value']
-names_kcit_postnonlinear = ['independent', 'noise', 'trial', 'N', 'runtime', 'statistic', 'boot_p_value', 'appr_p_value']
-names_kcit5_chaotic = ['independent', 'gamma', 'trial', 'N', 'pvalue']
-names_kcit5_postnonlinear = ['independent', 'noise', 'trial', 'N', 'pvalue']
-names_sdcit_chaotic = ['independent', 'gamma', 'trial', 'N', 'statistic', 'pvalue']
-names_sdcit_postnonlinear = ['independent', 'noise', 'trial', 'N', 'statistic', 'pvalue']
-names_kcipt_chaotic = ['independent', 'gamma', 'trial', 'N', 'statistic', 'pvalue', 'B']
-names_kcipt_postnonlinear = ['independent', 'noise', 'trial', 'N', 'statistic', 'pvalue', 'B']
 names_fcit_chaotic = ['independent', 'gamma', 'trial', 'N', 'pvalue']
 names_fcit_postnonlinear = ['independent', 'noise', 'trial', 'N', 'pvalue']
+names_fcit3_chaotic = ['sigma_squared', 'independent', 'gamma', 'trial', 'N', 'pvalue']
+names_fcit3_postnonlinear = ['sigma_squared', 'independent', 'noise', 'trial', 'N', 'pvalue']
 
-# KCIT: original MATLAB KCIT with columnwise-normalization & pre-determined RBF kernel parameter.
-# KCIT2: original MATLAB KCIT without columnwise-normalization and RBF kernel parameter based on median heuristic.
-# FCIT: kernel-based where kernel matrix constructed with RBF kernel parameter based on median heuristic.
-# FCIT2: real-value based where kernel matrix is built only after 'residualization'.
+names = {
+    ('FCIT2', 'chaotic'): names_fcit_chaotic,
+    ('FCIT2', 'postnonlinear'): names_fcit_postnonlinear,
+    ('FCIT5', 'chaotic'): names_fcit_chaotic,
+    ('FCIT5', 'postnonlinear'): names_fcit_postnonlinear,
+}
 
-names = {('CHSIC', 'chaotic'): names_chsic_chaotic,
-         ('CHSIC', 'postnonlinear'): names_chsic_postnonlinear,
-         ('KCIT', 'chaotic'): names_kcit_chaotic,
-         ('KCIT', 'postnonlinear'): names_kcit_postnonlinear,
-         ('KCIT5', 'chaotic'): names_kcit5_chaotic,
-         ('KCIT5', 'postnonlinear'): names_kcit5_postnonlinear,
-         ('SDCIT', 'chaotic'): names_sdcit_chaotic,
-         ('SDCIT', 'postnonlinear'): names_sdcit_postnonlinear,
-         ('CSDCIT', 'chaotic'): names_sdcit_chaotic,
-         ('CSDCIT', 'postnonlinear'): names_sdcit_postnonlinear,
-         ('KCIPT', 'chaotic'): names_kcipt_chaotic,
-         ('KCIPT', 'postnonlinear'): names_kcipt_postnonlinear,
-         ('FCIT5', 'chaotic'): names_fcit_chaotic,
-         ('FCIT5', 'postnonlinear'): names_fcit_postnonlinear,
-         }
-
-pvalue_column = collections.defaultdict(lambda: 'pvalue')
-pvalue_column['KCIT'] = 'boot_p_value'
-
+pvalue_column = collections.defaultdict(lambda: 'pvalue')  # {'FCIT': 'pvalue', 'KCIT': 'boot_p_value', 'SDCIT': 'pvalue', 'CSDCIT': 'pvalue', 'KCIPT': 'pvalue', 'FCIT2': 'pvalue', 'KCIT2': 'boot_p_value'}
 color_palettes = sns.color_palette('Paired', 10)
-# method_color_codes = {'FCIT': 9, 'KCIT': 3, 'SDCIT': 5, 'KCIPT': 1, 'CSDCIT': 7, 'FCIT2': 0, 'KCIT2': 8}
-markers = collections.defaultdict(lambda: 'o')
-markers.update({'FCIT': '^', 'KCIT': 'o', 'SDCIT': 's', 'KCIPT': '*', 'CSDCIT': '<', 'FCIT2': '>', 'KCIT2': 'o'})
-all_algos = ['KCIT', 'FCIT5', 'KCIT5', 'SDCIT', 'CSDCIT']
-method_color_codes = {'KCIT': 1, 'FCIT5': 3, 'KCIT5': 5, 'SDCIT': 7, 'CSDCIT': 9}
+method_color_codes = {}  # {'FCIT': 0, 'FCIT2': 2, 'FCIT3': 4, 'FCIT4': 6}
+markers = collections.defaultdict(lambda: 'o')  # {'FCIT': '^', 'KCIT': 'o', 'SDCIT': 's', 'KCIPT': '*', 'CSDCIT': '<', 'FCIT2': '>', 'KCIT2': 'o'}
+all_algos = ['FCIT2', 'FCIT5']
 
 
 def draw_aupc_chaotic():
@@ -60,12 +34,12 @@ def draw_aupc_chaotic():
 
     aupc_data = []
     for algo in all_algos:
-        df = pd.read_csv(SDCIT_RESULT_DIR + '/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
-
-        for group_key, group_df in df.groupby(by=['gamma', 'independent', 'N']):
-            group_key = (int(group_key[0] * 10) / 10, *group_key[1:])
-            if group_key[1] == 0:
-                aupc_data.append([algo, *group_key, aupc(group_df[pvalue_column[algo]])])
+        df0 = pd.read_csv(SDCIT_RESULT_DIR + '/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
+        for ss, df in (df0.groupby('sigma_squared') if names[(algo, data)][0] == 'sigma_squared' else [('', df0)]):
+            for group_key, group_df in df.groupby(by=['gamma', 'independent', 'N']):
+                group_key = (int(group_key[0] * 10) / 10, *group_key[1:])
+                if group_key[1] == 0:
+                    aupc_data.append([algo + ' ' + str(ss), *group_key, aupc(group_df[pvalue_column[algo]])])
 
     print(draw_aupc_chaotic.__name__)
     [print(xx) for xx in aupc_data]
@@ -86,20 +60,15 @@ def draw_aupc_chaotic():
     sns_setting()
     for k, gdf in aupc_df.groupby(['algorithm', 'N']):
         print('chaotic', k, gdf['AUPC'])
-        if k[1] == 400:
-            plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
-        else:
-            plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+        plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], ls='-' if k[1] == 400 else ':', label=str(k[0]), alpha=0.5)
 
     plt.axes().set_xlabel(r'$\gamma$')
     plt.axes().set_ylabel('Area Under Power Curve')
     plt.axes().set_ylim([0.45, 1.05])
-
+    sns.despine()
     handles, labels = plt.axes().get_legend_handles_labels()
     plt.axes().legend(handles[::-1], labels[::-1])
-
-    sns.despine()
-    plt.savefig(SDCIT_FIGURE_DIR + '/{}_aupc.pdf'.format(data), transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig(SDCIT_FIGURE_DIR + '/{}_aupc_fcits.pdf'.format(data), transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -107,11 +76,12 @@ def draw_calib_chaotic():
     data = 'chaotic'
     calib_data = []
     for algo in all_algos:
-        df = pd.read_csv(SDCIT_RESULT_DIR + '/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
-        for k, gdf in df.groupby(by=['independent', 'gamma', 'N']):
-            if float(k[0]) == 1:
-                D, _ = scipy.stats.kstest(gdf[pvalue_column[algo]], 'uniform')
-                calib_data.append([algo, float(k[1]), int(k[2]), D])
+        df0 = pd.read_csv(SDCIT_RESULT_DIR + '/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
+        for ss, df in (df0.groupby('sigma_squared') if names[(algo, data)][0] == 'sigma_squared' else [('', df0)]):
+            for k, gdf in df.groupby(by=['independent', 'gamma', 'N']):
+                if float(k[0]) == 1:
+                    D, _ = scipy.stats.kstest(gdf[pvalue_column[algo]], 'uniform')
+                    calib_data.append([algo + ' ' + str(ss), float(k[1]), int(k[2]), D])
 
     print(draw_calib_chaotic.__name__)
     [print(xx) for xx in calib_data]
@@ -122,22 +92,17 @@ def draw_calib_chaotic():
     df['D'] = df['D'].astype(float)
     sns_setting()
     for k, gdf in df.groupby(['algo', 'N']):
-        if k[1] == 400:
-            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
-        else:
-            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+        plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], ls='-' if k[1] == 400 else ':', label=str(k[0]), alpha=0.5)
     handles, labels = plt.axes().get_legend_handles_labels()
     plt.axes().legend(handles[::-1], labels[::-1], ncol=2)
     plt.axes().set_xlabel(r'$\gamma$')
     plt.axes().set_ylabel('KS test statistic')
     plt.axes().invert_yaxis()
     plt.axes().set_yticks([0.1, 0.2, 0.3])
-
+    sns.despine()
     handles, labels = plt.axes().get_legend_handles_labels()
     plt.axes().legend(handles[::-1], labels[::-1])
-
-    sns.despine()
-    plt.savefig(SDCIT_FIGURE_DIR + '/chaotic_calib.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig(SDCIT_FIGURE_DIR + '/chaotic_calib_fcits.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -288,8 +253,9 @@ def draw_calib_postnonlinear():
 def sns_setting():
     paper_rc = {'lines.linewidth': 1, 'lines.markersize': 2}
     sns.set_context("paper", rc=paper_rc)
-    sns.set(style='white', font_scale=1.4)
-    plt.figure(figsize=[4, 3])
+    pal = sns.color_palette('Set1', 12)
+    sns.set(style='white', font_scale=1.1, palette=pal)
+    plt.figure(figsize=[5, 4])
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{cmbright}')
 
@@ -373,7 +339,7 @@ if __name__ == '__main__':
     # chaotic series
     draw_aupc_chaotic()
     draw_calib_chaotic()
-
+    #
     # # postnonlinear-noise
     # draw_aupc_postnonlinear()
     # draw_calib_postnonlinear()

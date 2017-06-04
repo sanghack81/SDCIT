@@ -1,13 +1,12 @@
-import os
-
 import multiprocessing
+import os
 
 SDCIT_WORKING_DIR = os.path.expanduser('~/Dropbox/research/2014 rcm/workspace/python/SDCIT/UAI_2017_SDCIT_experiments')
 SDCIT_RESULT_DIR = SDCIT_WORKING_DIR + '/results'
 SDCIT_FIGURE_DIR = SDCIT_WORKING_DIR + '/figures'
 SDCIT_DATA_DIR = os.path.expanduser('~/kcipt_data')
 
-PARALLEL_JOBS = multiprocessing.cpu_count()//2
+PARALLEL_JOBS = multiprocessing.cpu_count() // 3
 
 assert os.path.exists(SDCIT_WORKING_DIR), 'working directory:{} does not exist. Please set appropriately'.format(SDCIT_WORKING_DIR)
 if not os.path.exists(SDCIT_FIGURE_DIR):
@@ -20,4 +19,3 @@ if not os.path.exists(SDCIT_DATA_DIR):
     print('creating directory: {}'.format(SDCIT_DATA_DIR))
     os.makedirs(SDCIT_DATA_DIR)
     print('please checkout https://github.com/garydoranjr/kcipt and run our MATLAB code to generate data used in the paper.')
-

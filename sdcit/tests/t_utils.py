@@ -1,4 +1,6 @@
 import numpy as np
+import scipy.stats
+
 
 def aupc(pvals):
     ttt = [(uniq_v, np.mean(pvals <= uniq_v)) for uniq_v in np.unique(pvals)]
@@ -9,3 +11,8 @@ def aupc(pvals):
         prev_x, prev_y = x, y
     area += (1 - prev_x) * prev_y
     return area
+
+
+def ks_statistic(pvals):
+    D, _ = scipy.stats.kstest(pvals, 'uniform')
+    return D

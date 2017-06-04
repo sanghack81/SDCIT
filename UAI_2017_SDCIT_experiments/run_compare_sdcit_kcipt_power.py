@@ -1,4 +1,3 @@
-import os
 import pickle
 import time
 from os.path import exists
@@ -8,11 +7,11 @@ import numpy as np
 import pandas as pd
 import scipy.stats
 import seaborn as sns
-from UAI_2017_SDCIT_experiments.run_KCIPT import test_chaotic
 from scipy.stats import gamma, pearson3
 from tqdm import trange
 
 from UAI_2017_SDCIT_experiments.exp_setup import *
+from UAI_2017_SDCIT_experiments.run_KCIPT import test_chaotic
 from UAI_2017_SDCIT_experiments.testing_utils import read_chaotic
 from sdcit.kcipt import c_KCIPT
 from sdcit.sdcit2 import bias_reduced_SDCIT
