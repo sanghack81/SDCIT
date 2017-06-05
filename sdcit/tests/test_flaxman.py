@@ -2,6 +2,7 @@ import multiprocessing
 
 import numpy as np
 from joblib import Parallel, delayed
+from tqdm import trange
 
 from sdcit.flaxman import FCIT, FCIT_K
 from sdcit.tests.synthetic import henon
@@ -93,24 +94,24 @@ def para_K2(trial, gamma, eq_17_as_is):
 
 def test_flaxman_henon_K2():
     """
-    test_flaxman_henon_K2 True 0.0 0.4848
-    test_flaxman_henon_K2 True 0.2 0.996865
-    test_flaxman_henon_K2 True 0.4 1.0
+    test_flaxman_henon_K2 True 0.0 0.4848   / ARD 0.4953
+    test_flaxman_henon_K2 True 0.2 0.996865 / ARD 0.996495
+    test_flaxman_henon_K2 True 0.4 1.0      / ARD 1.0
 
-    test_flaxman_henon_K2 False 0.0 0.48488
-    test_flaxman_henon_K2 False 0.2 0.996865
-    test_flaxman_henon_K2 False 0.4 1.0
+    test_flaxman_henon_K2 False 0.0 0.48488 /
+    test_flaxman_henon_K2 False 0.2 0.996865/
+    test_flaxman_henon_K2 False 0.4 1.0     /
     """
-    n_jobs = multiprocessing.cpu_count() // 3
+    n_jobs = multiprocessing.cpu_count() // 2
     n_trial = 200
     with Parallel(n_jobs) as parallel:
         for eq_17_as_is in [True, False]:
             for gamma in [0.0, 0.2, 0.4]:
-                ps = parallel(delayed(para_K2)(trial, gamma, eq_17_as_is) for trial in range(n_trial))
+                ps = parallel(delayed(para_K2)(trial, gamma, eq_17_as_is) for trial in trange(n_trial))
                 aupc_gamma = aupc(ps)
                 print('test_flaxman_henon_K2', eq_17_as_is, gamma, aupc_gamma)
 
 
 if __name__ == '__main__':
-    test_flaxman_henon_K()
+    # test_flaxman_henon_K()
     test_flaxman_henon_K2()

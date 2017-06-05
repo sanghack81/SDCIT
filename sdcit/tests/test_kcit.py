@@ -119,6 +119,4 @@ def test_matlab_kcit_henon():
 
 
 if __name__ == '__main__':
-    # test_kcit_henon()
-    # test_kcit_henon_K()
-    test_kcit_henon_K2()
+    pass

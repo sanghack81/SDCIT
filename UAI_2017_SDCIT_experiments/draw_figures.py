@@ -32,27 +32,36 @@ names = {('CHSIC', 'chaotic'): names_chsic_chaotic,
          ('CHSIC', 'postnonlinear'): names_chsic_postnonlinear,
          ('KCIT', 'chaotic'): names_kcit_chaotic,
          ('KCIT', 'postnonlinear'): names_kcit_postnonlinear,
-         ('KCIT5', 'chaotic'): names_kcit5_chaotic,
-         ('KCIT5', 'postnonlinear'): names_kcit5_postnonlinear,
+         ('KCIT2', 'chaotic'): names_kcit_chaotic,
+         ('KCIT2', 'postnonlinear'): names_kcit_postnonlinear,
+         ('KCITR', 'chaotic'): names_kcit5_chaotic,
+         ('KCITR', 'postnonlinear'): names_kcit5_postnonlinear,
+         ('KCITK', 'chaotic'): names_kcit5_chaotic,
+         ('KCITK', 'postnonlinear'): names_kcit5_postnonlinear,
          ('SDCIT', 'chaotic'): names_sdcit_chaotic,
          ('SDCIT', 'postnonlinear'): names_sdcit_postnonlinear,
          ('CSDCIT', 'chaotic'): names_sdcit_chaotic,
          ('CSDCIT', 'postnonlinear'): names_sdcit_postnonlinear,
          ('KCIPT', 'chaotic'): names_kcipt_chaotic,
          ('KCIPT', 'postnonlinear'): names_kcipt_postnonlinear,
-         ('FCIT5', 'chaotic'): names_fcit_chaotic,
-         ('FCIT5', 'postnonlinear'): names_fcit_postnonlinear,
+         ('FCITK', 'chaotic'): names_fcit_chaotic,
+         ('FCITK', 'postnonlinear'): names_fcit_postnonlinear,
+         ('FCITR', 'chaotic'): names_fcit_chaotic,
+         ('FCITR', 'postnonlinear'): names_fcit_postnonlinear,
          }
 
 pvalue_column = collections.defaultdict(lambda: 'pvalue')
 pvalue_column['KCIT'] = 'boot_p_value'
+pvalue_column['KCIT2'] = 'boot_p_value'
 
 color_palettes = sns.color_palette('Paired', 10)
 # method_color_codes = {'FCIT': 9, 'KCIT': 3, 'SDCIT': 5, 'KCIPT': 1, 'CSDCIT': 7, 'FCIT2': 0, 'KCIT2': 8}
 markers = collections.defaultdict(lambda: 'o')
 markers.update({'FCIT': '^', 'KCIT': 'o', 'SDCIT': 's', 'KCIPT': '*', 'CSDCIT': '<', 'FCIT2': '>', 'KCIT2': 'o'})
-all_algos = ['KCIT', 'FCIT5', 'KCIT5', 'SDCIT', 'CSDCIT']
-method_color_codes = {'KCIT': 1, 'FCIT5': 3, 'KCIT5': 5, 'SDCIT': 7, 'CSDCIT': 9}
+# all_algos = ['KCIT', 'FCIT5', 'KCIT5', 'SDCIT','KCIT2']
+all_algos = ['KCIT', 'KCIT2', 'KCITR', 'KCITK', 'FCITK', 'FCITR', 'SDCIT']
+# method_color_codes = {'KCIT': 1, 'KCIT2': 9, 'FCIT5': 3, 'KCIT5': 5, 'SDCIT': 7}
+method_color_codes = {'KCIT': 1, 'KCIT2': 4, 'KCITR': 9, 'KCITK': 3, 'FCITK': 5, 'FCITR': 7, 'SDCIT': 8}
 
 
 def draw_aupc_chaotic():
@@ -146,7 +155,7 @@ def draw_type_I_error_chaotic():
     calib_data = []
     for algo in all_algos:
         df = pd.read_csv(SDCIT_RESULT_DIR + '/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
-        for k, gdf in pd.groupby(df, by=['independent', 'gamma', 'N']):
+        for k, gdf in df.groupby(by=['independent', 'gamma', 'N']):
             if float(k[0]) == 1:
                 calib_data.append([algo, float(k[1]), int(k[2]), np.mean(gdf[pvalue_column[algo]] <= 0.05)])
 
@@ -299,7 +308,7 @@ def draw_calib_postnonlinear_highdim():
     calib_data = []
     for algo in all_algos:
         df = pd.read_csv(SDCIT_RESULT_DIR + '/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
-        for k, gdf in pd.groupby(df, by=['independent', 'noise', 'N']):
+        for k, gdf in df.groupby(by=['independent', 'noise', 'N']):
             if float(k[0]) == 1 and k[2] == 400:
                 dd, _ = scipy.stats.kstest(gdf[pvalue_column[algo]], 'uniform')
                 calib_data.append([algo, float(k[1]), int(k[2]), dd])
@@ -313,7 +322,7 @@ def draw_calib_postnonlinear_highdim():
     df['N'] = df['N'].map(int)
     df['D'] = df['D'].astype(float)
     sns_setting()
-    for k, gdf in pd.groupby(df, ['algo', 'N']):
+    for k, gdf in df.groupby(['algo', 'N']):
         print('postnonlinear', k, gdf['D'])
         if k[1] == 400:
             plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
@@ -335,7 +344,7 @@ def draw_type_I_postnonlinear_highdim():
     calib_data = []
     for algo in all_algos:
         df = pd.read_csv(SDCIT_RESULT_DIR + '/' + algo.lower() + '_' + data + '.csv', names=names[(algo, data)])
-        for k, gdf in pd.groupby(df, by=['independent', 'noise', 'N']):
+        for k, gdf in df.groupby(by=['independent', 'noise', 'N']):
             if float(k[0]) == 1 and k[2] == 400:
                 dd = np.mean(gdf[pvalue_column[algo]] <= 0.05)
                 calib_data.append([algo, float(k[1]), int(k[2]), dd])
@@ -349,7 +358,7 @@ def draw_type_I_postnonlinear_highdim():
     df['N'] = df['N'].map(int)
     df['D'] = df['D'].astype(float)
     sns_setting()
-    for k, gdf in pd.groupby(df, ['algo', 'N']):
+    for k, gdf in df.groupby(['algo', 'N']):
         if k[1] == 400:
             plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label=str(k[0]))
         else:
@@ -375,11 +384,11 @@ if __name__ == '__main__':
     draw_calib_chaotic()
 
     # # postnonlinear-noise
-    # draw_aupc_postnonlinear()
-    # draw_calib_postnonlinear()
-    # draw_aupc_postnonlinear_highdim()
-    # draw_calib_postnonlinear_highdim()
+    draw_aupc_postnonlinear()
+    draw_calib_postnonlinear()
+    draw_aupc_postnonlinear_highdim()
+    draw_calib_postnonlinear_highdim()
     #
     # # type I for both
-    # draw_type_I_error_chaotic()
-    # draw_type_I_postnonlinear_highdim()
+    draw_type_I_error_chaotic()
+    draw_type_I_postnonlinear_highdim()

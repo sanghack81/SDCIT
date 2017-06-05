@@ -19,15 +19,16 @@ if __name__ == '__main__':
                 kx, ky, kz, Dz = read_chaotic(independent, gamma, trial, N)
                 kxz = kx * kz
 
-                emp_mmd, emp_errors = emp_MMSD(kxz, ky, Dz, 100)
+                emp_mmd, emp_errors = emp_MMSD(kxz, ky, kz, Dz, 100)
                 bootmmd = adjust_errors(emp_errors, emp_mmd).mean()
 
-                _, _, mask, _ = MMSD(kxz, ky, Dz)
+                _, _, mask, _ = MMSD(ky, kz, kxz, Dz)
                 mask, Pidx = perm_and_mask(penalized_distance(Dz, mask))
 
                 # avoid permutation between already permuted pairs.
                 raw_null, raw_null_errors = emp_MMSD(kxz,
                                                      ky[np.ix_(Pidx, Pidx)],
+                                                     kz,
                                                      penalized_distance(Dz, mask),
                                                      1000)
                 adj_null = adjust_errors(raw_null_errors, raw_null)

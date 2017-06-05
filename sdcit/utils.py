@@ -1,25 +1,25 @@
 import warnings
 
-import GPflow
 import numpy as np
 import numpy.ma as ma
 import scipy.linalg
 import scipy.optimize
+from GPflow.gpr import GPR
 from GPflow.kernels import White, Linear, RBF
 from numpy import diag, exp, sqrt
 from numpy.matlib import repmat
 from sklearn.metrics import euclidean_distances
 
 
-def columnwise_normalizes(*xs):
-    return [columnwise_normalize(x) for x in xs]
+def columnwise_normalizes(*Xs):
+    return [columnwise_normalize(X) for X in Xs]
 
 
-def columnwise_normalize(x: np.ndarray) -> np.ndarray:
+def columnwise_normalize(X: np.ndarray) -> np.ndarray:
     """normalize per column"""
-    if x is None:
+    if X is None:
         return None
-    return (x - np.mean(x, 0)) / np.std(x, 0)  # broadcast
+    return (X - np.mean(X, 0)) / np.std(X, 0)  # broadcast
 
 
 def ensure_symmetric(x):
@@ -34,43 +34,50 @@ def truncated_eigen(eig_vals, eig_vecs=None, relative_threshold=1e-5):
         return eig_vals[indices]
 
 
-def eigdec(x: np.ndarray, n: int = None):
-    """Top N descending ordered eigenvalues and corresponding eigenvectors"""
-    if n is None:
-        n = len(x)
+def eigdec(X: np.ndarray, top_N: int = None):
+    """Eigendecomposition with top N descending ordered eigenvalues and corresponding eigenvectors"""
+    if top_N is None:
+        top_N = len(X)
 
-    x = ensure_symmetric(x)
-    M = len(x)
+    X = ensure_symmetric(X)
+    M = len(X)
 
     # ascending M-1-N <= <= M-1
-    w, v = scipy.linalg.eigh(x, eigvals=(M - 1 - n + 1, M - 1))
+    w, v = scipy.linalg.eigh(X, eigvals=(M - 1 - top_N + 1, M - 1))
+
     # descending
     return w[::-1], v[:, ::-1]
 
 
 def centering(M: np.ndarray) -> np.ndarray:
     """Matrix Centering"""
-    nr, nc = M.shape
-    assert nr == nc
-    n = nr
-    H = np.eye(n) - np.ones((n, n)) / n
+    if M is None:
+        return None
+    n = len(M)
+    H = np.eye(n) - 1 / n
     return H @ M @ H
 
 
-# inverse of a positive definite matrix
-def pdinv(x):
+def pdinv(x: np.ndarray) -> np.ndarray:
+    """inverse of a positive definite matrix"""
     U = scipy.linalg.cholesky(x)
     Uinv = scipy.linalg.inv(U)
     return Uinv @ Uinv.T
 
 
-def residualize(Y, X, gp_kernel=None):
-    # Y_i - E[Y_i|X_i]
-    if gp_kernel is None:
-        _, n_feats = X.shape
-        gp_kernel = RBF(n_feats) + White(n_feats)
+def default_gp_kernel(X):
+    _, n_feats = X.shape
+    return RBF(n_feats, ARD=True) + White(n_feats)
 
-    m = GPflow.gpr.GPR(X, Y, gp_kernel)
+
+def residualize(Y, X=None, gp_kernel=None):
+    """Y_i - E[Y_i|X_i]"""
+    if X is None:
+        return Y
+    if gp_kernel is None:
+        gp_kernel = default_gp_kernel(X)
+
+    m = GPR(X, Y, gp_kernel)
     m.optimize()
 
     Yhat, _ = m.predict_y(X)
@@ -78,7 +85,7 @@ def residualize(Y, X, gp_kernel=None):
 
 
 def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, eq_17_as_is=True, with_gp=False, sigma_squared=1e-3):
-    # R_Y|X
+    """Kernel matrix of residual Y|X"""
     K_Y, K_X = centering(K_Y), centering(K_X)
     T = len(K_Y)
     if with_gp:
@@ -89,27 +96,24 @@ def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, eq_17_as_is=True, with_gp=
         Y = eiy @ diag(sqrt(eig_Ky))
         n_feats = X.shape[1]
 
-        # TODO ARD
-        gp_x = GPflow.gpr.GPR(X, Y, Linear(n_feats) + White(n_feats))
-        gp_x.optimize()
+        gp_model = GPR(X, Y, Linear(n_feats, ARD=True) + White(n_feats))
+        gp_model.optimize()
 
-        K_X = gp_x.kern.linear.compute_K_symm(X)
-        # TODO ARD, diag variance
-        sigma_squared = gp_x.kern.white.variance.value[0]
+        K_X = gp_model.kern.linear.compute_K_symm(X)
+        sigma_squared = gp_model.kern.white.variance.value[0]
 
-    I = np.eye(len(K_X))
-    IK = pdinv(I + K_X / sigma_squared)  # I-K @ inv(K+Sigma)
-    if eq_17_as_is:
-        return (K_X + IK @ K_Y) @ IK
-    else:
-        return IK @ K_Y @ IK
+    P = pdinv(np.eye(T) + K_X / sigma_squared)  # == I-K @ inv(K+Sigma) in Zhang et al. 2011
+    if eq_17_as_is:  # Flaxman et al. 2016 Gaussian Processes for Independence Tests with Non-iid Data in Causal Inference.
+        return (K_X + P @ K_Y) @ P
+    else:  # Zhang et al. 2011. Kernel-based Conditional Independence Test and Application in Causal Discovery.
+        return P @ K_Y @ P
 
 
 def rbf_kernel_with_median_heuristic_wo2(data, *args):
     return rbf_kernel_with_median_heuristic(data, *args, without_two=True)
 
 
-def rbf_kernel_with_median_heuristic(data, *args, without_two=False):
+def rbf_kernel_with_median_heuristic(data: np.ndarray, *args, without_two=False):
     """A list of RBF kernel matrices for data sets in arguments based on median heuristic"""
     if args is None:
         args = []

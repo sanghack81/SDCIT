@@ -25,7 +25,7 @@ def henon(seed, n, gamma, independence, noise_dim=2, noise_std=0.5):
 
     # [0, ... n-2] is for 'warming up'
     # [n-1, ...  -2] = n-1:-1     is for Xt, Yt
-    #     [n, .... ,-1] = n:          is for Xt1, Yt1
+    # [n, .... ,-1] = n:          is for Xt1, Yt1
     # initial?
     for t in range(1, 2 * n):
         x[t, 0] = 1.4 - x[t - 1, 0] ** 2 + 0.3 * x[t - 1, 1]
