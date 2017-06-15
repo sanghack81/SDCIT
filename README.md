@@ -6,7 +6,7 @@ Sanghack Lee (<sanghack.lee@gmail.com>)
 Overview
 -------
 
-A Kernel-based Conditional Independence Test which checks $P(X,Y,Z)=P(X|Z)P(Y|Z)P(Z)$.
+A Kernel-based Conditional Independence Test which checks _P_(_X_,_Y_,_Z_)=_P_(_X_|_Z_)_P_(_Y_|_Z_)_P_(_Z_).
 
 
 > Sanghack Lee, Vasant Honavar **Self-Discrepancy Conditional Independence Test**
