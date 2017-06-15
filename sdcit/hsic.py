@@ -14,11 +14,12 @@ def HSIC(K: np.ndarray, L: np.ndarray, p_val_method='bootstrap', num_boot=1000):
         raise ValueError('unknown p value computation method: {}'.format(p_val_method))
 
 
-# It seems that gamma approx is less reliable under certain conditions
 def HSIC_gamma_approx(K: np.ndarray, L: np.ndarray) -> float:
-    """A Hilbert-Schmidt Independence Criterion"""
-    # based on matlab code by Arthur Gretton (hsicTestGamma.m, 03/06/07):
-    # http://www.gatsby.ucl.ac.uk/~gretton/indepTestFiles/indep.htm
+    """Hilbert-Schmidt Independence Criterion
+
+    based on matlab code by Arthur Gretton (hsicTestGamma.m, 03/06/07):
+    http://www.gatsby.ucl.ac.uk/~gretton/indepTestFiles/indep.htm
+    """
     K, L = K.copy(), L.copy()
     Kc, Lc = centering(K), centering(L)
     m = len(K)
@@ -45,7 +46,7 @@ def HSIC_gamma_approx(K: np.ndarray, L: np.ndarray) -> float:
 
 
 def HSIC_stat(K, L):
-    """HSIC statistic assuming given two kernel matrices are centered."""
+    """HSIC statistic assuming given two centered kernel matrices."""
     m = len(K)
     return 1 / m * np.sum(K * L)
 
@@ -61,4 +62,5 @@ def HSIC_boot(K: np.ndarray, L: np.ndarray, num_boot=1000) -> float:
     for i in range(num_boot):
         np.random.shuffle(idx)
         boot[i] = HSIC_stat(Kc, Lc[np.ix_(idx, idx)])
+
     return p_value_of(stat, boot)

@@ -4,9 +4,14 @@ from numpy.random import rand, randn
 
 
 def henon(seed, n, gamma, independence, noise_dim=2, noise_std=0.5):
-    """Python implementation of Chaotic Time Series used in Doran et al. (2014) A Permutation-based Kernel Conditional Independence Test
+    """Python implementation of chaotic time series as used in Doran et al. (2014) A Permutation-based Kernel Conditional Independence Test
 
-    It is not compatible to the MATLAB implementation by Doran et al. (2014) due to the use of differenct random number generator.
+    It is not compatible with the MATLAB implementation by Doran et al. (2014) due to the use of differenct random number generator.
+
+    References
+    ----------
+    Doran, G., Muandet, K., Zhang, K., & Schölkopf, B. (2014). A Permutation-Based Kernel Conditional Independence Test.
+    In Proceedings of the Thirtieth Conference on Uncertainty in Artificial Intelligence (pp. 132–141). Corvallis, Oregon: AUAI Press.
     """
     np.random.seed(seed)
 
@@ -44,11 +49,12 @@ def henon(seed, n, gamma, independence, noise_dim=2, noise_std=0.5):
 
 
 def normalize(X):
+    """Columnwise normalization"""
     return (X - np.mean(X, axis=0)) / np.std(X, axis=0)
 
 
 def zhang2012(seed, N, dimensions, the_case, independent=True):
-    """Python implementation of Postnonlinear noise model"""
+    """Python implementation of Postnonlinear noise data"""
 
     np.random.seed(seed)
 

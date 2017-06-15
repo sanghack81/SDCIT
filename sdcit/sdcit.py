@@ -1,26 +1,24 @@
-from sdcit.cython_impl.cy_sdcit import cy_sdcit
-from sdcit.kcipt import c_KCIPT
-from sdcit.permutation import permuted
-from sdcit.utils import *
+from typing import Tuple
+
+import numpy as np
+import numpy.ma as ma
+from sklearn.linear_model import LinearRegression
+
+from sdcit.cython_impl.cy_sdcit import cy_sdcit2
+from sdcit.cython_impl.cy_sdcit import cy_split_permutation, cy_dense_permutation
+from sdcit.utils import K2D, p_value_of, random_seeds, cythonize
 
 
-def MMSD(kxz, ky, Dz):
-    """Maximum Mean Self-Discrepancy"""
-    n = len(kxz)
-    full_idx = np.arange(0, n)
-
-    mask, perm = perm_and_mask(Dz)
-
-    K11 = kxz * ky
-    K12 = kxz * ky[np.ix_(full_idx, perm)]
-    K22 = kxz * ky[np.ix_(perm, perm)]
-
-    statistic = ma.array(K11 + K22 - K12 - K12.T, mask=mask).mean()
-
-    return statistic, mask, perm
+def permuted(D, dense=True):
+    out = np.zeros((len(D),), 'int32')
+    if dense:
+        cy_dense_permutation(D, out)
+    else:
+        cy_split_permutation(D, out)
+    return out
 
 
-def perm_and_mask(Dz):
+def mask_and_perm(Dz: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     n = len(Dz)
     full_idx = np.arange(0, n)
     perm = permuted(Dz)
@@ -34,86 +32,171 @@ def perm_and_mask(Dz):
     return mask, perm
 
 
-def emp_MMSD(kxz, ky, Dz, b):
+def penalized_distance(Dz: np.ndarray, mask: np.ndarray) -> np.ndarray:
+    # add some big value to "masked" values except diagonal.
+    return Dz + (mask - np.diag(np.diag(mask))) * Dz.max()  # soft penalty
+
+
+def MMSD(Ky: np.ndarray, Kz: np.ndarray, Kxz: np.ndarray, Dz: np.ndarray) -> Tuple[float, float, np.ndarray, np.ndarray]:
+    """Maximum Mean Self-Discrepancy"""
+    n = len(Kxz)
+    full_idx = np.arange(0, n)
+
+    mask, perm = mask_and_perm(Dz)
+    Ky_fp = Ky[np.ix_(full_idx, perm)]
+    Ky_pp = Ky[np.ix_(perm, perm)]
+
+    kk = (Ky + Ky_pp - 2 * Ky_fp)
+    statistic = ma.array(Kxz * kk, mask=mask).mean()
+    error_statistic = ma.array(Kz * kk, mask=mask).mean()
+
+    return statistic, error_statistic, mask, perm
+
+
+def emp_MMSD(Kxz: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, Dz: np.ndarray, num_samples: int) -> Tuple[np.ndarray, np.ndarray]:
     """Empirical distribution of MMSD"""
-    n = len(kxz)
-    empirical_distr = np.zeros((b,))
+    n = len(Kxz)
+    mmsd_distr = np.zeros((num_samples,))
+    error_distr = np.zeros((num_samples,))
 
-    for b_i in range(b):
-        idx1 = np.random.choice(n, n // 2, replace=False)
-        _11 = np.ix_(idx1, idx1)
-        empirical_distr[b_i], _, _ = MMSD(kxz[_11], ky[_11], Dz[_11])
+    for i_th in range(num_samples):
+        selected = np.random.choice(n, n // 2, replace=False)
+        grid = np.ix_(selected, selected)
+        mmsd_distr[i_th], error_distr[i_th], *_ = MMSD(Ky[grid], Kz[grid], Kxz[grid], Dz[grid])
 
-    return 0.5 * (empirical_distr - empirical_distr.mean()) + empirical_distr.mean()
+    return 0.5 * (mmsd_distr - mmsd_distr.mean()) + mmsd_distr.mean(), \
+           0.5 * (error_distr - error_distr.mean()) + error_distr.mean()
 
 
-def SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, adjust_null=True):
-    print('deprecated, use SDCIT2')
+def adjust_errors(null_errors, null, error=None, test_statistic=None):
+    if error is not None:
+        assert test_statistic is not None
 
+    model = LinearRegression().fit(null_errors[:, None], null[:, None])
+    beta = max(0, model.coef_[0, 0])
+
+    if error is not None:
+        return null - null_errors * beta, test_statistic - error * beta
+    else:
+        return null - null_errors * beta
+
+
+def SDCIT(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, adjust=True):
+    """SDCIT (Lee and Honavar, 2017)
+
+    Parameters
+    ----------
+    Kx : np.ndarray
+        N by N kernel matrix of X
+    Ky : np.ndarray
+        N by N kernel matrix of Y
+    Kz : np.ndarray
+        N by N kernel matrix of Z
+    Dz : np.ndarray
+        N by N pairwise distance matrix of Z
+    size_of_null_sample : int
+        The number of samples in a null distribution
+    with_null : bool
+        If true, null distribution is also returned
+    seed : int
+        Random seed
+    adjust : bool
+        whether to adjust null distribution and test statistics based on 'permutation error' information
+
+    References
+    ----------
+        Lee, S., Honavar, V. (2017). Self-Discrepancy Conditional Independence Test.
+        In Proceedings of the Thirty-third Conference on Uncertainty in Artificial Intelligence. Corvallis, Oregon: AUAI Press.
+    """
     if seed is not None:
         np.random.seed(seed)
 
     if Dz is None:
-        Dz = K2D(kz)
+        Dz = K2D(Kz)
 
-    kxz = kx * kz
+    Kxz = Kx * Kz
 
-    test_statistic, mask, Pidx = MMSD(kxz, ky, Dz)
-    mask, Pidx = perm_and_mask(penalized_distance(Dz, mask))
+    test_statistic, error_statistic, mask, _ = MMSD(Ky, Kz, Kxz, Dz)
+    mask, Pidx = mask_and_perm(penalized_distance(Dz, mask))
 
     # avoid permutation between already permuted pairs.
-    raw_null = emp_MMSD(kxz,
-                        ky[np.ix_(Pidx, Pidx)],
-                        penalized_distance(Dz, mask),
-                        size_of_null_sample)
+    mmsd_distr_under_null, error_distr_under_null = emp_MMSD(Kxz, Ky[np.ix_(Pidx, Pidx)], Kz, penalized_distance(Dz, mask), size_of_null_sample)
 
-    if adjust_null:
-        null = raw_null - raw_null.mean()
+    if adjust:
+        fix_null, fix_test_statistic = adjust_errors(error_distr_under_null, mmsd_distr_under_null, error_statistic, test_statistic)
+        fix_null = fix_null - fix_null.mean()
     else:
-        null = raw_null
+        fix_null = mmsd_distr_under_null - mmsd_distr_under_null.mean()
+        fix_test_statistic = test_statistic
 
     if with_null:
-        return test_statistic, p_value_of(test_statistic, null), null
+        return fix_test_statistic, p_value_of(fix_test_statistic, fix_null), fix_null
     else:
-        return test_statistic, p_value_of(test_statistic, null)
+        return fix_test_statistic, p_value_of(fix_test_statistic, fix_null)
 
 
-def penalized_distance(Dz, mask):
-    return Dz + (mask - np.diag(np.diag(mask))) * Dz.max()  # soft penalty
+def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1, adjust=True):
+    """C-based SDCIT (Lee and Honavar, 2017)
+
+    Parameters
+    ----------
+    Kx : np.ndarray
+        N by N kernel matrix of X
+    Ky : np.ndarray
+        N by N kernel matrix of Y
+    Kz : np.ndarray
+        N by N kernel matrix of Z
+    Dz : np.ndarray
+        N by N pairwise distance matrix of Z
+    size_of_null_sample : int
+        The number of samples in a null distribution
+    with_null : bool
+        If true, null distribution is also returned
+    seed : int
+        Random seed
+    n_jobs: int
+        number of threads to be used
+    adjust : bool
+        whether to adjust null distribution and test statistics based on 'permutation error' information
 
 
-def suggest_B_for_KCIPT(kx, ky, kz, Dz):
-    _, _, null_sdcit = c_SDCIT(kx, ky, kz, Dz, 250, with_null=True)
-    _, _, inner_null, _ = c_KCIPT(kx, ky, kz, Dz, 10, 1000, 0)
-    inner_null = inner_null.flatten()
-    return int(1 + (np.std(inner_null) / np.std(null_sdcit)) ** 2)
-
-
-def c_SDCIT(kx, ky, kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1, adjust_null=True):
-    print('deprecated, use c_SDCIT2')
+    References
+    ----------
+        Lee, S., Honavar, V. (2017). Self-Discrepancy Conditional Independence Test.
+        In Proceedings of the Thirty-third Conference on Uncertainty in Artificial Intelligence. Corvallis, Oregon: AUAI Press.
+    """
     if seed is None:
         seed = random_seeds()
+
     if Dz is None:
-        Dz = K2D(kz)
+        Dz = K2D(Kz)
 
-    kxz = kx * kz
+    Kxz = Kx * Kz
 
-    K_XZ = np.ascontiguousarray(kxz, dtype=np.float64)
-    K_Y = np.ascontiguousarray(ky, dtype=np.float64)
-    D_Z = np.ascontiguousarray(Dz, dtype=np.float64)
+    # prepare parameters & output variables
+    Kxz, Ky, Kz, Dz = cythonize(Kxz, Ky, Kz, Dz)
     raw_null = np.zeros((size_of_null_sample,), dtype='float64')
+    error_raw_null = np.zeros((size_of_null_sample,), dtype='float64')
     mmsd = np.zeros((1,), dtype='float64')
+    error_mmsd = np.zeros((1,), dtype='float64')
 
-    cy_sdcit(K_XZ, K_Y, D_Z, size_of_null_sample, seed, n_jobs, mmsd, raw_null)
+    # run SDCIT
+    cy_sdcit2(Kxz, Ky, Kz, Dz, size_of_null_sample, seed, n_jobs, mmsd, error_mmsd, raw_null, error_raw_null)
 
+    # postprocess outputs
     test_statistic = mmsd[0]
-    bias = raw_null.mean()
-    if adjust_null:
-        null = 0.5 * (raw_null - bias)
+    error_statistic = error_mmsd[0]
+    raw_null = 0.5 * (raw_null - raw_null.mean()) + raw_null.mean()
+    error_raw_null = 0.5 * (error_raw_null - error_raw_null.mean()) + error_raw_null.mean()
+
+    if adjust:
+        fix_null, fix_test_statistic = adjust_errors(error_raw_null, raw_null, error_statistic, test_statistic)
+        fix_null = fix_null - fix_null.mean()
     else:
-        null = 0.5 * (raw_null - bias) + bias
+        fix_null = raw_null - raw_null.mean()
+        fix_test_statistic = test_statistic
 
     if with_null:
-        return test_statistic, p_value_of(test_statistic, null), null
+        return fix_test_statistic, p_value_of(fix_test_statistic, fix_null), fix_null
     else:
-        return test_statistic, p_value_of(test_statistic, null)
+        return fix_test_statistic, p_value_of(fix_test_statistic, fix_null)

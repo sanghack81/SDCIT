@@ -14,7 +14,7 @@ from UAI_2017_SDCIT_experiments.exp_setup import *
 from UAI_2017_SDCIT_experiments.run_KCIPT import test_chaotic
 from UAI_2017_SDCIT_experiments.testing_utils import read_chaotic
 from sdcit.kcipt import c_KCIPT
-from sdcit.sdcit2 import bias_reduced_SDCIT
+from sdcit.sdcit import SDCIT
 from sdcit.utils import p_value_of, K2D
 
 
@@ -29,7 +29,7 @@ def experiment(obj_filename):
 
         # Compare SDCIT and KCIPT100
         print('SDCIT ... ')
-        sdcit_mmd, sdcit_pval, sdcit_null = bias_reduced_SDCIT(kx, ky, kz, with_null=True, seed=trial)
+        sdcit_mmd, sdcit_pval, sdcit_null = SDCIT(kx, ky, kz, with_null=True, seed=trial)
         print('KCIPT {} ... '.format(initial_B))
         _, mmds100, _, outer_null100 = c_KCIPT(kx, ky, kz, K2D(kz), initial_B, 10000, 10000, n_jobs=PARALLEL_JOBS, seed=trial)
 

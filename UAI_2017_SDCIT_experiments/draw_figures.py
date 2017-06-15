@@ -8,7 +8,7 @@ import scipy.stats
 import seaborn as sns
 
 from UAI_2017_SDCIT_experiments.exp_setup import SDCIT_RESULT_DIR, SDCIT_FIGURE_DIR
-from sdcit.tests.t_utils import aupc
+from sdcit.tests.t_utils import AUPC
 
 names_chsic_chaotic = ['independent', 'gamma', 'noise', 'trial', 'N', 'runtime', 'statistic', 'pvalue']
 names_chsic_postnonlinear = ['independent', 'noise', 'trial', 'N', 'runtime', 'statistic', 'pvalue']
@@ -74,7 +74,7 @@ def draw_aupc_chaotic():
         for group_key, group_df in df.groupby(by=['gamma', 'independent', 'N']):
             group_key = (int(group_key[0] * 10) / 10, *group_key[1:])
             if group_key[1] == 0:
-                aupc_data.append([algo, *group_key, aupc(group_df[pvalue_column[algo]])])
+                aupc_data.append([algo, *group_key, AUPC(group_df[pvalue_column[algo]])])
 
     print(draw_aupc_chaotic.__name__)
     [print(xx) for xx in aupc_data]
@@ -188,7 +188,7 @@ def draw_aupc_postnonlinear():
 
         for group_key, group_df in df.groupby(by=['noise', 'independent', 'N']):
             group_key = (int(group_key[0] * 10) / 10, int(group_key[1]), int(group_key[2]))
-            aupc_data.append([algo, *group_key, aupc(group_df[pvalue_column[algo]])])
+            aupc_data.append([algo, *group_key, AUPC(group_df[pvalue_column[algo]])])
 
     print(draw_aupc_postnonlinear.__name__)
     [print(xx) for xx in aupc_data]
@@ -226,7 +226,7 @@ def draw_aupc_postnonlinear_highdim():
 
         for group_key, group_df in df.groupby(by=['noise', 'independent', 'N']):
             group_key = (int(group_key[0] * 10) / 10, int(group_key[1]), int(group_key[2]))
-            aupc_data.append([algo, *group_key, aupc(group_df[pvalue_column[algo]])])
+            aupc_data.append([algo, *group_key, AUPC(group_df[pvalue_column[algo]])])
 
     print(draw_aupc_postnonlinear_highdim.__name__)
     [print(xx) for xx in aupc_data]

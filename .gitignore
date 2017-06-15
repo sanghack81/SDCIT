@@ -5,11 +5,10 @@ build
 SDCIT.egg-info
 temporary
 blossom5
-sdcit/blossom_v/*.so
 sdcit/cython_impl/*.so
 kcit/algorithms
 kcit/gpml-matlab
 blossom5-v2.05.src.tar.gz
 KCI-test.zip
 sdcit/cython_impl/cy_sdcit.cpp
-sdcit/blossom_v/cy_blossom_v.cpp
+private_experiments

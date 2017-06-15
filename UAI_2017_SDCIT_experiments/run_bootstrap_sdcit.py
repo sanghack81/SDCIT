@@ -4,8 +4,7 @@ import numpy as np
 from tqdm import trange
 
 from UAI_2017_SDCIT_experiments.testing_utils import read_chaotic
-from sdcit.sdcit import perm_and_mask, penalized_distance
-from sdcit.sdcit2 import emp_MMSD, MMSD, adjust_errors
+from sdcit.sdcit import penalized_distance, emp_MMSD, MMSD, adjust_errors, mask_and_perm
 from sdcit.utils import p_value_of
 
 if __name__ == '__main__':
@@ -23,7 +22,7 @@ if __name__ == '__main__':
                 bootmmd = adjust_errors(emp_errors, emp_mmd).mean()
 
                 _, _, mask, _ = MMSD(ky, kz, kxz, Dz)
-                mask, Pidx = perm_and_mask(penalized_distance(Dz, mask))
+                mask, Pidx = mask_and_perm(penalized_distance(Dz, mask))
 
                 # avoid permutation between already permuted pairs.
                 raw_null, raw_null_errors = emp_MMSD(kxz,

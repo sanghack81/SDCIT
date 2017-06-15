@@ -13,14 +13,14 @@ from sdcit.utils import *
 def test_chaotic(independent, gamma, trial, N):
     np.random.seed(trial)
     KX, KY, KZ, _ = read_chaotic(independent, gamma, trial, N)
-    pval = FCIT_K(KX, KY, KZ, seed=trial, with_gp=True, eq_17_as_is=True)
+    pval = FCIT_K(KX, KY, KZ, seed=trial, with_gp=True, use_expectation=True)
     return independent, gamma, trial, N, pval
 
 
 def test_postnonlinear(independent, noise, trial, N):
     np.random.seed(trial)
     KX, KY, KZ, _ = read_postnonlinear_noise(independent, noise, trial, N)
-    pval = FCIT_K(KX, KY, KZ, seed=trial, with_gp=True, eq_17_as_is=True)
+    pval = FCIT_K(KX, KY, KZ, seed=trial, with_gp=True, use_expectation=True)
     return independent, noise, trial, N, pval
 
 

@@ -6,20 +6,20 @@ from tqdm import tqdm, trange
 
 from UAI_2017_SDCIT_experiments.exp_setup import SDCIT_RESULT_DIR
 from UAI_2017_SDCIT_experiments.testing_utils import read_chaotic, read_postnonlinear_noise, chaotic_configs, postnonlinear_noise_configs
-from sdcit.sdcit2 import SDCIT2
+from sdcit.sdcit import SDCIT
 from sdcit.utils import *
 
 
 def test_chaotic(independent, gamma, trial, N):
     np.random.seed(trial)
-    mmd, pval = SDCIT2(*read_chaotic(independent, gamma, trial, N), seed=trial)
-    return independent, gamma, trial, N, mmd, pval
+    mmsd, pval = SDCIT(*read_chaotic(independent, gamma, trial, N), seed=trial)
+    return independent, gamma, trial, N, mmsd, pval
 
 
 def test_postnonlinear(independent, noise, trial, N):
     np.random.seed(trial)
-    mmd, pval = SDCIT2(*read_postnonlinear_noise(independent, noise, trial, N), seed=trial)
-    return independent, noise, trial, N, mmd, pval
+    mmsd, pval = SDCIT(*read_postnonlinear_noise(independent, noise, trial, N), seed=trial)
+    return independent, noise, trial, N, mmsd, pval
 
 
 def main():
