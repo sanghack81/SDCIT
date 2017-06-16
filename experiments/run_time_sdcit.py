@@ -4,7 +4,7 @@ from os.path import exists
 import pandas as pd
 import scipy.io
 
-from UAI_2017_SDCIT_experiments.exp_setup import *
+from experiments.exp_setup import *
 from sdcit.sdcit import c_SDCIT
 from sdcit.utils import rbf_kernel_median, K2D
 

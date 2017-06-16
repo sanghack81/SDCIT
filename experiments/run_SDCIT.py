@@ -4,8 +4,8 @@ from joblib import Parallel
 from joblib import delayed
 from tqdm import tqdm, trange
 
-from UAI_2017_SDCIT_experiments.exp_setup import SDCIT_RESULT_DIR
-from UAI_2017_SDCIT_experiments.exp_utils import read_chaotic, read_postnonlinear_noise, chaotic_configs, postnonlinear_noise_configs
+from experiments.exp_setup import SDCIT_RESULT_DIR
+from experiments.exp_utils import read_chaotic, read_postnonlinear_noise, chaotic_configs, postnonlinear_noise_configs
 from sdcit.sdcit import SDCIT
 from sdcit.utils import *
 

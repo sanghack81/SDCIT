@@ -7,7 +7,7 @@ import scipy
 import scipy.stats
 import seaborn as sns
 
-from UAI_2017_SDCIT_experiments.exp_setup import SDCIT_RESULT_DIR, SDCIT_FIGURE_DIR
+from experiments.exp_setup import SDCIT_RESULT_DIR, SDCIT_FIGURE_DIR
 from sdcit.utils import AUPC
 
 names_chsic_chaotic = ['independent', 'gamma', 'noise', 'trial', 'N', 'runtime', 'statistic', 'pvalue']

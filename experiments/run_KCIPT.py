@@ -7,8 +7,8 @@ from joblib import Parallel
 from joblib import delayed
 from tqdm import trange
 
-from UAI_2017_SDCIT_experiments.exp_setup import SDCIT_RESULT_DIR, PARALLEL_JOBS
-from UAI_2017_SDCIT_experiments.exp_utils import *
+from experiments.exp_setup import SDCIT_RESULT_DIR, PARALLEL_JOBS
+from experiments.exp_utils import *
 from sdcit.kcipt import c_KCIPT
 from sdcit.utils import *
 

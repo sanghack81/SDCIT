@@ -3,7 +3,7 @@ import os
 import numpy as np
 from tqdm import trange
 
-from UAI_2017_SDCIT_experiments.exp_utils import read_chaotic
+from experiments.exp_utils import read_chaotic
 from sdcit.sdcit import penalized_distance, emp_MMSD, MMSD, adjust_errors, mask_and_perm
 from sdcit.utils import p_value_of
 

@@ -5,7 +5,7 @@ import numpy as np
 import scipy
 import scipy.io
 
-from UAI_2017_SDCIT_experiments.exp_setup import SDCIT_DATA_DIR
+from experiments.exp_setup import SDCIT_DATA_DIR
 from sdcit.utils import rbf_kernel_median, K2D, cythonize
 
 

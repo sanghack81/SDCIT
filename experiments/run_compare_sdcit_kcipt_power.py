@@ -10,9 +10,9 @@ import seaborn as sns
 from scipy.stats import gamma, pearson3
 from tqdm import trange
 
-from UAI_2017_SDCIT_experiments.exp_setup import *
-from UAI_2017_SDCIT_experiments.run_KCIPT import test_chaotic
-from UAI_2017_SDCIT_experiments.exp_utils import read_chaotic
+from experiments.exp_setup import *
+from experiments.run_KCIPT import test_chaotic
+from experiments.exp_utils import read_chaotic
 from sdcit.kcipt import c_KCIPT
 from sdcit.sdcit import SDCIT
 from sdcit.utils import p_value_of, K2D
@@ -62,7 +62,7 @@ def main():
     assert exists(SDCIT_RESULT_DIR + '/kcipt_chaotic_5000.csv'), 'run_SDCIT first'
     assert exists(SDCIT_RESULT_DIR + '/kcipt_chaotic_20000.csv'), 'run_SDCIT first'
 
-    from UAI_2017_SDCIT_experiments.draw_figures import color_palettes, method_color_codes
+    from experiments.draw_figures import color_palettes, method_color_codes
 
     obj_filename = SDCIT_RESULT_DIR + '/right_power.pickle'
     experiment(obj_filename)
