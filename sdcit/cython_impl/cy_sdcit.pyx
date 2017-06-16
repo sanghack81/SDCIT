@@ -1,5 +1,6 @@
 import cython
 import numpy as np
+cimport numpy as np
 
 cdef extern from "KCIPT.h":
     void c_kcipt(const double *K_X, const double *K_Y, const double *K_Z, const double *D_Z,
@@ -12,8 +13,8 @@ cdef extern from "permutation.h":
     void dense_2n_permutation_interface(const double *D, const int full_n, int *perm);
 
 
-cdef extern from "SDCIT2.h":
-    void c_sdcit2(const double * const K_XZ, const double * const K_Y, const double * const K_Z, const double * const D_Z_, const int n,
+cdef extern from "SDCIT.h":
+    void c_sdcit(const double * const K_XZ, const double * const K_Y, const double * const K_Z, const double * const D_Z_, const int n,
               const int b, const int seed, const int n_threads,
               double *const mmsd, double *const error_mmsd, double *const null, double *const error_null);
 
@@ -60,7 +61,7 @@ def cy_dense_permutation(np.ndarray[double, ndim=2, mode="c"]  D not None,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def cy_sdcit2(np.ndarray[double, ndim=2, mode="c"] K_XZ not None,
+def cy_sdcit(np.ndarray[double, ndim=2, mode="c"] K_XZ not None,
               np.ndarray[double, ndim=2, mode="c"] K_Y not None,
               np.ndarray[double, ndim=2, mode="c"] K_Z not None,
               np.ndarray[double, ndim=2, mode="c"]  D_Z,
@@ -75,4 +76,4 @@ def cy_sdcit2(np.ndarray[double, ndim=2, mode="c"] K_XZ not None,
     cdef int ll
     ll = K_XZ.shape[0]
 
-    c_sdcit2(&K_XZ[0, 0], &K_Y[0, 0], &K_Z[0, 0], &D_Z[0, 0], ll, b, seed, n_threads, &mmsd[0], &error_mmsd[0], &null[0], &error_null[0])
+    c_sdcit(&K_XZ[0, 0], &K_Y[0, 0], &K_Z[0, 0], &D_Z[0, 0], ll, b, seed, n_threads, &mmsd[0], &error_mmsd[0], &null[0], &error_null[0])

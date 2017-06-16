@@ -8,60 +8,35 @@ import scipy.stats
 import seaborn as sns
 
 from UAI_2017_SDCIT_experiments.exp_setup import SDCIT_RESULT_DIR, SDCIT_FIGURE_DIR
-from sdcit.tests.t_utils import AUPC
+from sdcit.utils import AUPC
 
 names_chsic_chaotic = ['independent', 'gamma', 'noise', 'trial', 'N', 'runtime', 'statistic', 'pvalue']
 names_chsic_postnonlinear = ['independent', 'noise', 'trial', 'N', 'runtime', 'statistic', 'pvalue']
 names_kcit_chaotic = ['independent', 'gamma', 'noise', 'trial', 'N', 'runtime', 'statistic', 'boot_p_value', 'appr_p_value']
 names_kcit_postnonlinear = ['independent', 'noise', 'trial', 'N', 'runtime', 'statistic', 'boot_p_value', 'appr_p_value']
-names_kcit5_chaotic = ['independent', 'gamma', 'trial', 'N', 'pvalue']
-names_kcit5_postnonlinear = ['independent', 'noise', 'trial', 'N', 'pvalue']
 names_sdcit_chaotic = ['independent', 'gamma', 'trial', 'N', 'statistic', 'pvalue']
 names_sdcit_postnonlinear = ['independent', 'noise', 'trial', 'N', 'statistic', 'pvalue']
 names_kcipt_chaotic = ['independent', 'gamma', 'trial', 'N', 'statistic', 'pvalue', 'B']
 names_kcipt_postnonlinear = ['independent', 'noise', 'trial', 'N', 'statistic', 'pvalue', 'B']
-names_fcit_chaotic = ['independent', 'gamma', 'trial', 'N', 'pvalue']
-names_fcit_postnonlinear = ['independent', 'noise', 'trial', 'N', 'pvalue']
-
-# KCIT: original MATLAB KCIT with columnwise-normalization & pre-determined RBF kernel parameter.
-# KCIT2: original MATLAB KCIT without columnwise-normalization and RBF kernel parameter based on median heuristic.
-# FCIT: kernel-based where kernel matrix constructed with RBF kernel parameter based on median heuristic.
-# FCIT2: real-value based where kernel matrix is built only after 'residualization'.
 
 names = {('CHSIC', 'chaotic'): names_chsic_chaotic,
          ('CHSIC', 'postnonlinear'): names_chsic_postnonlinear,
          ('KCIT', 'chaotic'): names_kcit_chaotic,
          ('KCIT', 'postnonlinear'): names_kcit_postnonlinear,
-         ('KCIT2', 'chaotic'): names_kcit_chaotic,
-         ('KCIT2', 'postnonlinear'): names_kcit_postnonlinear,
-         ('KCITR', 'chaotic'): names_kcit5_chaotic,
-         ('KCITR', 'postnonlinear'): names_kcit5_postnonlinear,
-         ('KCITK', 'chaotic'): names_kcit5_chaotic,
-         ('KCITK', 'postnonlinear'): names_kcit5_postnonlinear,
          ('SDCIT', 'chaotic'): names_sdcit_chaotic,
          ('SDCIT', 'postnonlinear'): names_sdcit_postnonlinear,
-         ('CSDCIT', 'chaotic'): names_sdcit_chaotic,
-         ('CSDCIT', 'postnonlinear'): names_sdcit_postnonlinear,
          ('KCIPT', 'chaotic'): names_kcipt_chaotic,
          ('KCIPT', 'postnonlinear'): names_kcipt_postnonlinear,
-         ('FCITK', 'chaotic'): names_fcit_chaotic,
-         ('FCITK', 'postnonlinear'): names_fcit_postnonlinear,
-         ('FCITR', 'chaotic'): names_fcit_chaotic,
-         ('FCITR', 'postnonlinear'): names_fcit_postnonlinear,
          }
 
 pvalue_column = collections.defaultdict(lambda: 'pvalue')
 pvalue_column['KCIT'] = 'boot_p_value'
-pvalue_column['KCIT2'] = 'boot_p_value'
 
 color_palettes = sns.color_palette('Paired', 10)
-# method_color_codes = {'FCIT': 9, 'KCIT': 3, 'SDCIT': 5, 'KCIPT': 1, 'CSDCIT': 7, 'FCIT2': 0, 'KCIT2': 8}
+method_color_codes = {'KCIT': 3, 'SDCIT': 5, 'KCIPT': 1, 'CHSIC': 9}
 markers = collections.defaultdict(lambda: 'o')
-markers.update({'FCIT': '^', 'KCIT': 'o', 'SDCIT': 's', 'KCIPT': '*', 'CSDCIT': '<', 'FCIT2': '>', 'KCIT2': 'o'})
-# all_algos = ['KCIT', 'FCIT5', 'KCIT5', 'SDCIT','KCIT2']
-all_algos = ['KCIT', 'KCIT2', 'KCITR', 'KCITK', 'FCITK', 'FCITR', 'SDCIT']
-# method_color_codes = {'KCIT': 1, 'KCIT2': 9, 'FCIT5': 3, 'KCIT5': 5, 'SDCIT': 7}
-method_color_codes = {'KCIT': 1, 'KCIT2': 4, 'KCITR': 9, 'KCITK': 3, 'FCITK': 5, 'FCITR': 7, 'SDCIT': 8}
+markers.update({'KCIT': 'o', 'SDCIT': 's', 'KCIPT': '*', 'CHSIC': '^'})
+all_algos = ['KCIT', 'SDCIT', 'KCIPT', 'CHSIC']
 
 
 def draw_aupc_chaotic():
@@ -379,16 +354,17 @@ if __name__ == '__main__':
     #     for algo in all_algos:
     #         assert exists(SDCIT_RESULT_DIR + '/' + algo.lower() + '_' + data + '.csv'), 'run tests first -- missing {}'.format(algo.lower() + '_' + data + '.csv')
 
-    # chaotic series
-    draw_aupc_chaotic()
-    draw_calib_chaotic()
+    if False:
+        # chaotic series
+        draw_aupc_chaotic()
+        draw_calib_chaotic()
 
-    # # postnonlinear-noise
-    draw_aupc_postnonlinear()
-    draw_calib_postnonlinear()
-    draw_aupc_postnonlinear_highdim()
-    draw_calib_postnonlinear_highdim()
-    #
-    # # type I for both
-    draw_type_I_error_chaotic()
-    draw_type_I_postnonlinear_highdim()
+        # # postnonlinear-noise
+        draw_aupc_postnonlinear()
+        draw_calib_postnonlinear()
+        draw_aupc_postnonlinear_highdim()
+        draw_calib_postnonlinear_highdim()
+        #
+        # # type I for both
+        draw_type_I_error_chaotic()
+        draw_type_I_postnonlinear_highdim()

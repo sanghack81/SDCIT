@@ -1,11 +1,12 @@
 import typing
 import warnings
-from typing import Union
+from typing import Union, List
 
 import numpy as np
 import numpy.ma as ma
 import scipy.linalg
 import scipy.optimize
+import scipy.stats
 from GPflow.gpr import GPR
 from GPflow.kernels import White, Linear, RBF, Kern
 from numpy import diag, exp, sqrt
@@ -174,3 +175,29 @@ def K2D(K):
 
 def cythonize(*matrices):
     return tuple(np.ascontiguousarray(matrix, dtype=np.float64) for matrix in matrices)
+
+
+def AUPC(p_values: Union[List, np.ndarray]) -> float:
+    """Area Under Power Curve"""
+    p_values = np.array(p_values)
+
+    xys = [(uniq_v, np.mean(p_values <= uniq_v)) for uniq_v in np.unique(p_values)]
+
+    area, prev_x, prev_y = 0, 0, 0
+    for x, y in xys:
+        area += (x - prev_x) * prev_y
+        prev_x, prev_y = x, y
+
+    area += (1 - prev_x) * prev_y
+    return area
+
+
+def KS_statistic(p_values: np.ndarray) -> float:
+    """Kolmogorov-Smirnov test statistics"""
+    return scipy.stats.kstest(p_values, 'uniform')[0]
+
+
+def p_value_curve(p_values):
+    p_values = np.array(p_values)
+    xys = [(uniq_v, np.mean(p_values <= uniq_v)) for uniq_v in np.unique(p_values)]
+    return [(0, 0), *xys, (1, 1)]

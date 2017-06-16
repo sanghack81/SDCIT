@@ -15,7 +15,7 @@ def np2matlab(arr: np.ndarray):
     return matlab.double([[float(v) for v in row] for row in arr])
 
 
-def matlab_kcit(X: np.ndarray, Y: np.ndarray, Z: np.ndarray, seed: int = None, mateng=None, installed_at=None):
+def matlab_kcit(X: np.ndarray, Y: np.ndarray, Z: np.ndarray, seed: int = None, matlab_engine_instance=None, installed_at=None):
     """Python-wrapper for KCIT by Zhang et al. (2011)
 
 
@@ -26,21 +26,21 @@ def matlab_kcit(X: np.ndarray, Y: np.ndarray, Z: np.ndarray, seed: int = None, m
     """
     import matlab.engine
 
-    not_given = mateng is None
+    not_given = matlab_engine_instance is None
     try:
         if not_given:
-            mateng = matlab.engine.start_matlab()
+            matlab_engine_instance = matlab.engine.start_matlab()
             dir_at = os.path.expanduser(installed_at)
-            mateng.addpath(mateng.genpath(dir_at))
+            matlab_engine_instance.addpath(matlab_engine_instance.genpath(dir_at))
 
         if seed is not None:
-            mateng.RandStream.setGlobalStream(mateng.RandStream('mcg16807', 'Seed', seed))
+            matlab_engine_instance.RandStream.setGlobalStream(matlab_engine_instance.RandStream('mcg16807', 'Seed', seed))
 
-        statistic, v2, boot_p_value, v3, appr_p_value = mateng.CInd_test_new_withGP(np2matlab(X), np2matlab(Y), np2matlab(Z), 0.01, 0, nargout=5)
+        statistic, v2, boot_p_value, v3, appr_p_value = matlab_engine_instance.CInd_test_new_withGP(np2matlab(X), np2matlab(Y), np2matlab(Z), 0.01, 0, nargout=5)
         return statistic, v2, boot_p_value, v3, appr_p_value
     finally:
-        if not_given and mateng is not None:
-            mateng.quit()
+        if not_given and matlab_engine_instance is not None:
+            matlab_engine_instance.quit()
 
 
 def gamcdf(t: float, shape: float, scale: float) -> float:

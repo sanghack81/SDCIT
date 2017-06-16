@@ -4,8 +4,7 @@ import numpy as np
 import numpy.ma as ma
 from sklearn.linear_model import LinearRegression
 
-from sdcit.cython_impl.cy_sdcit import cy_sdcit2
-from sdcit.cython_impl.cy_sdcit import cy_split_permutation, cy_dense_permutation
+from sdcit.cython_impl.cy_sdcit import cy_sdcit, cy_split_permutation, cy_dense_permutation
 from sdcit.utils import K2D, p_value_of, random_seeds, cythonize
 
 
@@ -181,7 +180,7 @@ def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
     error_mmsd = np.zeros((1,), dtype='float64')
 
     # run SDCIT
-    cy_sdcit2(Kxz, Ky, Kz, Dz, size_of_null_sample, seed, n_jobs, mmsd, error_mmsd, raw_null, error_raw_null)
+    cy_sdcit(Kxz, Ky, Kz, Dz, size_of_null_sample, seed, n_jobs, mmsd, error_mmsd, raw_null, error_raw_null)
 
     # postprocess outputs
     test_statistic = mmsd[0]

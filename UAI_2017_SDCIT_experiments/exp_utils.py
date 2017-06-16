@@ -20,16 +20,13 @@ def postnonlinear_noise_configs():
 
 def read_chaotic(independent, gamma, trial, N, dir_at=SDCIT_DATA_DIR + '/'):
     X, Y, Z = read_chaotic_data(independent, gamma, trial, N, dir_at)
-
     kx, ky, kz = rbf_kernel_median(X, Y, Z)
     Dz = K2D(kz)
-
     return kx, ky, kz, Dz
 
 
 def read_postnonlinear_noise(independent, noise, trial, N, dir_at=SDCIT_DATA_DIR + '/'):
     X, Y, Z = read_postnonlinear_noise_data(independent, noise, trial, N, dir_at)
-
     kx, ky, kz = rbf_kernel_median(X, Y, Z)
 
     dist_mat_file = os.path.expanduser(dir_at + 'dist_{}_{}_{}_{}_postnonlinear.mat'.format(noise, trial, independent, N))

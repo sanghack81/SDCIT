@@ -12,7 +12,7 @@ from tqdm import trange
 
 from UAI_2017_SDCIT_experiments.exp_setup import *
 from UAI_2017_SDCIT_experiments.run_KCIPT import test_chaotic
-from UAI_2017_SDCIT_experiments.testing_utils import read_chaotic
+from UAI_2017_SDCIT_experiments.exp_utils import read_chaotic
 from sdcit.kcipt import c_KCIPT
 from sdcit.sdcit import SDCIT
 from sdcit.utils import p_value_of, K2D
