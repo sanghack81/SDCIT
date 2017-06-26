@@ -13,7 +13,7 @@ if __name__ == '__main__':
     fname = SDCIT_RESULT_DIR + '/c_sdcit_time.csv'
     independent = 1
     if not exists(fname):
-        with open(fname, 'w') as f:
+        with open(fname, 'a') as f:
             for N in [200, 400]:
                 for b in [500, 1000]:
                     for trial in range(300):

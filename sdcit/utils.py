@@ -201,3 +201,52 @@ def p_value_curve(p_values):
     p_values = np.array(p_values)
     xys = [(uniq_v, np.mean(p_values <= uniq_v)) for uniq_v in np.unique(p_values)]
     return [(0, 0), *xys, (1, 1)]
+
+
+def regression_distance(Y: np.ndarray, Z: np.ndarray):
+    warnings.warn('not tested yet!')
+
+    n, dims = Z.shape
+
+    rbf = RBF(dims, ARD=True)
+    rbf_white = rbf + White(dims)
+
+    gp_model = GPR(Z, Y, rbf_white)
+    gp_model.optimize()
+
+    Kz_y = rbf.compute_K_symm(Z)
+    Ry = pdinv(rbf_white.compute_K_symm(Z))
+    Fy = Y.T @ Ry @ Kz_y    # F(z)
+
+    M = Fy.T @ Fy
+    O = np.ones((n, 1))
+    N = O @ np.diag(M).T
+    D = np.sqrt(N + N.T - 2 * M)
+    return D
+
+
+def regression_distance_k(Kx: np.ndarray, Ky: np.ndarray):
+    warnings.warn('not tested yet!')
+
+    T = len(Kx)
+
+    eig_Ky, eiy = truncated_eigen(*eigdec(Ky, min(100, T // 4)))
+    eig_Kx, eix = truncated_eigen(*eigdec(Kx, min(100, T // 4)))
+
+    X = eix @ diag(sqrt(eig_Kx))  # X @ X.T is close to K_X
+    Y = eiy @ diag(sqrt(eig_Ky))
+    n_feats = X.shape[1]
+
+    gp_model = GPR(X, Y, Linear(n_feats, ARD=True) + White(n_feats))
+    gp_model.optimize()
+
+    Kx = gp_model.kern.linear.compute_K_symm(X)
+    sigma_squared = gp_model.kern.white.variance.value[0]
+
+    P = Kx @ pdinv(Kx + sigma_squared * np.eye(T))
+
+    M = P @ Ky @ P
+    O = np.ones((T, 1))
+    N = O @ np.diag(M).T
+    D = np.sqrt(N + N.T - 2 * M)
+    return D

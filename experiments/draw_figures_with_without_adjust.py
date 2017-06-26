@@ -27,6 +27,8 @@ names = {('CHSIC', 'chaotic'): names_chsic_chaotic,
          ('KCIT2', 'postnonlinear'): names_kcit_postnonlinear,
          ('SDCIT', 'chaotic'): names_sdcit_chaotic,
          ('SDCIT', 'postnonlinear'): names_sdcit_postnonlinear,
+         ('SDCIT-wo-adjust', 'chaotic'): names_sdcit_chaotic,
+         ('SDCIT-wo-adjust', 'postnonlinear'): names_sdcit_postnonlinear,
          ('KCIPT', 'chaotic'): names_kcipt_chaotic,
          ('KCIPT', 'postnonlinear'): names_kcipt_postnonlinear,
          }
@@ -36,18 +38,16 @@ pvalue_column['KCIT'] = 'boot_p_value'
 pvalue_column['KCIT2'] = 'boot_p_value'
 
 color_palettes = sns.color_palette('Paired', 10)
-method_color_codes = {'KCIT': 3, 'SDCIT': 5, 'KCIPT': 1, 'CHSIC': 9, 'KCIT2': 2}
+method_color_codes = {'KCIT': 3, 'SDCIT': 5, 'KCIPT': 1, 'CHSIC': 9, 'KCIT2': 7, 'SDCIT-wo-adjust': 4}
 markers = collections.defaultdict(lambda: 'o')
 markers.update({'KCIT': 'o', 'SDCIT': 's', 'KCIPT': '*', 'CHSIC': '^', 'KCIT2': 'o'})
-all_algos = ['KCIT', 'SDCIT', 'KCIPT', 'CHSIC', 'KCIT2']
-# all_algos = ['KCIT', 'SDCIT', 'KCIT2']
+all_algos = ['SDCIT', 'SDCIT-wo-adjust']
 def algo_name(org_name):
-    map = {'KCIT2':'KCIT', 'KCIT': 'KCIT (org.)'}
+    map = {'SDCIT-wo-adjust':'SDCIT w/o adjust'}
     if org_name in map:
         return map[org_name]
     else:
         return org_name
-
 
 
 def draw_aupc_chaotic():
@@ -91,10 +91,10 @@ def draw_aupc_chaotic():
     plt.axes().set_ylim([0.45, 1.05])
 
     handles, labels = plt.axes().get_legend_handles_labels()
-    # plt.axes().legend(handles[::-1], labels[::-1])
+    plt.axes().legend(handles[::-1], labels[::-1])
 
     sns.despine()
-    plt.savefig(SDCIT_FIGURE_DIR + '/{}_aupc.pdf'.format(data), transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig(SDCIT_FIGURE_DIR + '/{}_aupc_wo_adjust.pdf'.format(data), transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -125,16 +125,14 @@ def draw_calib_chaotic():
     plt.axes().legend(handles[::-1], labels[::-1], ncol=2)
     plt.axes().set_xlabel(r'$\gamma$')
     plt.axes().set_ylabel('KS test statistic')
-    plt.axes().set_ylim([0.0, 0.5])
     plt.axes().invert_yaxis()
-    plt.axes().set_yticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5])
-
+    plt.axes().set_yticks([0.1, 0.2, 0.3])
 
     handles, labels = plt.axes().get_legend_handles_labels()
-    # plt.axes().legend(handles[::-1], labels[::-1])
+    plt.axes().legend(handles[::-1], labels[::-1])
 
     sns.despine()
-    plt.savefig(SDCIT_FIGURE_DIR + '/chaotic_calib.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig(SDCIT_FIGURE_DIR + '/chaotic_calib_wo_adjust.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -165,7 +163,7 @@ def draw_type_I_error_chaotic():
     plt.axes().set_ylabel('Type I error')
     plt.axes().set_ylim([0.0, 0.2])
     sns.despine()
-    plt.savefig(SDCIT_FIGURE_DIR + '/chaotic_type_I.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig(SDCIT_FIGURE_DIR + '/chaotic_type_I_wo_adjust.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -203,7 +201,7 @@ def draw_aupc_postnonlinear():
     plt.axes().set_ylabel('Area Under Power Curve')
     plt.axes().set_ylim([0.45, 1.05])
     sns.despine()
-    plt.savefig(SDCIT_FIGURE_DIR + '/postnonlinear_aupc.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig(SDCIT_FIGURE_DIR + '/postnonlinear_aupc_wo_adjust.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -242,7 +240,7 @@ def draw_aupc_postnonlinear_highdim():
     plt.axes().set_xscale('log')
     plt.xticks([1, 5, 10, 20, 50], [1, 5, 10, 20, 50])
     sns.despine()
-    plt.savefig(SDCIT_FIGURE_DIR + '/postnonlinear_aupc_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig(SDCIT_FIGURE_DIR + '/postnonlinear_aupc_highdim_wo_adjust.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -275,13 +273,11 @@ def draw_calib_postnonlinear():
                      label='_nolegend_')
     plt.axes().set_xlabel('dimension')
     plt.axes().set_ylabel('KS test statistic')
-    plt.axes().set_ylim([0.0, 0.5])
     plt.axes().invert_yaxis()
-    plt.axes().set_yticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5])
-
+    plt.axes().set_yticks([0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
     # plt.title('Postnonlinear')
     sns.despine()
-    plt.savefig(SDCIT_FIGURE_DIR + '/postnonlinear_calib.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig(SDCIT_FIGURE_DIR + '/postnonlinear_calib_wo_adjust.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -322,13 +318,11 @@ def draw_calib_postnonlinear_highdim():
     plt.axes().set_xlabel('dimension')
     plt.axes().set_ylabel('KS test statistic')
     plt.axes().set_xscale('log')
-    plt.axes().set_ylim([0.0, 0.5])
     plt.axes().invert_yaxis()
     plt.xticks([1, 5, 10, 20, 50], [1, 5, 10, 20, 50])
-    plt.axes().set_yticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5])
-
+    plt.axes().set_yticks([0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
     sns.despine()
-    plt.savefig(SDCIT_FIGURE_DIR + '/postnonlinear_calib_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig(SDCIT_FIGURE_DIR + '/postnonlinear_calib_highdim_wo_adjust.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -363,7 +357,7 @@ def draw_type_I_postnonlinear_highdim():
     handles, labels = plt.axes().get_legend_handles_labels()
     plt.axes().legend(handles[::-1], labels[::-1])
     sns.despine()
-    plt.savefig(SDCIT_FIGURE_DIR + '/postnonlinear_type_I_highdim.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
+    plt.savefig(SDCIT_FIGURE_DIR + '/postnonlinear_type_I_highdim_wo_adjust.pdf', transparent=True, bbox_inches='tight', pad_inches=0.02)
     plt.close()
 
 
@@ -373,15 +367,15 @@ if __name__ == '__main__':
     #         assert exists(SDCIT_RESULT_DIR + '/' + algo.lower() + '_' + data + '.csv'), 'run tests first -- missing {}'.format(algo.lower() + '_' + data + '.csv')
     if True:
         # chaotic series
-        # draw_aupc_chaotic()
-        # draw_calib_chaotic()
+        draw_aupc_chaotic()
+        draw_calib_chaotic()
 
         # # postnonlinear-noise
-        # draw_aupc_postnonlinear()
-        # draw_calib_postnonlinear()
+        draw_aupc_postnonlinear()
+        draw_calib_postnonlinear()
         draw_aupc_postnonlinear_highdim()
-        # draw_calib_postnonlinear_highdim()
+        draw_calib_postnonlinear_highdim()
         #
         # # type I for both
-        # draw_type_I_error_chaotic()
-        # draw_type_I_postnonlinear_highdim()
+        draw_type_I_error_chaotic()
+        draw_type_I_postnonlinear_highdim()

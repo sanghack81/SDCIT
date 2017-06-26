@@ -124,6 +124,30 @@ def python_kcit_K(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, alpha=0.05, wi
     return kcit_null(Kxz, Kyz, T, alpha, num_bootstrap_for_null, test_statistic)
 
 
+
+def python_kcit_K2(Kx: np.ndarray, Ky: np.ndarray, Z: np.ndarray, alpha=0.05, with_gp=True, sigma_squared=1e-3, num_bootstrap_for_null=5000, seed=None):
+    if seed is not None:
+        np.random.seed(seed)
+
+    T = len(Kx)
+
+    Kz = rbf_kernel_median(Z)
+    Kx, Ky, Kz = centering(Kx * Kz), centering(Ky), centering(Kz)
+
+    if with_gp:
+        Kxz = residual_kernel_matrix_kernel_real(Kx, Z, min(200, T // 5))  # originally, min(400, T // 4)
+        Kyz = residual_kernel_matrix_kernel_real(Ky, Z, min(200, T // 5))
+    else:
+        P = eye(T) - Kz @ pdinv(Kz + sigma_squared * eye(T))
+        Kxz = P @ Kx @ P.T
+        Kyz = P @ Ky @ P.T
+
+    test_statistic = (Kxz * Kyz).sum()  # trace(Kxz @ Kyz)
+
+    return kcit_null(Kxz, Kyz, T, alpha, num_bootstrap_for_null, test_statistic)
+
+
+
 def kcit_null(Kxz, Kyz, T, alpha, num_bootstrap_for_null, test_statistic):
     # null computation
     eig_Kxz, eivx = truncated_eigen(*eigdec(Kxz))
