@@ -40,7 +40,6 @@ method_color_codes = {'KCIT': 3, 'SDCIT': 5, 'KCIPT': 1, 'CHSIC': 9, 'KCIT2': 2}
 markers = collections.defaultdict(lambda: 'o')
 markers.update({'KCIT': 'o', 'SDCIT': 's', 'KCIPT': '*', 'CHSIC': '^', 'KCIT2': 'o'})
 all_algos = ['KCIT', 'SDCIT', 'KCIPT', 'CHSIC', 'KCIT2']
-# all_algos = ['KCIT', 'SDCIT', 'KCIT2']
 def algo_name(org_name):
     map = {'KCIT2':'KCIT', 'KCIT': 'KCIT (org.)'}
     if org_name in map:
@@ -373,13 +372,13 @@ if __name__ == '__main__':
     #         assert exists(SDCIT_RESULT_DIR + '/' + algo.lower() + '_' + data + '.csv'), 'run tests first -- missing {}'.format(algo.lower() + '_' + data + '.csv')
     if True:
         # chaotic series
-        # draw_aupc_chaotic()
-        # draw_calib_chaotic()
+        draw_aupc_chaotic()
+        draw_calib_chaotic()
 
         # # postnonlinear-noise
         # draw_aupc_postnonlinear()
         # draw_calib_postnonlinear()
-        draw_aupc_postnonlinear_highdim()
+        # draw_aupc_postnonlinear_highdim()
         # draw_calib_postnonlinear_highdim()
         #
         # # type I for both

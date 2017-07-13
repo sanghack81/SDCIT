@@ -113,6 +113,8 @@ def SDCIT(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, Dz=None, size_of_null_
     if Dz is None:
         Dz = K2D(Kz)
 
+    # TODO randomize index to overcome possible problems with learning permutations.
+
     Kxz = Kx * Kz
 
     test_statistic, error_statistic, mask, _ = MMSD(Ky, Kz, Kxz, Dz)

@@ -56,7 +56,7 @@ def chi2rnd(df, m, n):
     return chi2.rvs(df, size=m * n).reshape((m, n))
 
 
-def residual_kernel_matrix_kernel_real(Kx, Z, num_eig):
+def residual_kernel_matrix_kernel_real(Kx, Z, num_eig, ARD=True):
     """K_X|Z"""
     assert len(Kx) == len(Z)
     assert num_eig <= len(Kx)
@@ -66,7 +66,7 @@ def residual_kernel_matrix_kernel_real(Kx, Z, num_eig):
     I = eye(T)
     eig_Kx, eix = truncated_eigen(*eigdec(Kx, num_eig))
 
-    gp_model = GPR(Z, 2 * sqrt(T) * eix @ diag(sqrt(eig_Kx)) / sqrt(eig_Kx[0]), RBF(D, ARD=True) + White(D))
+    gp_model = GPR(Z, 2 * sqrt(T) * eix @ diag(sqrt(eig_Kx)) / sqrt(eig_Kx[0]), RBF(D, ARD=ARD) + White(D))
     gp_model.optimize()
 
     Kz_x = gp_model.kern.rbf.compute_K_symm(Z)
