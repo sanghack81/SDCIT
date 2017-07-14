@@ -114,6 +114,7 @@ def SDCIT(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, Dz=None, size_of_null_
         Dz = K2D(Kz)
 
     # TODO randomize index to overcome possible problems with learning permutations.
+    Kx, Ky, Kz, Dz = shuffling(seed, Kx, Ky, Kz, Dz)  # categorical Z may yield an ordered 'block' matrix and it may harm permutation.
 
     Kxz = Kx * Kz
 
@@ -168,9 +169,12 @@ def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
     """
     if seed is None:
         seed = random_seeds()
+    np.random.seed(seed)
 
     if Dz is None:
         Dz = K2D(Kz)
+
+    Kx, Ky, Kz, Dz = shuffling(seed, Kx, Ky, Kz, Dz)  # categorical Z may yield an ordered 'block' matrix and it may harm permutation.
 
     Kxz = Kx * Kz
 
@@ -201,3 +205,15 @@ def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
         return fix_test_statistic, p_value_of(fix_test_statistic, fix_null), fix_null
     else:
         return fix_test_statistic, p_value_of(fix_test_statistic, fix_null)
+
+
+def shuffling(seed, *matrices):
+    np.random.seed(seed)
+    n = -1
+    for matrix in matrices:
+        if n < 0:
+            n = len(matrix)
+            idxs = np.arange(n)
+            np.random.shuffle(idxs)
+
+        yield matrix[np.ix_(idxs, idxs)]

@@ -249,26 +249,3 @@ def regression_distance_k(Kx: np.ndarray, Ky: np.ndarray):
     N = O @ np.diag(M).T
     D = np.sqrt(N + N.T - 2 * M)
     return D
-
-
-if __name__ == '__main__':
-    n = 100
-    z = np.random.randn(n, 4)
-    y = z[:, 0:2] + np.random.randn(n, 2)
-
-    Kz = rbf_kernel_median(z)
-    Kz2 = rbf_kernel_median(z[:, 0:2])
-    D, Kz_y = regression_distance(y, z)
-    import seaborn as sns
-    import matplotlib.pyplot as plt
-
-    sns.set()
-    sns.heatmap(Kz)
-    plt.savefig('yoyo1.pdf')
-    plt.close()
-    sns.heatmap(Kz_y)
-    plt.savefig('yoyo2.pdf')
-    plt.close()
-    sns.heatmap(Kz2)
-    plt.savefig('yoyo3.pdf')
-    plt.close()
