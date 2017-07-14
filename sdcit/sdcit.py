@@ -167,9 +167,8 @@ def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
         Lee, S., Honavar, V. (2017). Self-Discrepancy Conditional Independence Test.
         In Proceedings of the Thirty-third Conference on Uncertainty in Artificial Intelligence. Corvallis, Oregon: AUAI Press.
     """
-    if seed is None:
-        seed = random_seeds()
-    np.random.seed(seed)
+    if seed is not None:
+        np.random.seed(seed)
 
     if Dz is None:
         Dz = K2D(Kz)
@@ -186,7 +185,7 @@ def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
     error_mmsd = np.zeros((1,), dtype='float64')
 
     # run SDCIT
-    cy_sdcit(Kxz, Ky, Kz, Dz, size_of_null_sample, seed, n_jobs, mmsd, error_mmsd, raw_null, error_raw_null)
+    cy_sdcit(Kxz, Ky, Kz, Dz, size_of_null_sample, random_seeds(), n_jobs, mmsd, error_mmsd, raw_null, error_raw_null)
 
     # postprocess outputs
     test_statistic = mmsd[0]
@@ -208,7 +207,8 @@ def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
 
 
 def shuffling(seed, *matrices):
-    np.random.seed(seed)
+    if seed is not None:
+        np.random.seed(seed)
     n = -1
     for matrix in matrices:
         if n < 0:
