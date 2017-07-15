@@ -54,7 +54,7 @@ def para(N, independent, trial):
 
         p_KCIT = python_kcit_K(KX, KY, KZ, seed=trial)[2]
         p_KCIT2 = python_kcit_K2(KX, KY, Z, seed=trial)[2]
-        p_SDCIT = SDCIT(KX, KY, KZ, Dz=Dz, size_of_null_sample=500, seed=trial)[1]
+        p_SDCIT = SDCIT(KX, KY, KZ, Dz=Dz, size_of_null_sample=500, seed=trial, to_shuffle=False)[1]
 
         outs.append(['SDCIT', N, trial, multiplier, independent, p_SDCIT])
         outs.append(['KCIT', N, trial, multiplier, independent, p_KCIT])
