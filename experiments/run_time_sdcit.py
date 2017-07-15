@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
                         kkk = rbf_kernel_median(X, Y, Z)
                         Dz = K2D(kkk[-1])
-                        c_SDCIT(*kkk, Dz=Dz, size_of_null_sample=b, seed=trial)
+                        c_SDCIT(*kkk, Dz=Dz, size_of_null_sample=b, seed=trial, to_shuffle=False)
 
                         endtime = time.time()
                         print(endtime - start, trial, N, b, file=f, sep=',', flush=True)

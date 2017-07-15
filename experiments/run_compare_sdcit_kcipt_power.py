@@ -29,7 +29,7 @@ def experiment(obj_filename):
 
         # Compare SDCIT and KCIPT100
         print('SDCIT ... ')
-        sdcit_mmd, sdcit_pval, sdcit_null = SDCIT(kx, ky, kz, with_null=True, seed=trial)
+        sdcit_mmd, sdcit_pval, sdcit_null = SDCIT(kx, ky, kz, with_null=True, seed=trial, to_shuffle=False)
         print('KCIPT {} ... '.format(initial_B))
         _, mmds100, _, outer_null100 = c_KCIPT(kx, ky, kz, K2D(kz), initial_B, 10000, 10000, n_jobs=PARALLEL_JOBS, seed=trial)
 

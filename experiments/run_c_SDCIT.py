@@ -4,7 +4,7 @@ from joblib import Parallel
 from joblib import delayed
 from tqdm import tqdm, trange
 
-from experiments.exp_setup import SDCIT_RESULT_DIR
+from experiments.exp_setup import SDCIT_RESULT_DIR, PARALLEL_JOBS
 from experiments.exp_utils import read_chaotic, read_postnonlinear_noise, chaotic_configs, postnonlinear_noise_configs
 from sdcit.sdcit import c_SDCIT
 from sdcit.utils import *
@@ -12,18 +12,18 @@ from sdcit.utils import *
 
 def test_chaotic(independent, gamma, trial, N):
     np.random.seed(trial)
-    mmd, pval = c_SDCIT(*read_chaotic(independent, gamma, trial, N), seed=trial)
+    mmd, pval = c_SDCIT(*read_chaotic(independent, gamma, trial, N), seed=trial, to_shuffle=False)
     return independent, gamma, trial, N, mmd, pval
 
 
 def test_postnonlinear(independent, noise, trial, N):
     np.random.seed(trial)
-    mmd, pval = c_SDCIT(*read_postnonlinear_noise(independent, noise, trial, N), seed=trial)
+    mmd, pval = c_SDCIT(*read_postnonlinear_noise(independent, noise, trial, N), seed=trial, to_shuffle=False)
     return independent, noise, trial, N, mmd, pval
 
 
 def main():
-    with Parallel(2) as parallel:
+    with Parallel(PARALLEL_JOBS) as parallel:
         if not exists(SDCIT_RESULT_DIR + '/csdcit_chaotic.csv'):
             for independent, N, gamma in tqdm(chaotic_configs()):
                 outs = parallel(delayed(test_chaotic)(independent, gamma, trial, N) for trial in trange(300))

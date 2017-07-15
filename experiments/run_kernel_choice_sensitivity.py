@@ -8,7 +8,7 @@ from joblib import Parallel, delayed
 from sklearn.metrics import euclidean_distances
 from tqdm import tqdm
 
-from experiments.exp_setup import SDCIT_RESULT_DIR, SDCIT_DATA_DIR
+from experiments.exp_setup import SDCIT_RESULT_DIR, SDCIT_DATA_DIR, PARALLEL_JOBS
 from sdcit.kcit import python_kcit_K, python_kcit_K2
 from sdcit.sdcit import SDCIT
 from sdcit.utils import K2D, AUPC, KS_statistic
@@ -50,7 +50,7 @@ def para(N, independent, trial):
         KX = np.exp(-mX * DX * multiplier)
         KY = np.exp(-mY * DY * multiplier)
         KZ = np.exp(-mZ * DZ * multiplier)
-        # Dz = K2D(KZ)
+        Dz = K2D(KZ)
 
         p_KCIT = python_kcit_K(KX, KY, KZ, seed=trial)[2]
         p_KCIT2 = python_kcit_K2(KX, KY, Z, seed=trial)[2]
@@ -73,7 +73,7 @@ if __name__ == '__main__':
         configs = list(itertools.product([200, 400], [0, 1], list(range(300))))
         random.shuffle(configs)
 
-        with Parallel(12, verbose=100) as parallel:
+        with Parallel(PARALLEL_JOBS, verbose=100) as parallel:
             lll = parallel(delayed(para)(*param) for param in tqdm(configs))
             fname = 'results/sensitivity.csv'
             with open(fname, 'a') as f:
