@@ -91,7 +91,7 @@ def residualize(Y, X=None, gp_kernel=None):
 
 
 def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, use_expectation=True, with_gp=True, sigma_squared=1e-3):
-    """Kernel matrix of residual of Y given X based on their kernel matrices"""
+    """Kernel matrix of residual of Y given X based on their kernel matrices, Y=f(X)"""
     K_Y, K_X = centering(K_Y), centering(K_X)
     T = len(K_Y)
 
@@ -181,6 +181,7 @@ def AUPC(p_values: Union[List, np.ndarray]) -> float:
     """Area Under Power Curve"""
     p_values = np.array(p_values)
 
+    # CDF of p-values
     xys = [(uniq_v, np.mean(p_values <= uniq_v)) for uniq_v in np.unique(p_values)]
 
     area, prev_x, prev_y = 0, 0, 0
@@ -204,6 +205,7 @@ def p_value_curve(p_values):
 
 
 def regression_distance(Y: np.ndarray, Z: np.ndarray, ard=True):
+    """d(z,z') = |f(z)-f(z')| where Y=f(Z) + noise and f ~ GP"""
     n, dims = Z.shape
 
     rbf = RBF(dims, ARD=ard)
