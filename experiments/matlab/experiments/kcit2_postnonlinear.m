@@ -6,7 +6,7 @@ function kcit_postnonlinear(independent, noise, trial, N, outputfile)
 
     start = tic;
     [statistic v2 boot_p_value v3 appr_p_value] =...
-        CInd_test_new_withGP(data.X, data.Y, data.Z, 0.01, 0);
+        CInd_test_new_withGP2(data.X, data.Y, data.Z, 0.01, 0);
     runtime = toc(start);
 
     fileid = fopen(outputfile, 'a+');

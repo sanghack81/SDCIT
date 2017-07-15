@@ -1,4 +1,5 @@
 function run_kcit_chaotic_timing()
+    maxNumCompThreads = 1;
     addpath('gpml-matlab/gpml');
     addpath('algorithms');
     addpath('data');

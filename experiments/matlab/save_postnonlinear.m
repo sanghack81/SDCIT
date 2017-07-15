@@ -9,7 +9,7 @@ function save_postnonlinear()
                     args.dimensions = (noise + 1);
                     data = synthetic('caseI', trial, N, args);
                     
-                    fname = sprintf(string('/Users/sxl439/kcipt_data/%d_%d_%d_%d_postnonlinear.mat'),noise,trial,independent,N);
+                    fname = sprintf(getenv('HOME')+string('/kcipt_data/%d_%d_%d_%d_postnonlinear.mat'),noise,trial,independent,N);
                     save(char(fname),'data','-v7')
                 end
             end
@@ -25,7 +25,7 @@ function save_postnonlinear()
                 args.dimensions = (noise + 1);
                 data = synthetic('caseI', trial, N, args);
                 
-                fname = sprintf(string('/Users/sxl439/kcipt_data/%d_%d_%d_%d_postnonlinear.mat'),noise,trial,independent,N);
+                fname = sprintf(getenv('HOME')+string('/kcipt_data/%d_%d_%d_%d_postnonlinear.mat'),noise,trial,independent,N);
                 save(char(fname),'data','-v7')
             end
         end

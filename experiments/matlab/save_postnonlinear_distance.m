@@ -14,7 +14,7 @@ function save_postnonlinear_distance()
                     Z = data.Z;
                     D = regression_distance([X Y], Z);
                     
-                    fname = sprintf(string('/Users/sxl439/kcipt_data/dist_%d_%d_%d_%d_postnonlinear.mat'),noise,trial,independent,N);
+                    fname = sprintf(getenv('HOME')+string('/kcipt_data/dist_%d_%d_%d_%d_postnonlinear.mat'),noise,trial,independent,N);
                     save(char(fname),'D','-v7')
                 end
             end
@@ -35,7 +35,7 @@ function save_postnonlinear_distance()
                 Z = data.Z;
                 D = regression_distance([X Y], Z);
                 
-                fname = sprintf(string('/Users/sxl439/kcipt_data/dist_%d_%d_%d_%d_postnonlinear.mat'),noise,trial,independent,N);
+                fname = sprintf(getenv('HOME')+string('/kcipt_data/dist_%d_%d_%d_%d_postnonlinear.mat'),noise,trial,independent,N);
                 save(char(fname),'D','-v7')
             end
         end
