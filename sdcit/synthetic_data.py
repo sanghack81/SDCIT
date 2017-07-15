@@ -4,7 +4,7 @@ from numpy.random import rand, randn
 
 
 def henon(seed, n, gamma, independence, noise_dim=2, noise_std=0.5):
-    """Python implementation of chaotic time series as used in Doran et al. (2014) A Permutation-based Kernel Conditional Independence Test
+    """Python implementation of chaotic time series as used in Doran et al. (2014)
 
     It is not compatible with the MATLAB implementation by Doran et al. (2014) due to the use of differenct random number generator.
 

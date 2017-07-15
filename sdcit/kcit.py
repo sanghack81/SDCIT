@@ -16,8 +16,7 @@ def np2matlab(arr: np.ndarray):
 
 
 def matlab_kcit(X: np.ndarray, Y: np.ndarray, Z: np.ndarray, seed: int = None, matlab_engine_instance=None, installed_at=None):
-    """Python-wrapper for KCIT by Zhang et al. (2011)
-
+    """Python-wrapper for original implementation of KCIT by Zhang et al. (2011)
 
     References
     ----------
@@ -124,7 +123,6 @@ def python_kcit_K(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, alpha=0.05, wi
     return kcit_null(Kxz, Kyz, T, alpha, num_bootstrap_for_null, test_statistic)
 
 
-
 def python_kcit_K2(Kx: np.ndarray, Ky: np.ndarray, Z: np.ndarray, alpha=0.05, with_gp=True, sigma_squared=1e-3, num_bootstrap_for_null=5000, seed=None):
     if seed is not None:
         np.random.seed(seed)
@@ -145,7 +143,6 @@ def python_kcit_K2(Kx: np.ndarray, Ky: np.ndarray, Z: np.ndarray, alpha=0.05, wi
     test_statistic = (Kxz * Kyz).sum()  # trace(Kxz @ Kyz)
 
     return kcit_null(Kxz, Kyz, T, alpha, num_bootstrap_for_null, test_statistic)
-
 
 
 def kcit_null(Kxz, Kyz, T, alpha, num_bootstrap_for_null, test_statistic):

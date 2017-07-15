@@ -4,7 +4,7 @@ from sdcit.utils import *
 
 
 def c_KCIPT(Kx, Ky, Kz, Dz, B, b, M, n_jobs=1, seed=None):
-    """KCIPT by Doran et al. to test X _||_ Y | Z
+    """Python implementation of KCIPT by Doran et al. to test X _||_ Y | Z
 
     Parameters
     ----------
@@ -42,6 +42,7 @@ def c_KCIPT(Kx, Ky, Kz, Dz, B, b, M, n_jobs=1, seed=None):
 
     cy_kcipt(Kx, Ky, Kz, Dz, B, b, inner_null, mmds, seed, n_jobs, outer_null, M)
 
+    # null correction for test statistic based on a set of unbiased estimates of squared MMD
     if M > 0:
         outer_null -= outer_null.mean()
 

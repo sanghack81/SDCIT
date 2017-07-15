@@ -80,7 +80,7 @@ def adjust_errors(null_errors, null, error=None, test_statistic=None):
         return null - null_errors * beta
 
 
-def SDCIT(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, adjust=True):
+def SDCIT(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, adjust=True, to_shuffle=True):
     """SDCIT (Lee and Honavar, 2017)
 
     Parameters
@@ -96,11 +96,13 @@ def SDCIT(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, Dz=None, size_of_null_
     size_of_null_sample : int
         The number of samples in a null distribution
     with_null : bool
-        If true, null distribution is also returned
+        If true, resulting null distribution is also returned
     seed : int
         Random seed
     adjust : bool
         whether to adjust null distribution and test statistics based on 'permutation error' information
+    to_shuffle : bool
+        shuffle the order of given data at the beginning, which minimize possible issues with getting a bad permutation
 
     References
     ----------
@@ -113,8 +115,8 @@ def SDCIT(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, Dz=None, size_of_null_
     if Dz is None:
         Dz = K2D(Kz)
 
-    # TODO randomize index to overcome possible problems with learning permutations.
-    Kx, Ky, Kz, Dz = shuffling(seed, Kx, Ky, Kz, Dz)  # categorical Z may yield an ordered 'block' matrix and it may harm permutation.
+    if to_shuffle:
+        Kx, Ky, Kz, Dz = shuffling(seed, Kx, Ky, Kz, Dz)  # categorical Z may yield an ordered 'block' matrix and it may harm permutation.
 
     Kxz = Kx * Kz
 
@@ -137,7 +139,7 @@ def SDCIT(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, Dz=None, size_of_null_
         return fix_test_statistic, p_value_of(fix_test_statistic, fix_null)
 
 
-def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1, adjust=True):
+def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1, adjust=True, to_shuffle=True):
     """C-based SDCIT (Lee and Honavar, 2017)
 
     Parameters
@@ -153,13 +155,15 @@ def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
     size_of_null_sample : int
         The number of samples in a null distribution
     with_null : bool
-        If true, null distribution is also returned
+        If true, a resulting null distribution is also returned
     seed : int
         Random seed
     n_jobs: int
         number of threads to be used
     adjust : bool
         whether to adjust null distribution and test statistics based on 'permutation error' information
+    to_shuffle : bool
+        shuffle the order of given data at the beginning, which minimize possible issues with getting a bad permutation
 
 
     References
@@ -173,7 +177,8 @@ def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
     if Dz is None:
         Dz = K2D(Kz)
 
-    Kx, Ky, Kz, Dz = shuffling(seed, Kx, Ky, Kz, Dz)  # categorical Z may yield an ordered 'block' matrix and it may harm permutation.
+    if to_shuffle:
+        Kx, Ky, Kz, Dz = shuffling(seed, Kx, Ky, Kz, Dz)  # categorical Z may yield an ordered 'block' matrix and it may harm permutation.
 
     Kxz = Kx * Kz
 
@@ -187,7 +192,7 @@ def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
     # run SDCIT
     cy_sdcit(Kxz, Ky, Kz, Dz, size_of_null_sample, random_seeds(), n_jobs, mmsd, error_mmsd, raw_null, error_raw_null)
 
-    # postprocess outputs
+    # post-process outputs
     test_statistic = mmsd[0]
     error_statistic = error_mmsd[0]
     raw_null = 0.5 * (raw_null - raw_null.mean()) + raw_null.mean()
@@ -209,6 +214,7 @@ def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
 def shuffling(seed, *matrices):
     if seed is not None:
         np.random.seed(seed)
+
     n = -1
     for matrix in matrices:
         if n < 0:
