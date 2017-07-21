@@ -1,4 +1,4 @@
-function kcit_postnonlinear(independent, noise, trial, N, outputfile)
+function kcit2_postnonlinear(independent, noise, trial, N, outputfile)
 
     args.independent = independent;
     args.dimensions = (noise + 1);

@@ -1,4 +1,4 @@
-function [kx, bw_new] = kernel(x, xKern, theta)
+function [kx, bw_new] = kernel2(x, xKern, theta)
 
 % KERNEL Compute the rbf kernel
 % Copyright (c) 2010-2011  ...

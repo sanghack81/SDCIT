@@ -1,4 +1,4 @@
-function [Sta, Cri, p_val, Cri_appr, p_appr] = CInd_test_new_withGP(x, y, z, alpha, width)
+function [Sta, Cri, p_val, Cri_appr, p_appr] = CInd_test_new_withGP2(x, y, z, alpha, width)
 % To test if x and y are independent.
 % INPUT:
 %   The number of rows of x and y is the sample size.
