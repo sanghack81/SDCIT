@@ -1,4 +1,4 @@
-function kcit_chaotic(independent, gamma, noise, trial, N, outputfile)
+function kcit2_chaotic(independent, gamma, noise, trial, N, outputfile)
     args.gamma = gamma;
     args.noise = noise;
     data = synthetic('henon', trial, N, args);
