@@ -16,6 +16,12 @@ install:
   #  - conda info -a
   #  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pandas tqdm matplotlib seaborn joblib numpy scipy scikit-learn cython
   - pip install pandas tqdm matplotlib seaborn joblib numpy scipy scikit-learn cython
+  - pip install tensorflow==1.2.0
+  - cd ..
+  - git clone https://github.com/GPflow/GPflow
+  - cd GPflow
+  - python setup.py install
+  - cd ../SDCIT
   - ./setup.sh
   - python setup.py install
 
