@@ -5,8 +5,7 @@ language: python
 python: "3.6"
 
 install:
-  - pip install pandas tqdm matplotlib seaborn joblib numpy scipy scikit-learn cython
-  - pip install tensorflow==1.2.0
+  - pip install pandas tqdm matplotlib seaborn joblib numpy scipy scikit-learn cython tensorflow
   - cd ..
   - git clone https://github.com/GPflow/GPflow
   - cd GPflow
