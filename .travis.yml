@@ -12,7 +12,8 @@ install:
   - python setup.py install
   - cd ../SDCIT
   - ./setup.sh
-  - python setup.py install
+  - python setup.py build_ext --inplace
+  - pip install -e .
 
 script:
   pytest
