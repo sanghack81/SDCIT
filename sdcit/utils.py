@@ -90,7 +90,7 @@ def residualize(Y, X=None, gp_kernel=None):
     return Y - Yhat
 
 
-def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, use_expectation=True, with_gp=True, sigma_squared=1e-3):
+def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, use_expectation=True, with_gp=True, sigma_squared=1e-3, return_learned_K_X=False):
     """Kernel matrix of residual of Y given X based on their kernel matrices, Y=f(X)"""
     K_Y, K_X = centering(K_Y), centering(K_X)
     T = len(K_Y)
@@ -111,9 +111,14 @@ def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, use_expectation=True, with
 
     P = pdinv(np.eye(T) + K_X / sigma_squared)  # == I-K @ inv(K+Sigma) in Zhang et al. 2011
     if use_expectation:  # Flaxman et al. 2016 Gaussian Processes for Independence Tests with Non-iid Data in Causal Inference.
-        return (K_X + P @ K_Y) @ P
+        RK = (K_X + P @ K_Y) @ P
     else:  # Zhang et al. 2011. Kernel-based Conditional Independence Test and Application in Causal Discovery.
-        return P @ K_Y @ P
+        RK = P @ K_Y @ P
+
+    if return_learned_K_X:
+        return RK, K_X
+    else:
+        return RK
 
 
 def rbf_kernel_median(data: np.ndarray, *args, without_two=False):
