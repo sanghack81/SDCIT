@@ -7,7 +7,7 @@
 #include "../../blossom5/PerfectMatching.h"
 
 using std::vector;
-using std::isinf;
+// using std::isinf;
 
 
 template<typename T>
@@ -427,7 +427,7 @@ vector<int> split_permutation(const double *D, const int full_n, const vector<in
             const double *D_i = D + idxs[i] * full_n;
             for (int j = i + 1; j < len; j++) {
                 double d = D_i[idxs[j]];
-                if (!isinf(d)) {
+                if (!std::isinf(d)) {
                     pm->AddEdge(i, j, (int) (d * factor));
                 }
             }
@@ -513,7 +513,7 @@ void dense_data_analysis(const double *D, const int full_n, const int len, const
         const double *D_i = D + idxs[i] * full_n;
         for (int j = i + 1; j < len; j++) {
             double d = D_i[idxs[j]];
-            if (isinf(d)) {
+            if (std::isinf(d)) {
 
             } else {
                 if (max_distance < d) {
@@ -559,7 +559,7 @@ vector<int> dense_2n_permutation(const double *D, const int full_n, const vector
             const double *D_i = D + idxs[i] * full_n;
             for (int j = i + 1; j < len; j++) {
                 double d = D_i[idxs[j]];
-                if (!isinf(d)) {
+                if (!std::isinf(d)) {
                     pm->AddEdge(i, j, (int) (d * factor));
                 }
             }
@@ -607,7 +607,7 @@ void data_analysis(const double *D, const int full_n, const int len, vector<vect
         const double *D_i = D + idxs[i] * full_n;
         for (int j = i + 1; j < len; j++) {
             double d = D_i[idxs[j]];
-            if (isinf(d)) {
+            if (std::isinf(d)) {
                 if (next_component_start == -1 && !visited[j]) {
                     next_component_start = j;
                 }
