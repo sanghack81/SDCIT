@@ -1,4 +1,5 @@
 function save_postnonlinear()
+    mkdir(char(getenv('HOME')+string('/kcipt_data')));
     addpath('data');
     % Main experiments
     for noise=0:4

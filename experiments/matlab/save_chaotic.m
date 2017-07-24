@@ -1,4 +1,5 @@
 function save_chaotic()
+    mkdir(char(getenv('HOME')+string('/kcipt_data')));
     addpath('data');
     for gamma=0:0.1:0.5
         for trial=0:299
