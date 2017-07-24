@@ -1,4 +1,8 @@
 function save_postnonlinear_distance()
+    mkdir(char(getenv('HOME')+string('/kcipt_data')));
+    addpath('gpml-matlab/gpml');
+    addpath('algorithms');
+    addpath('kcipt');
     addpath('data');
     % Main experiments
     for noise=0:4
