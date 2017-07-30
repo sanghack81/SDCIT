@@ -42,8 +42,10 @@ method_color_codes = {'KCIT': 3, 'SDCIT': 5, 'KCIPT': 1, 'CHSIC': 9, 'KCIT2': 7,
 markers = collections.defaultdict(lambda: 'o')
 markers.update({'KCIT': 'o', 'SDCIT': 's', 'KCIPT': '*', 'CHSIC': '^', 'KCIT2': 'o'})
 all_algos = ['SDCIT', 'SDCIT-wo-adjust']
+
+
 def algo_name(org_name):
-    map = {'SDCIT-wo-adjust':'SDCIT w/o adjust'}
+    map = {'SDCIT-wo-adjust': 'SDCIT w/o adjust'}
     if org_name in map:
         return map[org_name]
     else:
@@ -82,9 +84,11 @@ def draw_aupc_chaotic():
     for k, gdf in aupc_df.groupby(['algorithm', 'N']):
         print('chaotic', k, gdf['AUPC'])
         if k[1] == 400:
-            plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label=algo_name(str(k[0])))
+            plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':', label=algo_name(str(k[0])))
         else:
-            plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+            plt.plot(gdf['gamma'], gdf['AUPC'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':', label='_nolegend_')
 
     plt.axes().set_xlabel(r'$\gamma$')
     plt.axes().set_ylabel('Area Under Power Curve')
@@ -118,9 +122,11 @@ def draw_calib_chaotic():
     sns_setting()
     for k, gdf in df.groupby(['algo', 'N']):
         if k[1] == 400:
-            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label=algo_name(str(k[0])))
+            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':', label=algo_name(str(k[0])))
         else:
-            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':', label='_nolegend_')
     handles, labels = plt.axes().get_legend_handles_labels()
     plt.axes().legend(handles[::-1], labels[::-1], ncol=2)
     plt.axes().set_xlabel(r'$\gamma$')
@@ -155,9 +161,11 @@ def draw_type_I_error_chaotic():
     sns_setting()
     for k, gdf in df.groupby(['algo', 'N']):
         if k[1] == 400:
-            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label=algo_name(str(k[0])))
+            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':', label=algo_name(str(k[0])))
         else:
-            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+            plt.plot(gdf['gamma'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':', label='_nolegend_')
     plt.axes().set_xlabel(r'$\gamma$')
     plt.axes().set_xticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5])
     plt.axes().set_ylabel('Type I error')
@@ -194,9 +202,11 @@ def draw_aupc_postnonlinear():
     for k, gdf in aupc_df.groupby(['algorithm', 'N']):
         gdf = gdf[gdf['dimension'] <= 5]
         if k[1] == 400:
-            plt.plot(gdf['dimension'], gdf['AUPC'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label=algo_name(str(k[0])))
+            plt.plot(gdf['dimension'], gdf['AUPC'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':', label=algo_name(str(k[0])))
         else:
-            plt.plot(gdf['dimension'], gdf['AUPC'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+            plt.plot(gdf['dimension'], gdf['AUPC'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':', label='_nolegend_')
     plt.axes().set_xlabel('dimension')
     plt.axes().set_ylabel('Area Under Power Curve')
     plt.axes().set_ylim([0.45, 1.05])
@@ -231,7 +241,8 @@ def draw_aupc_postnonlinear_highdim():
     sns_setting()
     for k, gdf in aupc_df.groupby(['algorithm', 'N']):
         if k[1] == 400:
-            plt.plot([int(v) for v in gdf['dimension']], gdf['AUPC'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':',
+            plt.plot([int(v) for v in gdf['dimension']], gdf['AUPC'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':',
                      label=algo_name(str(k[0])))
 
     plt.axes().set_xlabel('dimension')
@@ -266,10 +277,12 @@ def draw_calib_postnonlinear():
     for k, gdf in df.groupby(['algo', 'N']):
         gdf = gdf[gdf['dimension'] <= 5]
         if k[1] == 400:
-            plt.plot([int(v) for v in gdf['dimension']], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':',
+            plt.plot([int(v) for v in gdf['dimension']], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':',
                      label=algo_name(str(k[0])))
         else:
-            plt.plot([int(v) for v in gdf['dimension']], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':',
+            plt.plot([int(v) for v in gdf['dimension']], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':',
                      label='_nolegend_')
     plt.axes().set_xlabel('dimension')
     plt.axes().set_ylabel('KS test statistic')
@@ -312,9 +325,11 @@ def draw_calib_postnonlinear_highdim():
     for k, gdf in df.groupby(['algo', 'N']):
         print('postnonlinear', k, gdf['D'])
         if k[1] == 400:
-            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label=algo_name(str(k[0])))
+            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':', label=algo_name(str(k[0])))
         else:
-            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':', label='_nolegend_')
     plt.axes().set_xlabel('dimension')
     plt.axes().set_ylabel('KS test statistic')
     plt.axes().set_xscale('log')
@@ -347,9 +362,11 @@ def draw_type_I_postnonlinear_highdim():
     sns_setting()
     for k, gdf in df.groupby(['algo', 'N']):
         if k[1] == 400:
-            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label=algo_name(str(k[0])))
+            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':', label=algo_name(str(k[0])))
         else:
-            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]], ls='-' if k[1] == 400 else ':', label='_nolegend_')
+            plt.plot(gdf['dimension'], gdf['D'], markers[(k[0])], c=color_palettes[method_color_codes[k[0]]] if k[1] == 400 else color_palettes[-0 + method_color_codes[k[0]]],
+                     ls='-' if k[1] == 400 else ':', label='_nolegend_')
     plt.axes().set_xlabel('dimension')
     plt.axes().set_xscale('log')
     plt.xticks([1, 5, 10, 20, 50], [1, 5, 10, 20, 50])

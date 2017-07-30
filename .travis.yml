@@ -3,7 +3,10 @@ language: python
 python: "3.6"
 
 install:
-  - pip install pandas tqdm matplotlib seaborn joblib numpy scipy scikit-learn cython tensorflow
+  - pip install --upgrade pip
+  - pip install -U -r requirements.txt
+  - pip install pep8 pytest-pep8 pytest-xdist
+  - pip install python-coveralls pytest-cov
   - cd ..
   - git clone https://github.com/GPflow/GPflow
   - cd GPflow
@@ -14,4 +17,7 @@ install:
   - pip install -e .
 
 script:
-  pytest
+  - pytest --cov=sdcit --pep8
+
+after_success:
+  - coveralls

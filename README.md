@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/sanghack81/SDCIT.svg?branch=master)](https://travis-ci.org/sanghack81/SDCIT)
+
 SDCIT: Self-Discrepancy Conditional Independence Test
 ==
 

@@ -5,8 +5,6 @@ from sys import platform
 import numpy
 from Cython.Distutils import build_ext
 
-exec(open('version.py').read())
-
 blossom_v_dir = 'blossom5/'
 
 new_extension = Extension("sdcit.cython_impl.cy_sdcit",
@@ -38,15 +36,15 @@ new_extension = Extension("sdcit.cython_impl.cy_sdcit",
 
 setup(
     name='SDCIT',
-    packages=['sdcit','sdcit.cython_impl'],
-    version=__version__,
+    packages=['sdcit', 'sdcit.cython_impl'],
+    version='1.0.5',
     description='Self-Discrepancy Conditional Independence Test',
     author='Sanghack Lee',
     author_email='sanghack.lee@gmail.com',
     url='https://github.com/sanghack81/SDCIT',
     keywords=['independence test', 'conditional independence', 'machine learning', 'statistical test'],
     classifiers=[],
-
+    tests_require=['pytest', 'pytest-pep8'],
     cmdclass={'build_ext': build_ext},
     ext_modules=[
         new_extension
