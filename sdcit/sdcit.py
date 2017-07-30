@@ -63,8 +63,8 @@ def emp_MMSD(Kxz: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, Dz: np.ndarray, nu
         grid = np.ix_(selected, selected)
         mmsd_distr[i_th], error_distr[i_th], *_ = MMSD(Ky[grid], Kz[grid], Kxz[grid], Dz[grid])
 
-    return 0.5 * (mmsd_distr - mmsd_distr.mean()) + mmsd_distr.mean(), \
-           0.5 * (error_distr - error_distr.mean()) + error_distr.mean()
+    return (0.5 * (mmsd_distr - mmsd_distr.mean()) + mmsd_distr.mean(),
+            0.5 * (error_distr - error_distr.mean()) + error_distr.mean())
 
 
 def adjust_errors(null_errors, null, error=None, test_statistic=None):
