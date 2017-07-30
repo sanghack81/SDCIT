@@ -12,3 +12,4 @@ blossom5-v2.05.src.tar.gz
 KCI-test.zip
 sdcit/cython_impl/cy_sdcit.cpp
 private_experiments
+.coverage

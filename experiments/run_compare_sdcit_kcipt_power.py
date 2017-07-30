@@ -194,7 +194,7 @@ def main():
         plt.rc('text.latex', preamble=r'\usepackage{cmbright}')
         fig = plt.figure(figsize=[5, 1.6])
 
-        ### left subplot
+        # left subplot
         fig.add_subplot(1, 2, 1, adjustable='box')
         plt.plot(xs_sdcit, ys_sdcit_pearson3, label='SDCIT null', lw=1.5, color=color_palettes[method_color_codes['SDCIT']])
         plt.plot(xs_kcipt, ys_kcipt_20000_gamma, label='KCIPT null', lw=1.5, color=color_palettes[method_color_codes['KCIPT']])
@@ -206,7 +206,7 @@ def main():
         plt.gca().set_xlim([-0.0002, 0.0003])
         plt.setp(plt.gca(), 'yticklabels', [])
 
-        ### right subplot
+        # right subplot
         fig.add_subplot(1, 2, 2, adjustable='box')
         sns.distplot(df_kcipt_20000['pvalue'], hist=True, bins=20, kde=False, color=color_palettes[method_color_codes['KCIPT']], norm_hist=True, label='KCIPT p')
         sns.distplot([p_value_of(ss, sdcit_null) for ss in df_kcipt_20000['statistic']], hist=True, bins=20, kde=False, color='k', norm_hist=True, label='KCIPT p on SDCIT null')
