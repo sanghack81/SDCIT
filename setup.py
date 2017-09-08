@@ -37,7 +37,7 @@ new_extension = Extension("sdcit.cython_impl.cy_sdcit",
 setup(
     name='SDCIT',
     packages=['sdcit', 'sdcit.cython_impl'],
-    version='1.0.5',
+    version='1.0.6',
     description='Self-Discrepancy Conditional Independence Test',
     author='Sanghack Lee',
     author_email='sanghack.lee@gmail.com',
@@ -48,7 +48,8 @@ setup(
     cmdclass={'build_ext': build_ext},
     ext_modules=[
         new_extension
-    ], requires=['numpy']
+    ], requires=['numpy'],
+    installed_requires=[]
 
 )
 # python3 setup.py build_ext --inplace

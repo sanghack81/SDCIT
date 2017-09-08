@@ -7,8 +7,8 @@ import numpy.ma as ma
 import scipy.linalg
 import scipy.optimize
 import scipy.stats
-from GPflow.gpr import GPR
-from GPflow.kernels import White, Linear, RBF, Kern
+from gpflow.gpr import GPR
+from gpflow.kernels import White, Linear, RBF, Kern
 from numpy import diag, exp, sqrt
 from numpy.matlib import repmat
 from sklearn.metrics import euclidean_distances
