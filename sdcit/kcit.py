@@ -1,8 +1,8 @@
 import os
 
 import numpy as np
-from GPflow.gpr import GPR
-from GPflow.kernels import RBF, White
+from gpflow.gpr import GPR
+from gpflow.kernels import RBF, White
 from numpy import eye, sqrt, trace, diag, zeros
 from scipy.stats import chi2, gamma
 

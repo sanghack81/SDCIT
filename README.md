@@ -20,8 +20,10 @@ You are required to use `python>=3.6`. Other required packages are described in 
 cd ~/Downloads
 git clone https://github.com/sanghack81/SDCIT
 cd SDCIT
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ./setup.sh
+python3 setup.py build_ext --inplace
+pip3 install -e .
 ```
 
 
@@ -75,7 +77,7 @@ References
 > _Proceedings of the 30th Conference on Uncertainty in Artificial Intelligence._ 2014.
 
 
-> Vladimir Kolmogorov. "Blossom V: A new implementation of a minimum cost perfect matching algorithm."
+> Vladimir Kolmogorov. **Blossom V: A new implementation of a minimum cost perfect matching algorithm.**
 >        In Mathematical Programming Computation (MPC), July 2009, 1(1):43-67.
 
 
