@@ -43,14 +43,14 @@ N = 200
 X = np.random.randn(N, 2)
 Y = np.random.randn(N, 2)
 Z = np.random.randn(N, 2)
-Kx, Ky, Kz = rbf_kernel_median(X, Y, Z) # median heuristic
+Kx, Ky, Kz = rbf_kernel_median(X, Y, Z)  # median heuristic
 test_statistic, p_value = SDCIT(Kx, Ky, Kz)
 print('p_value: {:.4f}'.format(p_value))
 
 # (conditionally dependent)
 # X --> Z <-- Y 
 Z = X + Y + np.random.randn(N, 2)
-Kx, Ky, Kz = rbf_kernel_median(X, Y, Z) # median heuristic
+Kx, Ky, Kz = rbf_kernel_median(X, Y, Z)  # median heuristic
 test_statistic, p_value = SDCIT(Kx, Ky, Kz)
 print('p_value: {:.4f}'.format(p_value))
 
@@ -59,7 +59,7 @@ print('p_value: {:.4f}'.format(p_value))
 Z = np.random.randn(N, 2)
 X = Z + np.random.randn(N, 2)
 Y = Z + np.random.randn(N, 2)
-Kx, Ky, Kz = rbf_kernel_median(X, Y, Z) # median heuristic
+Kx, Ky, Kz = rbf_kernel_median(X, Y, Z)  # median heuristic
 test_statistic, p_value = SDCIT(Kx, Ky, Kz)
 print('p_value: {:.4f}'.format(p_value))
 
