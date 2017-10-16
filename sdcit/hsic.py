@@ -1,11 +1,12 @@
 import numpy as np
 import scipy.stats
+from sdcit.cython_impl.cy_sdcit import cy_hsic
 
 from sdcit.kcit import centering
-from sdcit.utils import p_value_of
+from sdcit.utils import p_value_of, cythonize, random_seeds
 
 
-def HSIC(K: np.ndarray, L: np.ndarray, p_val_method='bootstrap', num_boot=1000):
+def HSIC(K: np.ndarray, L: np.ndarray, p_val_method='bootstrap', num_boot=1000) -> float:
     if p_val_method == 'bootstrap':
         return HSIC_boot(K, L, num_boot)
     elif p_val_method == 'gamma':
@@ -14,7 +15,7 @@ def HSIC(K: np.ndarray, L: np.ndarray, p_val_method='bootstrap', num_boot=1000):
         raise ValueError('unknown p value computation method: {}'.format(p_val_method))
 
 
-def sum_except_diag(M):
+def sum_except_diag(M: np.ndarray):
     return M.sum() - M.trace()
 
 
@@ -39,7 +40,7 @@ def HSIC_gamma_approx(K: np.ndarray, L: np.ndarray) -> float:
     return scipy.stats.gamma.sf(test_stat, al, scale=bet)
 
 
-def HSIC_stat(K, L):
+def HSIC_stat(K: np.ndarray, L: np.ndarray) -> float:
     """HSIC statistic assuming given two centered kernel matrices.
 
     References
@@ -71,3 +72,24 @@ def HSIC_boot(K: np.ndarray, L: np.ndarray, num_boot=1000, seed=None) -> float:
     null_distribution = [HSIC_stat(Kc, shuffled()) for _ in range(num_boot)]
 
     return p_value_of(test_statistics, null_distribution)
+
+
+def c_HSIC(K: np.ndarray, L: np.ndarray, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1):
+    if seed is not None:
+        np.random.seed(seed)
+
+    K, L = centering(K), centering(L)
+    K, L = cythonize(K, L)
+    raw_null = np.zeros((size_of_null_sample,), dtype='float64')
+    test_statistic = np.zeros((1,), dtype='float64')
+
+    # run SDCIT
+    cy_hsic(K, L, size_of_null_sample, random_seeds(), n_jobs, test_statistic, raw_null)
+
+    # post-process outputs
+    test_statistic = test_statistic[0]
+
+    if with_null:
+        return test_statistic, p_value_of(test_statistic, raw_null), raw_null
+    else:
+        return test_statistic, p_value_of(test_statistic, raw_null)

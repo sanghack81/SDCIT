@@ -2,9 +2,9 @@ from typing import Tuple
 
 import numpy as np
 import numpy.ma as ma
+from sdcit.cython_impl.cy_sdcit import cy_sdcit, cy_split_permutation, cy_dense_permutation
 from sklearn.linear_model import LinearRegression
 
-from sdcit.cython_impl.cy_sdcit import cy_sdcit, cy_split_permutation, cy_dense_permutation
 from sdcit.utils import K2D, p_value_of, random_seeds, cythonize
 
 

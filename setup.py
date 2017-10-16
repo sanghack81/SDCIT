@@ -12,6 +12,7 @@ new_extension = Extension("sdcit.cython_impl.cy_sdcit",
                               'sdcit/cython_impl/cy_sdcit.pyx',
                               'sdcit/cython_impl/KCIPT.cpp',
                               'sdcit/cython_impl/SDCIT.cpp',
+                              'sdcit/cython_impl/HSIC.cpp',
                               'sdcit/cython_impl/permutation.cpp',
                               blossom_v_dir + 'GEOM/GPMinit.cpp',
                               blossom_v_dir + 'GEOM/GPMinterface.cpp',
@@ -37,20 +38,17 @@ new_extension = Extension("sdcit.cython_impl.cy_sdcit",
 setup(
     name='SDCIT',
     packages=['sdcit', 'sdcit.cython_impl'],
-    version='1.0.6',
+    version='1.0.7',
     description='Self-Discrepancy Conditional Independence Test',
     author='Sanghack Lee',
     author_email='sanghack.lee@gmail.com',
     url='https://github.com/sanghack81/SDCIT',
     keywords=['independence test', 'conditional independence', 'machine learning', 'statistical test'],
     classifiers=[],
-    tests_require=['pytest', 'pytest-pep8'],
     cmdclass={'build_ext': build_ext},
     ext_modules=[
         new_extension
     ], requires=['numpy'],
-    installed_requires=[]
-
 )
-# python3 setup.py build_ext --inplace
+# python setup.py build_ext --inplace
 # pip install -e .

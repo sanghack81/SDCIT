@@ -12,11 +12,13 @@ cdef extern from "permutation.h":
     void split_permutation_interface(double *D, const int full_n, int*perm);
     void dense_2n_permutation_interface(const double *D, const int full_n, int *perm);
 
-
 cdef extern from "SDCIT.h":
     void c_sdcit(const double * const K_XZ, const double * const K_Y, const double * const K_Z, const double * const D_Z_, const int n,
               const int b, const int seed, const int n_threads,
               double *const mmsd, double *const error_mmsd, double *const null, double *const error_null);
+
+cdef extern from "HSIC.h":
+    void c_hsic(const double *const K_X, const double *const K_Y, const int n, const int b, const int seed, const int n_threads, double *const test_statistic, double *const null);
 
 
 @cython.boundscheck(False)
@@ -77,3 +79,19 @@ def cy_sdcit(np.ndarray[double, ndim=2, mode="c"] K_XZ not None,
     ll = K_XZ.shape[0]
 
     c_sdcit(&K_XZ[0, 0], &K_Y[0, 0], &K_Z[0, 0], &D_Z[0, 0], ll, b, seed, n_threads, &mmsd[0], &error_mmsd[0], &null[0], &error_null[0])
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def cy_hsic(np.ndarray[double, ndim=2, mode="c"] Kc not None,
+              np.ndarray[double, ndim=2, mode="c"] Lc not None,
+              int b,
+              int seed,
+              int n_threads,
+              np.ndarray[double, ndim=1, mode="c"]  test_statistic not None,
+              np.ndarray[double, ndim=1, mode="c"]  null not None
+              ):
+    cdef int ll
+    ll = Kc.shape[0]
+
+    c_hsic(&Kc[0, 0], &Lc[0, 0], ll, b, seed, n_threads, &test_statistic[0], &null[0])

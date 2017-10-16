@@ -16,9 +16,8 @@ using std::pair;
 using std::mt19937;
 
 
-
 std::pair<vector<int>, vector<std::pair<int, int> >> perm_and_mask(const vector<double> &D_Z, const int n, const vector<int> &sample, mt19937 &generator) {
-    const vector<int>& permutation = dense_2n_permutation(&D_Z[0], n, sample, generator);
+    const vector<int> &permutation = dense_2n_permutation(&D_Z[0], n, sample, generator);
     // mask to hide!
     std::set<pair<int, int> > setmask;  // relative index
     const int sample_size = sample.size();
@@ -56,8 +55,6 @@ vector<double> shuffle_matrix(const double *mat, const int n, const vector<int> 
     }
     return newmat;
 }
-
-
 
 
 std::tuple<double, double, vector<int>, vector<std::pair<int, int> >> MMSD(const double *const K_XZ, const double *const K_Y, const double *const K_Z, const vector<double> &D_Z, const int n, const vector<int> &sample, mt19937 &generator) {
@@ -117,8 +114,8 @@ void multi_mmsd(const double *const K_XZ, const double *const K_Y, const double 
 //
 //
 void c_sdcit(const double *const K_XZ, const double *const K_Y, const double *const K_Z, const double *const D_Z_, const int n,
-              const int b, const int seed, const int n_threads,
-              double *const mmsd, double *const error_mmsd, double *const null, double *const error_null) {
+             const int b, const int seed, const int n_threads,
+             double *const mmsd, double *const error_mmsd, double *const null, double *const error_null) {
     mt19937 generator(seed);
 
     double test_statistic;
@@ -132,8 +129,8 @@ void c_sdcit(const double *const K_XZ, const double *const K_Y, const double *co
     std::tie(test_statistic, error_statistic, permutation, mask) = MMSD(K_XZ, K_Y, K_Z, D_Z, n, full_idx, generator);
 
     std::tie(permutation, mask) = perm_and_mask(penalized_distance(D_Z, n, mask), n, full_idx, generator);
-    const auto& D_Z_for_null = penalized_distance(D_Z, n, mask);
-    const auto& K_Y_null = shuffle_matrix(K_Y, n, permutation);
+    const auto &D_Z_for_null = penalized_distance(D_Z, n, mask);
+    const auto &K_Y_null = shuffle_matrix(K_Y, n, permutation);
     vector<thread> threads;
     int b_offset = 0;
     for (int i = 0; i < n_threads; i++) {
