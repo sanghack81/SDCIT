@@ -2,13 +2,14 @@ import typing
 import warnings
 from typing import Union, List
 
+import gpflow
 import numpy as np
 import numpy.ma as ma
 import scipy.linalg
 import scipy.optimize
 import scipy.stats
-from gpflow.gpr import GPR
 from gpflow.kernels import White, Linear, RBF, Kern
+from gpflow.models import GPR
 from numpy import diag, exp, sqrt
 from numpy.matlib import repmat
 from sklearn.metrics import euclidean_distances
@@ -84,7 +85,7 @@ def residualize(Y, X=None, gp_kernel=None):
         gp_kernel = default_gp_kernel(X)
 
     m = GPR(X, Y, gp_kernel)
-    m.optimize()
+    gpflow.train.ScipyOptimizer().minimize(m)
 
     Yhat, _ = m.predict_y(X)
     return Y - Yhat
@@ -104,7 +105,7 @@ def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, use_expectation=True, with
         n_feats = X.shape[1]
 
         gp_model = GPR(X, Y, Linear(n_feats, ARD=True) + White(n_feats))
-        gp_model.optimize()
+        gpflow.train.ScipyOptimizer().minimize(gp_model)
 
         K_X = gp_model.kern.linear.compute_K_symm(X)
         sigma_squared = gp_model.kern.white.variance.value[0]
@@ -217,7 +218,7 @@ def regression_distance(Y: np.ndarray, Z: np.ndarray, ard=True):
     rbf_white = rbf + White(dims)
 
     gp_model = GPR(Z, Y, rbf_white)
-    gp_model.optimize()
+    gpflow.train.ScipyOptimizer().minimize(gp_model)
 
     Kz_y = rbf.compute_K_symm(Z)
     Ry = pdinv(rbf_white.compute_K_symm(Z))
@@ -244,7 +245,7 @@ def regression_distance_k(Kx: np.ndarray, Ky: np.ndarray):
     n_feats = X.shape[1]
 
     gp_model = GPR(X, Y, Linear(n_feats, ARD=True) + White(n_feats))
-    gp_model.optimize()
+    gpflow.train.ScipyOptimizer().minimize(gp_model)
 
     Kx = gp_model.kern.linear.compute_K_symm(X)
     sigma_squared = gp_model.kern.white.variance.value[0]

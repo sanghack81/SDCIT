@@ -1,5 +1,6 @@
 # Release 1.1.0
-- Started versioning more correctly 
+- Started versioning more correctly
+- Require gpflow>=1.0.0 
 
 
 # Release 1.0.0
