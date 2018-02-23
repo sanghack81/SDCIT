@@ -144,11 +144,11 @@ def rbf_kernel_median(data: np.ndarray, *args, without_two=False):
         return outs
 
 
-def p_value_of(val: float, data: np.ndarray) -> float:
+def p_value_of(val: float, data: typing.Iterable) -> float:
     """The percentile of a value given a data"""
 
     data = np.sort(data)
-    return 1 - np.searchsorted(data, val, side='right') / len(data)
+    return float(1 - np.searchsorted(data, val, side='right') / len(data))
 
 
 def random_seeds(n=None):
@@ -159,7 +159,7 @@ def random_seeds(n=None):
         return [np.random.randint(np.iinfo(np.int32).max) for _ in range(n)]
 
 
-def K2D(K):
+def K2D(K: Union[None, np.ndarray]) -> np.ndarray:
     """An RKHS distance matrix given a kernel matrix
 
     A distance matrix D of the same size of the given kernel matrix K
