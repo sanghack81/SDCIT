@@ -69,7 +69,7 @@ def residual_kernel_matrix_kernel_real(Kx, Z, num_eig, ARD=True):
     gpflow.train.ScipyOptimizer().minimize(gp_model)
 
     Kz_x = gp_model.kern.rbf.compute_K_symm(Z)
-    sigma_squared = gp_model.kern.white.variance.value[0]
+    sigma_squared = gp_model.kern.white.variance.value
 
     P = I - Kz_x @ pdinv(Kz_x + sigma_squared * I)
     return P @ Kx @ P.T

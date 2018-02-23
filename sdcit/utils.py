@@ -108,7 +108,7 @@ def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, use_expectation=True, with
         gpflow.train.ScipyOptimizer().minimize(gp_model)
 
         K_X = gp_model.kern.linear.compute_K_symm(X)
-        sigma_squared = gp_model.kern.white.variance.value[0]
+        sigma_squared = gp_model.kern.white.variance.value
 
     P = pdinv(np.eye(T) + K_X / sigma_squared)  # == I-K @ inv(K+Sigma) in Zhang et al. 2011
     if use_expectation:  # Flaxman et al. 2016 Gaussian Processes for Independence Tests with Non-iid Data in Causal Inference.
@@ -248,7 +248,7 @@ def regression_distance_k(Kx: np.ndarray, Ky: np.ndarray):
     gpflow.train.ScipyOptimizer().minimize(gp_model)
 
     Kx = gp_model.kern.linear.compute_K_symm(X)
-    sigma_squared = gp_model.kern.white.variance.value[0]
+    sigma_squared = gp_model.kern.white.variance.value
 
     P = Kx @ pdinv(Kx + sigma_squared * np.eye(T))
 
