@@ -65,11 +65,13 @@ def residual_kernel_matrix_kernel_real(Kx, Z, num_eig, ARD=True):
     I = eye(T)
     eig_Kx, eix = truncated_eigen(*eigdec(Kx, num_eig))
 
-    gp_model = GPR(Z, 2 * sqrt(T) * eix @ diag(sqrt(eig_Kx)) / sqrt(eig_Kx[0]), RBF(D, ARD=ARD) + White(D))
+    rbf = RBF(D, ARD=ARD)
+    white = White(D)
+    gp_model = GPR(Z, 2 * sqrt(T) * eix @ diag(sqrt(eig_Kx)) / sqrt(eig_Kx[0]), rbf + white)
     gpflow.train.ScipyOptimizer().minimize(gp_model)
 
-    Kz_x = gp_model.kern.rbf.compute_K_symm(Z)
-    sigma_squared = gp_model.kern.white.variance.value
+    sigma_squared = white.variance.value
+    Kz_x = rbf.compute_K_symm(Z)
 
     P = I - Kz_x @ pdinv(Kz_x + sigma_squared * I)
     return P @ Kx @ P.T
