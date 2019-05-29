@@ -1,9 +1,9 @@
 import numpy as np
 import scipy.stats
-from sdcit.cython_impl.cy_sdcit import cy_hsic
+from typing import List, Tuple
 
-from sdcit.kcit import centering
-from sdcit.utils import p_value_of, cythonize, random_seeds
+from sdcit.cython_impl.cy_sdcit import cy_hsic
+from sdcit.utils import p_value_of, cythonize, random_seeds, centering
 
 
 def HSIC(K: np.ndarray, L: np.ndarray, p_val_method='bootstrap', num_boot=1000) -> float:
@@ -48,10 +48,10 @@ def HSIC_stat(K: np.ndarray, L: np.ndarray) -> float:
     Gretton, A., Herbrich, R., Smola, A., Bousquet, O., & Schölkopf, B. (2005). Kernel Methods for Measuring Independence. Journal of Machine Learning Research, 6, 2075–2129.
     """
     m = len(K)
-    return 1 / m * np.sum(K * L)
+    return float(1 / m * np.sum(K * L))
 
 
-def HSIC_boot(K: np.ndarray, L: np.ndarray, num_boot=1000, seed=None) -> float:
+def HSIC_boot(K: np.ndarray, L: np.ndarray, num_boot=1000, seed=None) -> Tuple[float, List[float]]:
     """A Hilbert-Schmidt Independence Criterion where null distribution is based on bootstrapping
 
     References

@@ -1,11 +1,11 @@
 import os
 
+import gpflow
 import numpy as np
-from gpflow.gpr import GPR
 from gpflow.kernels import RBF, White
+from gpflow.models import GPR
 from numpy import eye, sqrt, trace, diag, zeros
 from scipy.stats import chi2, gamma
-
 from sdcit.utils import centering, pdinv, truncated_eigen, eigdec, columnwise_normalizes, residual_kernel, rbf_kernel_median
 
 
@@ -65,11 +65,13 @@ def residual_kernel_matrix_kernel_real(Kx, Z, num_eig, ARD=True):
     I = eye(T)
     eig_Kx, eix = truncated_eigen(*eigdec(Kx, num_eig))
 
-    gp_model = GPR(Z, 2 * sqrt(T) * eix @ diag(sqrt(eig_Kx)) / sqrt(eig_Kx[0]), RBF(D, ARD=ARD) + White(D))
-    gp_model.optimize()
+    rbf = RBF(D, ARD=ARD)
+    white = White(D)
+    gp_model = GPR(Z, 2 * sqrt(T) * eix @ diag(sqrt(eig_Kx)) / sqrt(eig_Kx[0]), rbf + white)
+    gpflow.train.ScipyOptimizer().minimize(gp_model)
 
-    Kz_x = gp_model.kern.rbf.compute_K_symm(Z)
-    sigma_squared = gp_model.kern.white.variance.value[0]
+    sigma_squared = white.variance.value
+    Kz_x = rbf.compute_K_symm(Z)
 
     P = I - Kz_x @ pdinv(Kz_x + sigma_squared * I)
     return P @ Kx @ P.T

@@ -13,3 +13,4 @@ KCI-test.zip
 sdcit/cython_impl/cy_sdcit.cpp
 private_experiments
 .coverage
+.pytest_cache

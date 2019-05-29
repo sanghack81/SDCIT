@@ -1,17 +1,14 @@
-import typing
-import warnings
-from typing import Union, List
-
 import numpy as np
 import numpy.ma as ma
 import scipy.linalg
 import scipy.optimize
 import scipy.stats
-from gpflow.gpr import GPR
-from gpflow.kernels import White, Linear, RBF, Kern
+import typing
+import warnings
 from numpy import diag, exp, sqrt
 from numpy.matlib import repmat
 from sklearn.metrics import euclidean_distances
+from typing import Union, List
 
 
 def columnwise_normalizes(*Xs) -> typing.List[Union[None, np.ndarray]]:
@@ -70,13 +67,18 @@ def pdinv(x: np.ndarray) -> np.ndarray:
     return Uinv @ Uinv.T
 
 
-def default_gp_kernel(X: np.ndarray) -> Kern:
+def default_gp_kernel(X: np.ndarray):
+    from gpflow.kernels import White, RBF
+
     _, n_feats = X.shape
     return RBF(n_feats, ARD=True) + White(n_feats)
 
 
 def residualize(Y, X=None, gp_kernel=None):
     """Residual of Y given X. Y_i - E[Y_i|X_i]"""
+    import gpflow
+    from gpflow.models import GPR
+
     if X is None:
         return Y - np.mean(Y)  # nothing is residualized!
 
@@ -84,7 +86,7 @@ def residualize(Y, X=None, gp_kernel=None):
         gp_kernel = default_gp_kernel(X)
 
     m = GPR(X, Y, gp_kernel)
-    m.optimize()
+    gpflow.train.ScipyOptimizer().minimize(m)
 
     Yhat, _ = m.predict_y(X)
     return Y - Yhat
@@ -92,6 +94,10 @@ def residualize(Y, X=None, gp_kernel=None):
 
 def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, use_expectation=True, with_gp=True, sigma_squared=1e-3, return_learned_K_X=False):
     """Kernel matrix of residual of Y given X based on their kernel matrices, Y=f(X)"""
+    import gpflow
+    from gpflow.kernels import White, Linear
+    from gpflow.models import GPR
+
     K_Y, K_X = centering(K_Y), centering(K_X)
     T = len(K_Y)
 
@@ -103,11 +109,13 @@ def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, use_expectation=True, with
         Y = eiy @ diag(sqrt(eig_Ky))
         n_feats = X.shape[1]
 
-        gp_model = GPR(X, Y, Linear(n_feats, ARD=True) + White(n_feats))
-        gp_model.optimize()
+        linear = Linear(n_feats, ARD=True)
+        white = White(n_feats)
+        gp_model = GPR(X, Y, linear + white)
+        gpflow.train.ScipyOptimizer().minimize(gp_model)
 
-        K_X = gp_model.kern.linear.compute_K_symm(X)
-        sigma_squared = gp_model.kern.white.variance.value[0]
+        K_X = linear.compute_K_symm(X)
+        sigma_squared = white.variance.value
 
     P = pdinv(np.eye(T) + K_X / sigma_squared)  # == I-K @ inv(K+Sigma) in Zhang et al. 2011
     if use_expectation:  # Flaxman et al. 2016 Gaussian Processes for Independence Tests with Non-iid Data in Causal Inference.
@@ -144,11 +152,11 @@ def rbf_kernel_median(data: np.ndarray, *args, without_two=False):
         return outs
 
 
-def p_value_of(val: float, data: np.ndarray) -> float:
+def p_value_of(val: float, data: typing.Iterable) -> float:
     """The percentile of a value given a data"""
 
     data = np.sort(data)
-    return 1 - np.searchsorted(data, val, side='right') / len(data)
+    return float(1 - np.searchsorted(data, val, side='right') / len(data))
 
 
 def random_seeds(n=None):
@@ -159,7 +167,7 @@ def random_seeds(n=None):
         return [np.random.randint(np.iinfo(np.int32).max) for _ in range(n)]
 
 
-def K2D(K):
+def K2D(K: Union[None, np.ndarray]) -> np.ndarray:
     """An RKHS distance matrix given a kernel matrix
 
     A distance matrix D of the same size of the given kernel matrix K
@@ -211,13 +219,17 @@ def p_value_curve(p_values):
 
 def regression_distance(Y: np.ndarray, Z: np.ndarray, ard=True):
     """d(z,z') = |f(z)-f(z')| where Y=f(Z) + noise and f ~ GP"""
+    import gpflow
+    from gpflow.kernels import White, RBF
+    from gpflow.models import GPR
+
     n, dims = Z.shape
 
     rbf = RBF(dims, ARD=ard)
     rbf_white = rbf + White(dims)
 
     gp_model = GPR(Z, Y, rbf_white)
-    gp_model.optimize()
+    gpflow.train.ScipyOptimizer().minimize(gp_model)
 
     Kz_y = rbf.compute_K_symm(Z)
     Ry = pdinv(rbf_white.compute_K_symm(Z))
@@ -233,6 +245,9 @@ def regression_distance(Y: np.ndarray, Z: np.ndarray, ard=True):
 
 def regression_distance_k(Kx: np.ndarray, Ky: np.ndarray):
     warnings.warn('not tested yet!')
+    import gpflow
+    from gpflow.kernels import White, Linear
+    from gpflow.models import GPR
 
     T = len(Kx)
 
@@ -243,11 +258,13 @@ def regression_distance_k(Kx: np.ndarray, Ky: np.ndarray):
     Y = eiy @ diag(sqrt(eig_Ky))
     n_feats = X.shape[1]
 
-    gp_model = GPR(X, Y, Linear(n_feats, ARD=True) + White(n_feats))
-    gp_model.optimize()
+    linear = Linear(n_feats, ARD=True)
+    white = White(n_feats)
+    gp_model = GPR(X, Y, linear + white)
+    gpflow.train.ScipyOptimizer().minimize(gp_model)
 
-    Kx = gp_model.kern.linear.compute_K_symm(X)
-    sigma_squared = gp_model.kern.white.variance.value[0]
+    Kx = linear.compute_K_symm(X)
+    sigma_squared = white.variance.value
 
     P = Kx @ pdinv(Kx + sigma_squared * np.eye(T))
 
