@@ -13,18 +13,10 @@ def test_hsics():
     X = np.random.randn(600, 3)
     Y = np.random.randn(600, 3) + 0.01 * X
     KX, KY = rbf_kernel_median(X, Y)
-    import time
-    at0 = time.time()
     t0, p0 = c_HSIC(KX, KY, n_jobs=1, size_of_null_sample=5000)
-    at1 = time.time()
     t1, p1 = c_HSIC(KX, KY, n_jobs=4, size_of_null_sample=5000)
-    at2 = time.time()
     p2 = HSIC(KX, KY, num_boot=5000)
-    at3 = time.time()
-    print(f'Python:{at3-at2:.3f} vs C4:{at2-at1:.3f} vs C1:{at1-at0:.3f}')
-
-    print(t0, t1)
-    print(p0, p1, p2)
+    assert np.allclose([p0, p1, p2], [0.0338, 0.0336, 0.0316])
 
 
 def test_reproducible():
@@ -37,9 +29,7 @@ def test_reproducible():
     _, _, p3, *_ = python_kcit(X, Y, Z, seed=99)
     _, _, p4, *_ = python_kcit_K(KX, KY, KZ, seed=99)
 
-    print(p1, p2, p3, p4)
-    # mac os 0.0608 == p4? linux 0.0606? 
-    assert np.allclose([p1, p3, p4], [0.345, 0.095, 0.0606])
+    assert np.allclose([p1, p2, p3, p4], [0.345, 0.348, 0.095, 0.0606])
 
 
 def test_shuffling():
@@ -48,4 +38,3 @@ def test_shuffling():
 
     X, Y = shuffling(77, X, Y)
     print(np.allclose(X, Y))
-    print(X)

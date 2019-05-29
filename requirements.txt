@@ -7,4 +7,3 @@ numpy
 scipy
 scikit-learn
 cython
-tensorflow>=1.5.0

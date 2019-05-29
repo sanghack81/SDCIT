@@ -38,7 +38,7 @@ new_extension = Extension("sdcit.cython_impl.cy_sdcit",
 setup(
     name='SDCIT',
     packages=['sdcit', 'sdcit.cython_impl'],
-    version='1.1.1',
+    version='1.1.2',
     description='Self-Discrepancy Conditional Independence Test',
     author='Sanghack Lee',
     author_email='sanghack.lee@gmail.com',

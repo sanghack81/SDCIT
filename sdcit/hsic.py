@@ -1,11 +1,9 @@
-from typing import List, Tuple
-
 import numpy as np
 import scipy.stats
-from sdcit.cython_impl.cy_sdcit import cy_hsic
+from typing import List, Tuple
 
-from sdcit.kcit import centering
-from sdcit.utils import p_value_of, cythonize, random_seeds
+from sdcit.cython_impl.cy_sdcit import cy_hsic
+from sdcit.utils import p_value_of, cythonize, random_seeds, centering
 
 
 def HSIC(K: np.ndarray, L: np.ndarray, p_val_method='bootstrap', num_boot=1000) -> float:

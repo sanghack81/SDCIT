@@ -10,6 +10,7 @@
 #include "permutation.h"
 #include <valarray>
 #include <condition_variable>
+#include <functional>
 
 using std::thread;
 using std::vector;

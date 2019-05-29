@@ -1,4 +1,3 @@
-import gpflow
 import numpy as np
 import numpy.ma as ma
 import scipy.linalg
@@ -6,8 +5,6 @@ import scipy.optimize
 import scipy.stats
 import typing
 import warnings
-from gpflow.kernels import White, Linear, RBF, Kern
-from gpflow.models import GPR
 from numpy import diag, exp, sqrt
 from numpy.matlib import repmat
 from sklearn.metrics import euclidean_distances
@@ -70,13 +67,18 @@ def pdinv(x: np.ndarray) -> np.ndarray:
     return Uinv @ Uinv.T
 
 
-def default_gp_kernel(X: np.ndarray) -> Kern:
+def default_gp_kernel(X: np.ndarray):
+    from gpflow.kernels import White, RBF
+
     _, n_feats = X.shape
     return RBF(n_feats, ARD=True) + White(n_feats)
 
 
 def residualize(Y, X=None, gp_kernel=None):
     """Residual of Y given X. Y_i - E[Y_i|X_i]"""
+    import gpflow
+    from gpflow.models import GPR
+
     if X is None:
         return Y - np.mean(Y)  # nothing is residualized!
 
@@ -92,6 +94,10 @@ def residualize(Y, X=None, gp_kernel=None):
 
 def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, use_expectation=True, with_gp=True, sigma_squared=1e-3, return_learned_K_X=False):
     """Kernel matrix of residual of Y given X based on their kernel matrices, Y=f(X)"""
+    import gpflow
+    from gpflow.kernels import White, Linear
+    from gpflow.models import GPR
+
     K_Y, K_X = centering(K_Y), centering(K_X)
     T = len(K_Y)
 
@@ -213,6 +219,10 @@ def p_value_curve(p_values):
 
 def regression_distance(Y: np.ndarray, Z: np.ndarray, ard=True):
     """d(z,z') = |f(z)-f(z')| where Y=f(Z) + noise and f ~ GP"""
+    import gpflow
+    from gpflow.kernels import White, RBF
+    from gpflow.models import GPR
+
     n, dims = Z.shape
 
     rbf = RBF(dims, ARD=ard)
@@ -235,6 +245,9 @@ def regression_distance(Y: np.ndarray, Z: np.ndarray, ard=True):
 
 def regression_distance_k(Kx: np.ndarray, Ky: np.ndarray):
     warnings.warn('not tested yet!')
+    import gpflow
+    from gpflow.kernels import White, Linear
+    from gpflow.models import GPR
 
     T = len(Kx)
 
