@@ -7,3 +7,4 @@ numpy
 scipy
 scikit-learn
 cython
+pytest>=4.4.0
