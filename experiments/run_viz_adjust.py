@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 
 from experiments.exp_utils import read_chaotic
-from sdcit.sdcit import mask_and_perm, MMSD, adjust_errors, emp_MMSD, penalized_distance
+from sdcit.sdcit_mod import mask_and_perm, MMSD, adjust_errors, emp_MMSD, penalized_distance
 from sdcit.utils import K2D, p_value_of
 import seaborn as sns
 import matplotlib.pyplot as plt

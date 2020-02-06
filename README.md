@@ -20,10 +20,11 @@ You are required to use `python>=3.6`. Other required packages are described in 
 cd ~/Downloads
 git clone https://github.com/sanghack81/SDCIT
 cd SDCIT
-pip3 install -r requirements.txt
+pip install -r requirements.txt
+pip install 'gpflow<2.0' 'tensorflow<2.0'
 ./setup.sh
 python3 setup.py build_ext --inplace
-pip3 install -e .
+pip install -e .
 ```
 
 
@@ -33,7 +34,7 @@ We provide three simple examples, where kernel matrices are computed based on me
 
 ```python
 import numpy as np
-from sdcit.sdcit import SDCIT
+from sdcit.sdcit_mod import SDCIT
 from sdcit.utils import rbf_kernel_median
 
 np.random.seed(0)

@@ -6,7 +6,7 @@ from tqdm import tqdm, trange
 
 from experiments.exp_setup import SDCIT_RESULT_DIR, PARALLEL_JOBS
 from experiments.exp_utils import read_chaotic, read_postnonlinear_noise, chaotic_configs, postnonlinear_noise_configs
-from sdcit.sdcit import SDCIT
+from sdcit.sdcit_mod import SDCIT
 from sdcit.utils import *
 
 

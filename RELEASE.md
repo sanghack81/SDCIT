@@ -1,3 +1,7 @@
+# Release 1.2.0
+- sdcit module is renamed to sdcit_mod due to name conflicts.
+
+
 # Release 1.1.2
 - refactoring 
 

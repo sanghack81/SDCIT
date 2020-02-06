@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from experiments.exp_setup import SDCIT_RESULT_DIR, SDCIT_DATA_DIR, PARALLEL_JOBS
 from sdcit.kcit import python_kcit_K, python_kcit_K2
-from sdcit.sdcit import SDCIT
+from sdcit.sdcit_mod import SDCIT
 from sdcit.utils import K2D, AUPC, KS_statistic
 
 

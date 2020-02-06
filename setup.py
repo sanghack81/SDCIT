@@ -31,14 +31,16 @@ new_extension = Extension("sdcit.cython_impl.cy_sdcit",
                           language="c++",
                           include_dirs=[numpy.get_include(), 'sdcit/cython_impl', blossom_v_dir,
                                         blossom_v_dir + 'MinCost', blossom_v_dir + 'GEOM'],
-                          extra_compile_args=["-std=c++11", "-stdlib=libc++", "-mmacosx-version-min=10.7"] if platform == "darwin" else ["-std=c++11"],
-                          extra_link_args=["-std=c++11", "-stdlib=libc++", "-mmacosx-version-min=10.7"] if platform == "darwin" else ["-std=c++11"]
+                          # extra_compile_args=["-std=c++11", "-stdlib=libc++", "-mmacosx-version-min=10.7"] if platform == "darwin" else ["-std=c++11"],
+                          # extra_link_args=["-std=c++11", "-stdlib=libc++", "-mmacosx-version-min=10.7"] if platform == "darwin" else ["-std=c++11"]
+                          extra_compile_args=["-std=c++17", "-mmacosx-version-min=10.9"] if platform == "darwin" else ["-std=c++11"],
+                          extra_link_args=["-std=c++17", "-mmacosx-version-min=10.9"] if platform == "darwin" else ["-std=c++11"]
                           )
 
 setup(
     name='SDCIT',
     packages=['sdcit', 'sdcit.cython_impl'],
-    version='1.1.2',
+    version='1.2.0',
     description='Self-Discrepancy Conditional Independence Test',
     author='Sanghack Lee',
     author_email='sanghack.lee@gmail.com',

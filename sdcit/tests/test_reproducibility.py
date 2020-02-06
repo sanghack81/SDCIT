@@ -2,7 +2,7 @@ import numpy as np
 
 from sdcit.hsic import c_HSIC, HSIC
 from sdcit.kcit import python_kcit, python_kcit_K
-from sdcit.sdcit import SDCIT, c_SDCIT, shuffling
+from sdcit.sdcit_mod import SDCIT, c_SDCIT, shuffling
 from sdcit.synthetic_data import henon
 from sdcit.utils import rbf_kernel_median
 

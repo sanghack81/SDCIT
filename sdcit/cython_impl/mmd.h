@@ -49,7 +49,7 @@ double u_mmd(const double *K_X, const double *K_Y, const double *K_Z, const int 
         const double *k_row_x = &K_X[full_n * idx1x[i]];
         const double *k_row_y = &K_Y[full_n * idx1y[i]];
         const double *k_row_z = &K_Z[full_n * idx1z[i]];
-        for (int j = 0; j < idx1_size; j++) {
+        for (size_t j = 0; j < idx1_size; j++) {
             k11 += k_row_x[idx1x[j]] * k_row_y[idx1y[j]] * k_row_z[idx1z[j]];
         }
         k11 -= k_row_x[idx1x[i]] * k_row_y[idx1y[i]] * k_row_z[idx1z[i]];
@@ -64,7 +64,7 @@ double u_mmd(const double *K_X, const double *K_Y, const double *K_Z, const int 
         const double *k_row_y = &K_Y[full_n * idx2y[i]];
         const double *k_row_z = &K_Z[full_n * idx2z[i]];
 
-        for (int j = 0; j < idx2_size; j++) {
+        for (size_t j = 0; j < idx2_size; j++) {
             k22 += k_row_x[idx2x[j]] * k_row_y[idx2y[j]] * k_row_z[idx2z[j]];
         }
         k22 -= k_row_x[idx2x[i]] * k_row_y[idx2y[i]] * k_row_z[idx2z[i]];

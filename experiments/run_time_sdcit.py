@@ -5,7 +5,7 @@ import pandas as pd
 import scipy.io
 
 from experiments.exp_setup import *
-from sdcit.sdcit import c_SDCIT
+from sdcit.sdcit_mod import c_SDCIT
 from sdcit.utils import rbf_kernel_median, K2D
 
 if __name__ == '__main__':

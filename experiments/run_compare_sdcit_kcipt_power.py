@@ -14,7 +14,7 @@ from experiments.exp_setup import *
 from experiments.run_KCIPT import test_chaotic
 from experiments.exp_utils import read_chaotic
 from sdcit.kcipt import c_KCIPT
-from sdcit.sdcit import SDCIT
+from sdcit.sdcit_mod import SDCIT
 from sdcit.utils import p_value_of, K2D
 
 

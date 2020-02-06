@@ -78,6 +78,10 @@ def residual_kernel_matrix_kernel_real(Kx, Z, num_eig, ARD=True):
 
 
 def python_kcit(X: np.ndarray, Y: np.ndarray, Z: np.ndarray, alpha=0.05, with_gp=True, noise=1e-3, num_bootstrap_for_null=5000, normalize=False, kern=rbf_kernel_median, seed=None):
+    """ A test for X _||_ Y | Z using KCIT with tabular data X, Y, and Z
+
+    see `kcit_null` for the output
+    """
     if seed is not None:
         np.random.seed(seed)
 
@@ -105,6 +109,10 @@ def python_kcit(X: np.ndarray, Y: np.ndarray, Z: np.ndarray, alpha=0.05, with_gp
 
 
 def python_kcit_K(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, alpha=0.05, with_gp=True, sigma_squared=1e-3, num_bootstrap_for_null=5000, seed=None):
+    """ A test for X _||_ Y | Z using KCIT with Gram matrices for X, Y, and Z
+
+    see `kcit_null` for the output
+    """
     if seed is not None:
         np.random.seed(seed)
 
@@ -126,6 +134,10 @@ def python_kcit_K(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, alpha=0.05, wi
 
 
 def python_kcit_K2(Kx: np.ndarray, Ky: np.ndarray, Z: np.ndarray, alpha=0.05, with_gp=True, sigma_squared=1e-3, num_bootstrap_for_null=5000, seed=None):
+    """ A test for X _||_ Y | Z using KCIT with Gram matrices for X, Y, and a tabular data Z
+
+    see `kcit_null` for the output
+    """
     if seed is not None:
         np.random.seed(seed)
 
@@ -148,6 +160,15 @@ def python_kcit_K2(Kx: np.ndarray, Ky: np.ndarray, Z: np.ndarray, alpha=0.05, wi
 
 
 def kcit_null(Kxz, Kyz, T, alpha, num_bootstrap_for_null, test_statistic):
+    """ Computes null distribution
+
+    returns a tuple of
+    test statistic,
+    critical value (where test statistic matches to a given alpha),
+    bootstrap based p-value,
+    approximate critical value, and
+    approximate p-value corresponding to the approximate critical value.
+    """
     # null computation
     eig_Kxz, eivx = truncated_eigen(*eigdec(Kxz))
     eig_Kyz, eivy = truncated_eigen(*eigdec(Kyz))
