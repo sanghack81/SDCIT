@@ -26,11 +26,14 @@ def test_reproducible():
     KX, KY, KZ = rbf_kernel_median(X, Y, Z)
     _, p1 = SDCIT(KX, KY, KZ, seed=55)
     _, p2 = c_SDCIT(KX, KY, KZ, seed=55)  # macOS and Linux may have different result.
-    _, _, p3, *_ = python_kcit(X, Y, Z, seed=99)
-    _, _, p4, *_ = python_kcit_K(KX, KY, KZ, seed=99)
 
-    # [0.345, 0.347, 0.095, 0.0606]
-    assert np.allclose([p1, p2, p3, p4], [0.345, 0.348, 0.095, 0.0606], atol=0.005, rtol=0)
+    try:
+        import gpflow  # noqa: F401
+        _, _, p3, *_ = python_kcit(X, Y, Z, seed=99)
+        _, _, p4, *_ = python_kcit_K(KX, KY, KZ, seed=99)
+        assert np.allclose([p1, p2, p3, p4], [0.345, 0.348, 0.095, 0.0606], atol=0.005, rtol=0)
+    except ImportError:
+        assert np.allclose([p1, p2], [0.345, 0.348], atol=0.005, rtol=0)
 
 
 def test_shuffling():
@@ -39,3 +42,23 @@ def test_shuffling():
 
     X, Y = shuffling(77, X, Y)
     print(np.allclose(X, Y))
+
+
+def test_permutation_seed():
+    from sdcit.sdcit_mod import permuted
+
+    # D is all zeros, so Blossom-V gets 0 distance and relies entirely on random tie-breaking / fallback
+    D = np.zeros((10, 10))
+    p1 = permuted(D, seed=42, dense=True)
+    p2 = permuted(D, seed=42, dense=True)
+    p3 = permuted(D, seed=99, dense=True)
+
+    assert np.array_equal(p1, p2)
+    assert not np.array_equal(p1, p3)
+
+    p4 = permuted(D, seed=42, dense=False)
+    p5 = permuted(D, seed=42, dense=False)
+    p6 = permuted(D, seed=99, dense=False)
+
+    assert np.array_equal(p4, p5)
+    assert not np.array_equal(p4, p6)

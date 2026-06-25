@@ -8,19 +8,21 @@ from sklearn.linear_model import LinearRegression
 from sdcit.utils import K2D, p_value_of, random_seeds, cythonize
 
 
-def permuted(D, dense=True):
+def permuted(D, seed=None, dense=True):
+    if seed is None:
+        seed = random_seeds()
     out = np.zeros((len(D),), 'int32')
     if dense:
-        cy_dense_permutation(D, out)
+        cy_dense_permutation(D, out, seed)
     else:
-        cy_split_permutation(D, out)
+        cy_split_permutation(D, out, seed)
     return out
 
 
-def mask_and_perm(Dz: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+def mask_and_perm(Dz: np.ndarray, seed: int = None) -> Tuple[np.ndarray, np.ndarray]:
     n = len(Dz)
     full_idx = np.arange(0, n)
-    perm = permuted(Dz)
+    perm = permuted(Dz, seed)
 
     # 1 for masked (=excluded)
     mask = np.zeros((n, n))
@@ -36,12 +38,12 @@ def penalized_distance(Dz: np.ndarray, mask: np.ndarray) -> np.ndarray:
     return Dz + (mask - np.diag(np.diag(mask))) * Dz.max()  # soft penalty
 
 
-def MMSD(Ky: np.ndarray, Kz: np.ndarray, Kxz: np.ndarray, Dz: np.ndarray) -> Tuple[float, float, np.ndarray, np.ndarray]:
+def MMSD(Ky: np.ndarray, Kz: np.ndarray, Kxz: np.ndarray, Dz: np.ndarray, seed: int = None) -> Tuple[float, float, np.ndarray, np.ndarray]:
     """Maximum Mean Self-Discrepancy"""
     n = len(Kxz)
     full_idx = np.arange(0, n)
 
-    mask, perm = mask_and_perm(Dz)
+    mask, perm = mask_and_perm(Dz, seed)
     Ky_fp = Ky[np.ix_(full_idx, perm)]
     Ky_pp = Ky[np.ix_(perm, perm)]
 
@@ -59,9 +61,11 @@ def emp_MMSD(Kxz: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, Dz: np.ndarray, nu
     error_distr = np.zeros((num_samples,))
 
     for i_th in range(num_samples):
+        # generate a random seed for internal MMSD
+        loop_seed = random_seeds()
         selected = np.random.choice(n, n // 2, replace=False)
         grid = np.ix_(selected, selected)
-        mmsd_distr[i_th], error_distr[i_th], *_ = MMSD(Ky[grid], Kz[grid], Kxz[grid], Dz[grid])
+        mmsd_distr[i_th], error_distr[i_th], *_ = MMSD(Ky[grid], Kz[grid], Kxz[grid], Dz[grid], loop_seed)
 
     return (0.5 * (mmsd_distr - mmsd_distr.mean()) + mmsd_distr.mean(),
             0.5 * (error_distr - error_distr.mean()) + error_distr.mean())
@@ -120,8 +124,8 @@ def SDCIT(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, Dz=None, size_of_null_
 
     Kxz = Kx * Kz
 
-    test_statistic, error_statistic, mask, _ = MMSD(Ky, Kz, Kxz, Dz)
-    mask, Pidx = mask_and_perm(penalized_distance(Dz, mask))
+    test_statistic, error_statistic, mask, _ = MMSD(Ky, Kz, Kxz, Dz, random_seeds())
+    mask, Pidx = mask_and_perm(penalized_distance(Dz, mask), random_seeds())
 
     # avoid permutation between already permuted pairs.
     mmsd_distr_under_null, error_distr_under_null = emp_MMSD(Kxz, Ky[np.ix_(Pidx, Pidx)], Kz, penalized_distance(Dz, mask), size_of_null_sample)

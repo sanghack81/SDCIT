@@ -1,9 +1,13 @@
 import os
 
-import gpflow
+try:
+    import gpflow
+    from gpflow.kernels import RBF, White
+    from gpflow.models import GPR
+except ImportError:
+    gpflow = None
+
 import numpy as np
-from gpflow.kernels import RBF, White
-from gpflow.models import GPR
 from numpy import eye, sqrt, trace, diag, zeros
 from scipy.stats import chi2, gamma
 from sdcit.utils import centering, pdinv, truncated_eigen, eigdec, columnwise_normalizes, residual_kernel, rbf_kernel_median
@@ -57,12 +61,15 @@ def chi2rnd(df, m, n):
 
 def residual_kernel_matrix_kernel_real(Kx, Z, num_eig, ARD=True):
     """K_X|Z"""
+    if gpflow is None:
+        raise ImportError("gpflow is required for this function but it is not installed.")
+
     assert len(Kx) == len(Z)
     assert num_eig <= len(Kx)
 
     T = len(Kx)
     D = Z.shape[1]
-    I = eye(T)
+    I_mat = eye(T)
     eig_Kx, eix = truncated_eigen(*eigdec(Kx, num_eig))
 
     rbf = RBF(D, ARD=ARD)
@@ -73,7 +80,7 @@ def residual_kernel_matrix_kernel_real(Kx, Z, num_eig, ARD=True):
     sigma_squared = white.variance.value
     Kz_x = rbf.compute_K_symm(Z)
 
-    P = I - Kz_x @ pdinv(Kz_x + sigma_squared * I)
+    P = I_mat - Kz_x @ pdinv(Kz_x + sigma_squared * I_mat)
     return P @ Kx @ P.T
 
 

@@ -4,9 +4,31 @@ from numpy.random import rand, randn
 
 
 def henon(seed, n, gamma, independence, noise_dim=2, noise_std=0.5):
-    """Python implementation of chaotic time series as used in Doran et al. (2014)
+    """Python implementation of chaotic time series generator for independence tests.
 
-    It is not compatible with the MATLAB implementation by Doran et al. (2014) due to the use of differenct random number generator.
+    It creates simulated values following chaotic structure. It is not compatible with
+    the MATLAB implementation by Doran et al. (2014) due to the use of a different random
+    number generator logic.
+
+    Parameters
+    ----------
+    seed : int
+        Random seed.
+    n : int
+        Number of samples to generate.
+    gamma : float
+        Coupling parameter driving dependency.
+    independence : bool
+        If True, X and Y will be conditionally independent given Z. Otherwise, dependent.
+    noise_dim : int, optional
+        The number of dimensions added as extra noise (default is 2).
+    noise_std : float, optional
+        Standard deviation for the initial noise variables (default is 0.5).
+
+    Returns
+    -------
+    Tuple[np.ndarray, np.ndarray, np.ndarray]
+        A tuple of arrays (X, Y, Z) containing the simulated variables.
 
     References
     ----------
@@ -49,12 +71,42 @@ def henon(seed, n, gamma, independence, noise_dim=2, noise_std=0.5):
 
 
 def normalize(X):
-    """Columnwise normalization"""
+    """Columnwise normalization of the given array.
+
+    Parameters
+    ----------
+    X : np.ndarray
+        Array to be normalized.
+
+    Returns
+    -------
+    np.ndarray
+        An array where each column has mean 0 and standard deviation 1.
+    """
     return (X - np.mean(X, axis=0)) / np.std(X, axis=0)
 
 
 def zhang2012(seed, N, dimensions, the_case, independent=True):
-    """Python implementation of Postnonlinear noise data"""
+    """Python implementation of Post-nonlinear noise data generation.
+
+    Parameters
+    ----------
+    seed : int
+        Random seed.
+    N : int
+        Number of samples to generate.
+    dimensions : int
+        Number of dimensions (allowed range: 1 to 5).
+    the_case : int
+        Type of configuration, either 1 or 2 as implemented in the literature.
+    independent : bool, optional
+        Whether the generated X and Y should be conditionally independent given Z (default is True).
+
+    Returns
+    -------
+    Tuple[np.ndarray, np.ndarray, np.ndarray]
+        Arrays for (X, Y, Z).
+    """
 
     np.random.seed(seed)
 
@@ -179,6 +231,26 @@ def zhang2012(seed, N, dimensions, the_case, independent=True):
 
 
 def symmetric_zhang2012(seed, N, dimensions, the_case, independent=True):
+    """Symmetric variant of Zhang's 2012 data generation.
+
+    Parameters
+    ----------
+    seed : int
+        Random seed.
+    N : int
+        Number of samples to generate.
+    dimensions : int
+        Number of dimensions (allowed range: 1 to 5).
+    the_case : int
+        Type of configuration, either 1 or 2 as implemented in the literature.
+    independent : bool, optional
+        Whether the generated X and Y should be conditionally independent given Z (default is True).
+
+    Returns
+    -------
+    Tuple[np.ndarray, np.ndarray, np.ndarray]
+        Arrays for (X, Y, Z).
+    """
     np.random.seed(seed)
 
     if the_case == 1:

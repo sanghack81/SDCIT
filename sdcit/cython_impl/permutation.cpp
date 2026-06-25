@@ -4,6 +4,7 @@
 #include <cmath>
 #include <random>
 #include <algorithm>
+#include <memory>
 #include "../../blossom5/PerfectMatching.h"
 
 using std::vector;
@@ -417,7 +418,7 @@ vector<int> split_permutation(const double *D, const int full_n, const vector<in
 
 
     struct PerfectMatching::Options options;
-    PerfectMatching *pm = new PerfectMatching(len + odd_components.size(), n_edges);
+    std::unique_ptr<PerfectMatching> pm(new PerfectMatching(len + odd_components.size(), n_edges));
     {
         double factor = 1.0;
         if (sum_distance < INT_MAX) {
@@ -455,7 +456,6 @@ vector<int> split_permutation(const double *D, const int full_n, const vector<in
                 perm_array[i] = i;  // matched to dummy, not permuted.
             }
         }
-        delete pm;
     }
 
 
@@ -549,7 +549,7 @@ vector<int> dense_2n_permutation(const double *D, const int full_n, const vector
 
 
     struct PerfectMatching::Options options;
-    PerfectMatching *pm = new PerfectMatching(len, n_edges);
+    std::unique_ptr<PerfectMatching> pm(new PerfectMatching(len, n_edges));
     {
         double factor = 1.0;
         if (sum_distance < INT_MAX) {
@@ -575,7 +575,6 @@ vector<int> dense_2n_permutation(const double *D, const int full_n, const vector
                 perm_array[j] = i;
             }
         }
-        delete pm;
     }
 
     vector<int> comps_of_3;
@@ -635,8 +634,8 @@ void data_analysis(const double *D, const int full_n, const int len, vector<vect
 }
 
 
-void split_permutation_interface(const double *D, const int full_n, int *perm) {
-    std::mt19937 generator;
+void split_permutation_interface(const double *D, const int full_n, int *perm, const int seed) {
+    std::mt19937 generator(seed);
 
     vector<int> samples(full_n);
     std::iota(std::begin(samples), std::end(samples), 0);
@@ -648,8 +647,8 @@ void split_permutation_interface(const double *D, const int full_n, int *perm) {
 }
 
 
-void dense_2n_permutation_interface(const double *D, const int full_n, int *perm) {
-    std::mt19937 generator;
+void dense_2n_permutation_interface(const double *D, const int full_n, int *perm, const int seed) {
+    std::mt19937 generator(seed);
 
     vector<int> samples(full_n);
     std::iota(std::begin(samples), std::end(samples), 0);

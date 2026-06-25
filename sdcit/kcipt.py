@@ -1,6 +1,7 @@
 from sdcit.cython_impl.cy_sdcit import cy_kcipt
 
-from sdcit.utils import *
+import numpy as np
+from sdcit.utils import random_seeds, cythonize, p_value_of
 
 
 def c_KCIPT(Kx, Ky, Kz, Dz, B, b, M, n_jobs=1, seed=None):

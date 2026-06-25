@@ -1,9 +1,8 @@
-from distutils.core import setup
-from distutils.extension import Extension
+from setuptools import setup, Extension
 from sys import platform
 
 import numpy
-from Cython.Distutils import build_ext
+from Cython.Build import cythonize
 
 blossom_v_dir = 'blossom5/'
 
@@ -40,17 +39,15 @@ new_extension = Extension("sdcit.cython_impl.cy_sdcit",
 setup(
     name='SDCIT',
     packages=['sdcit', 'sdcit.cython_impl'],
-    version='1.2.0',
+    version='1.3.0',
     description='Self-Discrepancy Conditional Independence Test',
     author='Sanghack Lee',
     author_email='sanghack.lee@gmail.com',
     url='https://github.com/sanghack81/SDCIT',
     keywords=['independence test', 'conditional independence', 'machine learning', 'statistical test'],
     classifiers=[],
-    cmdclass={'build_ext': build_ext},
-    ext_modules=[
-        new_extension
-    ], requires=['numpy'],
+    ext_modules=cythonize([new_extension]),
+    requires=['numpy'],
 )
 # python setup.py build_ext --inplace
 # pip install -e .

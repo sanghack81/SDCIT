@@ -6,29 +6,98 @@ import scipy.stats
 import typing
 import warnings
 from numpy import diag, exp, sqrt
-from numpy.matlib import repmat
 from sklearn.metrics import euclidean_distances
+
 from typing import Union, List
 
 
+def repmat(a, m, n):
+    """Repeat a matrix a given number of times.
+
+    Parameters
+    ----------
+    a : array_like
+        The array to repeat.
+    m : int
+        Number of repetitions along the first axis.
+    n : int
+        Number of repetitions along the second axis.
+
+    Returns
+    -------
+    np.ndarray
+        The tiled array.
+    """
+    return np.tile(a, (m, n))
+
+
 def columnwise_normalizes(*Xs) -> typing.List[Union[None, np.ndarray]]:
-    """normalize per column for multiple data"""
+    """Normalize multiple arrays per column.
+
+    Parameters
+    ----------
+    *Xs : tuple of np.ndarray
+        Arrays to be normalized.
+
+    Returns
+    -------
+    List[Union[None, np.ndarray]]
+        A list of normalized arrays.
+    """
     return [columnwise_normalize(X) for X in Xs]
 
 
 def columnwise_normalize(X: np.ndarray) -> Union[None, np.ndarray]:
-    """normalize per column"""
+    """Normalize a single array per column.
+
+    Parameters
+    ----------
+    X : np.ndarray
+        Array to be normalized.
+
+    Returns
+    -------
+    Union[None, np.ndarray]
+        An array where each column has mean 0 and standard deviation 1.
+    """
     if X is None:
         return None
     return (X - np.mean(X, 0)) / np.std(X, 0)  # broadcast
 
 
 def ensure_symmetric(x: np.ndarray) -> np.ndarray:
+    """Ensure a matrix is perfectly symmetric.
+
+    Parameters
+    ----------
+    x : np.ndarray
+        Square matrix to be symmetrized.
+
+    Returns
+    -------
+    np.ndarray
+        Symmetric matrix computed as (x + x.T) / 2.
+    """
     return (x + x.T) / 2
 
 
 def truncated_eigen(eig_vals, eig_vecs=None, relative_threshold=1e-5):
-    """Retain eigenvalues and corresponding eigenvectors where an eigenvalue > max(eigenvalues)*relative_threshold"""
+    """Retain eigenvalues and corresponding eigenvectors where an eigenvalue > max(eigenvalues)*relative_threshold
+
+    Parameters
+    ----------
+    eig_vals : np.ndarray
+        1D array of eigenvalues.
+    eig_vecs : np.ndarray, optional
+        2D array of eigenvectors.
+    relative_threshold : float, optional
+        Threshold criteria to filter eigenvalues (default is 1e-5).
+
+    Returns
+    -------
+    Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]
+        Filtered eigenvalues, and optionally filtered eigenvectors if they were provided.
+    """
     indices = np.where(eig_vals > max(eig_vals) * relative_threshold)[0]
     if eig_vecs is not None:
         return eig_vals[indices], eig_vecs[:, indices]
@@ -37,7 +106,20 @@ def truncated_eigen(eig_vals, eig_vecs=None, relative_threshold=1e-5):
 
 
 def eigdec(X: np.ndarray, top_N: int = None):
-    """Eigendecomposition with top N descending ordered eigenvalues and corresponding eigenvectors"""
+    """Eigendecomposition with top N descending ordered eigenvalues and corresponding eigenvectors.
+
+    Parameters
+    ----------
+    X : np.ndarray
+        Symmetric matrix to decompose.
+    top_N : int, optional
+        Number of top eigenvalues to retain. If None, retains all (default is None).
+
+    Returns
+    -------
+    Tuple[np.ndarray, np.ndarray]
+        Descending sorted eigenvalues and their corresponding eigenvectors.
+    """
     if top_N is None:
         top_N = len(X)
 
@@ -45,14 +127,25 @@ def eigdec(X: np.ndarray, top_N: int = None):
     M = len(X)
 
     # ascending M-1-N <= <= M-1
-    w, v = scipy.linalg.eigh(X, eigvals=(M - 1 - top_N + 1, M - 1))
+    w, v = scipy.linalg.eigh(X, subset_by_index=(M - 1 - top_N + 1, M - 1))
 
     # descending
     return w[::-1], v[:, ::-1]
 
 
 def centering(M: np.ndarray) -> Union[None, np.ndarray]:
-    """Matrix Centering"""
+    """Matrix Centering operation.
+
+    Parameters
+    ----------
+    M : np.ndarray
+        A square matrix.
+
+    Returns
+    -------
+    Union[None, np.ndarray]
+        The centered matrix H @ M @ H.
+    """
     if M is None:
         return None
     n = len(M)
@@ -61,13 +154,36 @@ def centering(M: np.ndarray) -> Union[None, np.ndarray]:
 
 
 def pdinv(x: np.ndarray) -> np.ndarray:
-    """Inverse of a positive definite matrix"""
+    """Inverse of a positive definite matrix using Cholesky decomposition.
+
+    Parameters
+    ----------
+    x : np.ndarray
+        Positive definite matrix to invert.
+
+    Returns
+    -------
+    np.ndarray
+        Inverse of the matrix.
+    """
     U = scipy.linalg.cholesky(x)
     Uinv = scipy.linalg.inv(U)
     return Uinv @ Uinv.T
 
 
 def default_gp_kernel(X: np.ndarray):
+    """Generates the default GP kernel.
+
+    Parameters
+    ----------
+    X : np.ndarray
+        Input features array to define the number of features.
+
+    Returns
+    -------
+    gpflow.kernels.Kernel
+        An additive kernel of RBF and White.
+    """
     from gpflow.kernels import White, RBF
 
     _, n_feats = X.shape
@@ -75,7 +191,22 @@ def default_gp_kernel(X: np.ndarray):
 
 
 def residualize(Y, X=None, gp_kernel=None):
-    """Residual of Y given X. Y_i - E[Y_i|X_i]"""
+    """Residual of Y given X. Generates conditional predictions Y_i - E[Y_i|X_i].
+
+    Parameters
+    ----------
+    Y : np.ndarray
+        Target labels or values.
+    X : np.ndarray, optional
+        Features. If None, Y is simply centered.
+    gp_kernel : optional
+        Custom GP kernel to use. If None, the default kernel is built.
+
+    Returns
+    -------
+    np.ndarray
+        The residual differences.
+    """
     import gpflow
     from gpflow.models import GPR
 
@@ -93,7 +224,28 @@ def residualize(Y, X=None, gp_kernel=None):
 
 
 def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, use_expectation=True, with_gp=True, sigma_squared=1e-3, return_learned_K_X=False):
-    """Kernel matrix of residual of Y given X based on their kernel matrices, Y=f(X)"""
+    """Kernel matrix of residual of Y given X based on their kernel matrices, Y=f(X)
+
+    Parameters
+    ----------
+    K_Y : np.ndarray
+        Kernel matrix of Y.
+    K_X : np.ndarray
+        Kernel matrix of X.
+    use_expectation : bool, optional
+        Whether to use expectation correction formulation (default is True).
+    with_gp : bool, optional
+        Whether to learn hyperparameters using GPFlow (default is True).
+    sigma_squared : float, optional
+        Default variance noise floor (default is 1e-3).
+    return_learned_K_X : bool, optional
+        If True, returns the learned residual kernel and the original kernel (default is False).
+
+    Returns
+    -------
+    Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]
+        The residual kernel matrix.
+    """
     import gpflow
     from gpflow.kernels import White, Linear
     from gpflow.models import GPR
@@ -130,7 +282,22 @@ def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, use_expectation=True, with
 
 
 def rbf_kernel_median(data: np.ndarray, *args, without_two=False):
-    """A list of RBF kernel matrices for data sets in arguments based on median heuristic"""
+    """A list of RBF kernel matrices for data sets in arguments based on median heuristic.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        The primary data array.
+    *args : np.ndarray
+        Additional sequence of data arrays.
+    without_two : bool, optional
+        If True, the variance logic scales without the (0.5) multiplier reduction (default is False).
+
+    Returns
+    -------
+    Union[np.ndarray, List[np.ndarray]]
+        A single kernel matrix or a list of kernel matrices.
+    """
     if args is None:
         args = []
 
@@ -153,14 +320,37 @@ def rbf_kernel_median(data: np.ndarray, *args, without_two=False):
 
 
 def p_value_of(val: float, data: typing.Iterable) -> float:
-    """The percentile of a value given a data"""
+    """The percentile of a value given an array of empirical distribution data.
 
+    Parameters
+    ----------
+    val : float
+        The test statistic.
+    data : typing.Iterable
+        The distribution or array of null hypothesis values.
+
+    Returns
+    -------
+    float
+        The calculated p-value representing area beyond the val.
+    """
     data = np.sort(data)
     return float(1 - np.searchsorted(data, val, side='right') / len(data))
 
 
 def random_seeds(n=None):
-    """Random seeds of given size or a random seed if n is None"""
+    """Random seeds of given size or a random seed if n is None.
+
+    Parameters
+    ----------
+    n : int, optional
+        How many random seeds to return (default is None).
+
+    Returns
+    -------
+    Union[int, List[int]]
+        A single integer seed or a list of random integer seeds.
+    """
     if n is None:
         return np.random.randint(np.iinfo(np.int32).max)
     else:
@@ -168,10 +358,20 @@ def random_seeds(n=None):
 
 
 def K2D(K: Union[None, np.ndarray]) -> np.ndarray:
-    """An RKHS distance matrix given a kernel matrix
+    """An RKHS distance matrix given a kernel matrix.
 
     A distance matrix D of the same size of the given kernel matrix K
      :math:`d^2(i,j)=k(i,i)+k(j,j)-2k(i,j)`.
+
+    Parameters
+    ----------
+    K : Union[None, np.ndarray]
+        The source Kernel correlation matrix.
+
+    Returns
+    -------
+    np.ndarray
+        The Euclidean translation distance matrix.
     """
     if K is None:
         return None
@@ -187,11 +387,34 @@ def K2D(K: Union[None, np.ndarray]) -> np.ndarray:
 
 
 def cythonize(*matrices):
+    """Casts matrices into a contiguous float64 array type for quick C ingestion.
+
+    Parameters
+    ----------
+    *matrices : tuple of np.ndarray
+        Array matrices to convert.
+
+    Returns
+    -------
+    tuple
+        Sequence of np.float64 matrices.
+    """
     return tuple(np.ascontiguousarray(matrix, dtype=np.float64) for matrix in matrices)
 
 
 def AUPC(p_values: Union[List, np.ndarray]) -> float:
-    """Area Under Power Curve"""
+    """Area Under Power Curve mapping calculated p-values into uniform spaces.
+
+    Parameters
+    ----------
+    p_values : Union[List, np.ndarray]
+        Test p-values collection.
+
+    Returns
+    -------
+    float
+        Total curve area integration score.
+    """
     p_values = np.array(p_values)
 
     # CDF of p-values
@@ -207,18 +430,56 @@ def AUPC(p_values: Union[List, np.ndarray]) -> float:
 
 
 def KS_statistic(p_values: np.ndarray) -> float:
-    """Kolmogorov-Smirnov test statistics"""
+    """Kolmogorov-Smirnov test statistics over uniformity checking.
+
+    Parameters
+    ----------
+    p_values : np.ndarray
+        Series of recorded test p-values.
+
+    Returns
+    -------
+    float
+        Deviation ratio from the expected distribution line.
+    """
     return scipy.stats.kstest(p_values, 'uniform')[0]
 
 
 def p_value_curve(p_values):
+    """Yields plot anchor coordinates representing power characteristics of p-values.
+
+    Parameters
+    ----------
+    p_values : typing.Iterable
+        Calculated or empirical p-value array.
+
+    Returns
+    -------
+    list
+        List of 2D coordinates representing discrete empirical points.
+    """
     p_values = np.array(p_values)
     xys = [(uniq_v, np.mean(p_values <= uniq_v)) for uniq_v in np.unique(p_values)]
     return [(0, 0), *xys, (1, 1)]
 
 
 def regression_distance(Y: np.ndarray, Z: np.ndarray, ard=True):
-    """d(z,z') = |f(z)-f(z')| where Y=f(Z) + noise and f ~ GP"""
+    """d(z,z') = |f(z)-f(z')| where Y=f(Z) + noise and f ~ GP.
+
+    Parameters
+    ----------
+    Y : np.ndarray
+        Dependent target dataset matrix.
+    Z : np.ndarray
+        Conditional feature subset matrix.
+    ard : bool, optional
+        Use Automatic Relevance Determination (default is True).
+
+    Returns
+    -------
+    Tuple[np.ndarray, np.ndarray]
+        Regression translated RKHS distance matrix and computed kernel mapping.
+    """
     import gpflow
     from gpflow.kernels import White, RBF
     from gpflow.models import GPR
@@ -236,8 +497,8 @@ def regression_distance(Y: np.ndarray, Z: np.ndarray, ard=True):
     Fy = Y.T @ Ry @ Kz_y  # F(z)
 
     M = Fy.T @ Fy
-    O = np.ones((n, 1))
-    N = O @ (np.diag(M)[:, None]).T
+    ones_mat = np.ones((n, 1))
+    N = ones_mat @ (np.diag(M)[:, None]).T
     D = np.sqrt(N + N.T - 2 * M)
 
     return D, Kz_y
@@ -269,7 +530,7 @@ def regression_distance_k(Kx: np.ndarray, Ky: np.ndarray):
     P = Kx @ pdinv(Kx + sigma_squared * np.eye(T))
 
     M = P @ Ky @ P
-    O = np.ones((T, 1))
-    N = O @ np.diag(M).T
+    ones_mat = np.ones((T, 1))
+    N = ones_mat @ np.diag(M).T
     D = np.sqrt(N + N.T - 2 * M)
     return D

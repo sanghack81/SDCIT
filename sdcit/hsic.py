@@ -7,6 +7,24 @@ from sdcit.utils import p_value_of, cythonize, random_seeds, centering
 
 
 def HSIC(K: np.ndarray, L: np.ndarray, p_val_method='bootstrap', num_boot=1000) -> float:
+    """Hilbert-Schmidt Independence Criterion wrapper.
+
+    Parameters
+    ----------
+    K : np.ndarray
+        N by N kernel matrix of X.
+    L : np.ndarray
+        N by N kernel matrix of Y.
+    p_val_method : str, optional
+        Method to compute p-value, either 'bootstrap' or 'gamma' (default is 'bootstrap').
+    num_boot : int, optional
+        Number of bootstraps if p_val_method is 'bootstrap' (default is 1000).
+
+    Returns
+    -------
+    float
+        The calculated p-value of the HSIC test.
+    """
     if p_val_method == 'bootstrap':
         return HSIC_boot(K, L, num_boot)
     elif p_val_method == 'gamma':
@@ -16,11 +34,35 @@ def HSIC(K: np.ndarray, L: np.ndarray, p_val_method='bootstrap', num_boot=1000) 
 
 
 def sum_except_diag(M: np.ndarray):
+    """Sum of all elements in a matrix excluding the diagonal.
+
+    Parameters
+    ----------
+    M : np.ndarray
+        A square matrix.
+
+    Returns
+    -------
+    float
+        Sum of elements excluding the diagonal.
+    """
     return M.sum() - M.trace()
 
 
 def HSIC_gamma_approx(K: np.ndarray, L: np.ndarray) -> float:
     """Hilbert-Schmidt Independence Criterion where null distribution is based on approximated Gamma distribution
+
+    Parameters
+    ----------
+    K : np.ndarray
+        N by N kernel matrix of X.
+    L : np.ndarray
+        N by N kernel matrix of Y.
+
+    Returns
+    -------
+    float
+        The p-value based on Gamma approximation.
 
     References
     ----------
@@ -43,6 +85,18 @@ def HSIC_gamma_approx(K: np.ndarray, L: np.ndarray) -> float:
 def HSIC_stat(K: np.ndarray, L: np.ndarray) -> float:
     """HSIC statistic assuming given two centered kernel matrices.
 
+    Parameters
+    ----------
+    K : np.ndarray
+        Centered N by N kernel matrix of X.
+    L : np.ndarray
+        Centered N by N kernel matrix of Y.
+
+    Returns
+    -------
+    float
+        The empirical HSIC test statistic.
+
     References
     ----------
     Gretton, A., Herbrich, R., Smola, A., Bousquet, O., & Schölkopf, B. (2005). Kernel Methods for Measuring Independence. Journal of Machine Learning Research, 6, 2075–2129.
@@ -51,8 +105,24 @@ def HSIC_stat(K: np.ndarray, L: np.ndarray) -> float:
     return float(1 / m * np.sum(K * L))
 
 
-def HSIC_boot(K: np.ndarray, L: np.ndarray, num_boot=1000, seed=None) -> Tuple[float, List[float]]:
-    """A Hilbert-Schmidt Independence Criterion where null distribution is based on bootstrapping
+def HSIC_boot(K: np.ndarray, L: np.ndarray, num_boot=1000, seed=None) -> float:
+    """A Hilbert-Schmidt Independence Criterion where null distribution is based on bootstrapping.
+
+    Parameters
+    ----------
+    K : np.ndarray
+        N by N kernel matrix of X.
+    L : np.ndarray
+        N by N kernel matrix of Y.
+    num_boot : int, optional
+        Number of bootstraps (default is 1000).
+    seed : int, optional
+        Random seed for reproducibility.
+
+    Returns
+    -------
+    float
+        The p-value of the HSIC test.
 
     References
     ----------
@@ -75,6 +145,29 @@ def HSIC_boot(K: np.ndarray, L: np.ndarray, num_boot=1000, seed=None) -> Tuple[f
 
 
 def c_HSIC(K: np.ndarray, L: np.ndarray, size_of_null_sample=1000, with_null=False, seed=None, n_jobs=1):
+    """Cython optimized Hilbert-Schmidt Independence Criterion testing.
+
+    Parameters
+    ----------
+    K : np.ndarray
+        N by N kernel matrix of X.
+    L : np.ndarray
+        N by N kernel matrix of Y.
+    size_of_null_sample : int, optional
+        Size of the null distribution sample (default is 1000).
+    with_null : bool, optional
+        Whether to return the generated raw null distribution array (default is False).
+    seed : int, optional
+        Random seed for reproducibility.
+    n_jobs : int, optional
+        Number of parallel jobs to use (default is 1).
+
+    Returns
+    -------
+    Union[Tuple[float, float], Tuple[float, float, np.ndarray]]
+        A tuple of (test_statistic, p_value) if `with_null` is False.
+        A tuple of (test_statistic, p_value, raw_null_distribution) if `with_null` is True.
+    """
     if seed is not None:
         np.random.seed(seed)
 
@@ -87,9 +180,9 @@ def c_HSIC(K: np.ndarray, L: np.ndarray, size_of_null_sample=1000, with_null=Fal
     cy_hsic(K, L, size_of_null_sample, random_seeds(), n_jobs, test_statistic, raw_null)
 
     # post-process outputs
-    test_statistic = test_statistic[0]
+    test_statistic_val = test_statistic[0]
 
     if with_null:
-        return test_statistic, p_value_of(test_statistic, raw_null), raw_null
+        return test_statistic_val, p_value_of(test_statistic_val, raw_null), raw_null
     else:
-        return test_statistic, p_value_of(test_statistic, raw_null)
+        return test_statistic_val, p_value_of(test_statistic_val, raw_null)

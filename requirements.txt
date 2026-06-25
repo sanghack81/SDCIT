@@ -8,3 +8,4 @@ scipy
 scikit-learn
 cython
 pytest
+pytest-cov
