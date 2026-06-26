@@ -31,6 +31,40 @@ def repmat(a, m, n):
     return np.tile(a, (m, n))
 
 
+def _require_gpflow():
+    """Import gpflow, enforcing the 2.x API that SDCIT targets.
+
+    GP-based functions (KCIT, FCIT, GP residualization) require gpflow>=2.0.
+    gpflow is an optional dependency; install it with ``pip install 'SDCIT[gp]'``.
+    """
+    try:
+        import gpflow
+    except ImportError as e:  # pragma: no cover - optional dependency
+        raise ImportError(
+            "gpflow>=2.0 is required for GP-based functions. "
+            "Install with `pip install 'SDCIT[gp]'`."
+        ) from e
+    if int(gpflow.__version__.split('.')[0]) < 2:
+        raise ImportError(
+            f"SDCIT requires gpflow>=2.0 (the 1.x API was removed), but found gpflow {gpflow.__version__}."
+        )
+    return gpflow
+
+
+def _optimize_gpr(model) -> None:
+    """Fit a gpflow 2.x GPR model's hyperparameters with Scipy L-BFGS-B."""
+    import gpflow
+    gpflow.optimizers.Scipy().minimize(model.training_loss, model.trainable_variables)
+
+
+def _kernel_matrix(kernel, X: np.ndarray) -> np.ndarray:
+    """Gram matrix K(X, X) of a gpflow 2.x kernel as a numpy array.
+
+    Replaces the gpflow 1.x ``kernel.compute_K_symm(X)`` API.
+    """
+    return np.asarray(kernel(X), dtype=np.float64)
+
+
 def columnwise_normalizes(*Xs) -> typing.List[Union[None, np.ndarray]]:
     """Normalize multiple arrays per column.
 
@@ -187,7 +221,7 @@ def default_gp_kernel(X: np.ndarray):
     from gpflow.kernels import White, RBF
 
     _, n_feats = X.shape
-    return RBF(n_feats, ARD=True) + White(n_feats)
+    return RBF(lengthscales=np.ones(n_feats)) + White()  # ARD via vector lengthscales (gpflow 2.x)
 
 
 def residualize(Y, X=None, gp_kernel=None):
@@ -207,7 +241,7 @@ def residualize(Y, X=None, gp_kernel=None):
     np.ndarray
         The residual differences.
     """
-    import gpflow
+    _require_gpflow()
     from gpflow.models import GPR
 
     if X is None:
@@ -216,11 +250,13 @@ def residualize(Y, X=None, gp_kernel=None):
     if gp_kernel is None:
         gp_kernel = default_gp_kernel(X)
 
-    m = GPR(X, Y, gp_kernel)
-    gpflow.train.ScipyOptimizer().minimize(m)
+    X = np.asarray(X, dtype=np.float64)
+    Y = np.asarray(Y, dtype=np.float64)
+    m = GPR((X, Y), kernel=gp_kernel)
+    _optimize_gpr(m)
 
     Yhat, _ = m.predict_y(X)
-    return Y - Yhat
+    return Y - np.asarray(Yhat, dtype=np.float64)
 
 
 def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, use_expectation=True, with_gp=True, sigma_squared=1e-3, return_learned_K_X=False):
@@ -246,7 +282,7 @@ def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, use_expectation=True, with
     Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]
         The residual kernel matrix.
     """
-    import gpflow
+    _require_gpflow()
     from gpflow.kernels import White, Linear
     from gpflow.models import GPR
 
@@ -261,13 +297,15 @@ def residual_kernel(K_Y: np.ndarray, K_X: np.ndarray, use_expectation=True, with
         Y = eiy @ diag(sqrt(eig_Ky))
         n_feats = X.shape[1]
 
-        linear = Linear(n_feats, ARD=True)
-        white = White(n_feats)
-        gp_model = GPR(X, Y, linear + white)
-        gpflow.train.ScipyOptimizer().minimize(gp_model)
+        X = np.asarray(X, dtype=np.float64)
+        Y = np.asarray(Y, dtype=np.float64)
+        linear = Linear(variance=np.ones(n_feats))  # ARD via per-dimension variance (gpflow 2.x)
+        white = White()
+        gp_model = GPR((X, Y), kernel=linear + white)
+        _optimize_gpr(gp_model)
 
-        K_X = linear.compute_K_symm(X)
-        sigma_squared = white.variance.value
+        K_X = _kernel_matrix(linear, X)
+        sigma_squared = float(white.variance.numpy())
 
     P = pdinv(np.eye(T) + K_X / sigma_squared)  # == I-K @ inv(K+Sigma) in Zhang et al. 2011
     if use_expectation:  # Flaxman et al. 2016 Gaussian Processes for Independence Tests with Non-iid Data in Causal Inference.
@@ -480,20 +518,22 @@ def regression_distance(Y: np.ndarray, Z: np.ndarray, ard=True):
     Tuple[np.ndarray, np.ndarray]
         Regression translated RKHS distance matrix and computed kernel mapping.
     """
-    import gpflow
+    _require_gpflow()
     from gpflow.kernels import White, RBF
     from gpflow.models import GPR
 
     n, dims = Z.shape
 
-    rbf = RBF(dims, ARD=ard)
-    rbf_white = rbf + White(dims)
+    rbf = RBF(lengthscales=np.ones(dims) if ard else 1.0)
+    rbf_white = rbf + White()
 
-    gp_model = GPR(Z, Y, rbf_white)
-    gpflow.train.ScipyOptimizer().minimize(gp_model)
+    Z = np.asarray(Z, dtype=np.float64)
+    Y = np.asarray(Y, dtype=np.float64)
+    gp_model = GPR((Z, Y), kernel=rbf_white)
+    _optimize_gpr(gp_model)
 
-    Kz_y = rbf.compute_K_symm(Z)
-    Ry = pdinv(rbf_white.compute_K_symm(Z))
+    Kz_y = _kernel_matrix(rbf, Z)
+    Ry = pdinv(_kernel_matrix(rbf_white, Z))
     Fy = Y.T @ Ry @ Kz_y  # F(z)
 
     M = Fy.T @ Fy
@@ -506,7 +546,7 @@ def regression_distance(Y: np.ndarray, Z: np.ndarray, ard=True):
 
 def regression_distance_k(Kx: np.ndarray, Ky: np.ndarray):
     warnings.warn('not tested yet!')
-    import gpflow
+    _require_gpflow()
     from gpflow.kernels import White, Linear
     from gpflow.models import GPR
 
@@ -519,13 +559,15 @@ def regression_distance_k(Kx: np.ndarray, Ky: np.ndarray):
     Y = eiy @ diag(sqrt(eig_Ky))
     n_feats = X.shape[1]
 
-    linear = Linear(n_feats, ARD=True)
-    white = White(n_feats)
-    gp_model = GPR(X, Y, linear + white)
-    gpflow.train.ScipyOptimizer().minimize(gp_model)
+    X = np.asarray(X, dtype=np.float64)
+    Y = np.asarray(Y, dtype=np.float64)
+    linear = Linear(variance=np.ones(n_feats))  # ARD via per-dimension variance (gpflow 2.x)
+    white = White()
+    gp_model = GPR((X, Y), kernel=linear + white)
+    _optimize_gpr(gp_model)
 
-    Kx = linear.compute_K_symm(X)
-    sigma_squared = white.variance.value
+    Kx = _kernel_matrix(linear, X)
+    sigma_squared = float(white.variance.numpy())
 
     P = Kx @ pdinv(Kx + sigma_squared * np.eye(T))
 

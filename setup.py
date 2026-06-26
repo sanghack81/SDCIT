@@ -39,15 +39,22 @@ new_extension = Extension("sdcit.cython_impl.cy_sdcit",
 setup(
     name='SDCIT',
     packages=['sdcit', 'sdcit.cython_impl'],
-    version='1.3.0',
+    version='2.0.0',
     description='Self-Discrepancy Conditional Independence Test',
     author='Sanghack Lee',
     author_email='sanghack.lee@gmail.com',
     url='https://github.com/sanghack81/SDCIT',
     keywords=['independence test', 'conditional independence', 'machine learning', 'statistical test'],
     classifiers=[],
-    ext_modules=cythonize([new_extension]),
-    requires=['numpy'],
+    # force=True: always regenerate the .cpp from the .pyx, so a stale Cython
+    # output (e.g. generated against a different NumPy version) is never reused.
+    ext_modules=cythonize([new_extension], force=True, language_level='3'),
+    python_requires='>=3.9',
+    install_requires=['numpy', 'scipy>=1.5', 'scikit-learn'],
+    extras_require={
+        # GP-based tests (KCIT, FCIT, GP residualization) require the gpflow 2.x API.
+        'gp': ['gpflow>=2.0', 'tensorflow>=2.0'],
+    },
 )
 # python setup.py build_ext --inplace
 # pip install -e .

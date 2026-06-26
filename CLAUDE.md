@@ -13,9 +13,11 @@ The package has a Cython/C++ extension that links against Blossom-V (external de
 ```bash
 # Download and extract Blossom-V into blossom5/ directory
 ./setup.sh
-# Build extensions and install in editable mode
+# Build extensions and install in editable mode (recommended; resolves build deps)
 pip install -e .
-# Or build extensions in-place only
+# GP-based tests (KCIT/FCIT) need the optional gpflow 2.x extra:
+pip install -e '.[gp]'
+# Or build extensions in-place only (requires setuptools/cython/numpy preinstalled)
 python setup.py build_ext --inplace
 ```
 
@@ -40,7 +42,7 @@ All statistical tests take **kernel matrices** (N×N numpy arrays) as primary in
 - **`sdcit.sdcit_mod.SDCIT`** — Pure Python SDCIT. Returns `(test_statistic, p_value)`.
 - **`sdcit.sdcit_mod.c_SDCIT`** — C++-accelerated SDCIT via Cython. Same interface, supports `n_jobs` for threading.
 - **`sdcit.kcipt.c_KCIPT`** — C++-accelerated KCIPT (Doran et al. 2014). Permutation-based kernel CI test.
-- **`sdcit.kcit.python_kcit`** — KCIT (Zhang et al. 2011). Takes raw data (X, Y, Z), not kernel matrices. Requires `gpflow` (<2.0) and `tensorflow` (<2.0).
+- **`sdcit.kcit.python_kcit`** — KCIT (Zhang et al. 2011). Takes raw data (X, Y, Z), not kernel matrices. Requires `gpflow` (>=2.0) and `tensorflow` (>=2.0).
 - **`sdcit.kcit.python_kcit_K`** — KCIT variant that takes kernel matrices instead of raw data.
 - **`sdcit.hsic.HSIC` / `c_HSIC`** — Hilbert-Schmidt Independence Criterion (unconditional independence test).
 - **`sdcit.flaxman.FCIT`** — Flaxman et al. (2016) residualization-based CI test. Requires `gpflow`.
@@ -68,7 +70,7 @@ All statistical tests take **kernel matrices** (N×N numpy arrays) as primary in
 
 ## Important Notes
 
-- `gpflow` and `tensorflow` are optional dependencies, only needed for KCIT, FCIT, and GP-based residualization. The core SDCIT/KCIPT/HSIC tests work without them.
+- `gpflow` and `tensorflow` are optional dependencies (install via the `gp` extra: `pip install -e '.[gp]'`), only needed for KCIT, FCIT, and GP-based residualization. The core SDCIT/KCIPT/HSIC tests work without them. As of SDCIT 2.0, the GP code targets the **gpflow 2.x** API; gpflow 1.x is no longer supported (and its `tensorflow<2` requirement cannot be installed on modern Python).
 - Blossom-V is free for research but requires a commercial license for commercial use.
 - On macOS, the extension compiles with `-std=c++17`; on Linux with `-std=c++11`.
 - Test tolerances in `test_reproducibility.py` may differ between macOS and Linux due to platform-specific numerical behavior in Blossom-V.

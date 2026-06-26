@@ -4,6 +4,9 @@ try:
     import gpflow
     from gpflow.kernels import RBF, White
     from gpflow.models import GPR
+
+    if int(gpflow.__version__.split('.')[0]) < 2:  # SDCIT 2.x requires the gpflow 2.x API
+        gpflow = None
 except ImportError:
     gpflow = None
 
@@ -72,13 +75,14 @@ def residual_kernel_matrix_kernel_real(Kx, Z, num_eig, ARD=True):
     I_mat = eye(T)
     eig_Kx, eix = truncated_eigen(*eigdec(Kx, num_eig))
 
-    rbf = RBF(D, ARD=ARD)
-    white = White(D)
-    gp_model = GPR(Z, 2 * sqrt(T) * eix @ diag(sqrt(eig_Kx)) / sqrt(eig_Kx[0]), rbf + white)
-    gpflow.train.ScipyOptimizer().minimize(gp_model)
+    rbf = RBF(lengthscales=np.ones(D) if ARD else 1.0)
+    white = White()
+    Yt = np.asarray(2 * sqrt(T) * eix @ diag(sqrt(eig_Kx)) / sqrt(eig_Kx[0]), dtype=np.float64)
+    gp_model = GPR((np.asarray(Z, dtype=np.float64), Yt), kernel=rbf + white)
+    gpflow.optimizers.Scipy().minimize(gp_model.training_loss, gp_model.trainable_variables)
 
-    sigma_squared = white.variance.value
-    Kz_x = rbf.compute_K_symm(Z)
+    sigma_squared = float(white.variance.numpy())
+    Kz_x = np.asarray(rbf(Z), dtype=np.float64)
 
     P = I_mat - Kz_x @ pdinv(Kz_x + sigma_squared * I_mat)
     return P @ Kx @ P.T

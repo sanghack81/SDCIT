@@ -13,18 +13,28 @@ This algorithm depends on [`Blossom-V`](http://pub.ist.ac.at/~vnk/software/bloss
 
 Installation
 -----
-This package requires `python>=3.8`. Other required packages are described in [requirements.txt](https://github.com/sanghack81/SDCIT/blob/master/requirements.txt). The following script will clone the SDCIT code, download `Blossom-V`, and install the package using `pip`.
+This package requires `python>=3.9`. Other required packages are described in [requirements.txt](https://github.com/sanghack81/SDCIT/blob/master/requirements.txt). The following script will clone the SDCIT code, download `Blossom-V`, and install the package using `pip`.
 
 ```bash
 git clone https://github.com/sanghack81/SDCIT
 cd SDCIT
-# Install standard dependencies
-pip install -r requirements.txt
 # Prepare C++ external dependencies (Blossom-V)
 ./setup.sh
-# Build and install the extensions
+# Build and install the package (build deps are resolved via pyproject.toml)
 pip install -e .
 ```
+
+The GP-based tests (KCIT, FCIT, GP residualization) are optional and require the
+modern `gpflow` 2.x API. Install them with the `gp` extra:
+
+```bash
+pip install -e '.[gp]'   # adds gpflow>=2.0 and tensorflow>=2.0
+```
+
+> **Note:** `pip install -e .` is the recommended install — it resolves the
+> build-time dependencies (`setuptools`, `cython`, `numpy`) automatically.
+> Running `python setup.py build_ext --inplace` directly requires those three
+> to be installed first.
 
 ### Running Tests
 To verify your installation and run unit tests:

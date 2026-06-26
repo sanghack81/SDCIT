@@ -27,12 +27,12 @@ def test_reproducible():
     _, p1 = SDCIT(KX, KY, KZ, seed=55)
     _, p2 = c_SDCIT(KX, KY, KZ, seed=55)  # macOS and Linux may have different result.
 
-    try:
-        import gpflow  # noqa: F401
+    import sdcit.kcit as kcit
+    if kcit.gpflow is not None:  # gpflow>=2.0 available (1.x is treated as unavailable)
         _, _, p3, *_ = python_kcit(X, Y, Z, seed=99)
         _, _, p4, *_ = python_kcit_K(KX, KY, KZ, seed=99)
         assert np.allclose([p1, p2, p3, p4], [0.345, 0.348, 0.095, 0.0606], atol=0.005, rtol=0)
-    except ImportError:
+    else:
         assert np.allclose([p1, p2], [0.345, 0.348], atol=0.005, rtol=0)
 
 
