@@ -358,22 +358,29 @@ def rbf_kernel_median(data: np.ndarray, *args, without_two=False):
 
 
 def p_value_of(val: float, data: typing.Iterable) -> float:
-    """The percentile of a value given an array of empirical distribution data.
+    """Calculate an upper-tail Monte Carlo p-value, including ties.
+
+    For B null draws, return (1 + number of draws >= val) / (B + 1).
+    The added observation prevents a zero p-value from a finite simulation.
+    This rank correction does not establish validity of the supplied null law.
 
     Parameters
     ----------
     val : float
         The test statistic.
     data : typing.Iterable
-        The distribution or array of null hypothesis values.
+        A nonempty one-dimensional array of null hypothesis values.
 
     Returns
     -------
     float
-        The calculated p-value representing area beyond the val.
+        The calculated p-value in [1 / (B + 1), 1].
     """
     data = np.sort(data)
-    return float(1 - np.searchsorted(data, val, side='right') / len(data))
+    if len(data) == 0:
+        raise ValueError("A Monte Carlo p-value requires at least one null value.")
+    count = len(data) - np.searchsorted(data, val, side='left')
+    return float((1 + count) / (len(data) + 1))
 
 
 def random_seeds(n=None):

@@ -5,10 +5,73 @@
 #include <random>
 #include <algorithm>
 #include <memory>
+#include <cstdint>
+#include <stdexcept>
 #include "../../blossom5/PerfectMatching.h"
 
 using std::vector;
 // using std::isinf;
+
+namespace {
+
+// Blossom-V doubles each integer cost and uses INT_MAX/2 as its infinity
+// sentinel. Bound the SUM of all edge costs, including dummy edges, to leave
+// headroom for that doubling and aggregate dual/slack arithmetic.
+class MatchingCostScale {
+    static constexpr int budget = INT_MAX / 8;
+    double maximum = 0.0;
+    long double units = 0.0;
+
+public:
+    MatchingCostScale(const double *distance, int n, const vector<int> &indices,
+                      double dummy_distance = 0.0, std::size_t dummy_count = 0) {
+        for (std::size_t i = 0; i < indices.size(); ++i) {
+            for (std::size_t j = i + 1; j < indices.size(); ++j) {
+                const double d = distance[indices[i] * n + indices[j]];
+                if (std::isnan(d) || d < 0.0) {
+                    throw std::invalid_argument("matching distances must be nonnegative and not NaN");
+                }
+                if (std::isfinite(d)) maximum = std::max(maximum, d);
+            }
+        }
+        if (dummy_count) maximum = std::max(maximum, dummy_distance);
+        if (maximum == 0.0) return;
+
+        // Normalize BEFORE summing: finite inputs near DBL_MAX must neither
+        // overflow the sum nor be converted directly to out-of-range integers.
+        long double normalized_sum = dummy_count *
+                                     (static_cast<long double>(dummy_distance) / maximum);
+        for (std::size_t i = 0; i < indices.size(); ++i) {
+            for (std::size_t j = i + 1; j < indices.size(); ++j) {
+                const double d = distance[indices[i] * n + indices[j]];
+                if (std::isfinite(d)) normalized_sum += static_cast<long double>(d) / maximum;
+            }
+        }
+        units = budget / normalized_sum;
+
+        // Check the actual rounded integer total, rather than relying on an
+        // exact floating-point sum. A global rescaling preserves relative costs.
+        while (true) {
+            std::int64_t total = static_cast<std::int64_t>(dummy_count) * (*this)(dummy_distance);
+            for (std::size_t i = 0; i < indices.size(); ++i) {
+                for (std::size_t j = i + 1; j < indices.size(); ++j) {
+                    const double d = distance[indices[i] * n + indices[j]];
+                    if (std::isfinite(d)) total += (*this)(d);
+                }
+            }
+            if (total <= budget) break;
+            units *= static_cast<long double>(budget) / (total + 1);
+        }
+    }
+
+    int operator()(double distance) const {
+        if (maximum == 0.0) return 0;
+        const long double scaled = (static_cast<long double>(distance) / maximum) * units;
+        return static_cast<int>(std::min(scaled, static_cast<long double>(budget)));
+    }
+};
+
+}  // namespace
 
 
 template<typename T>
@@ -412,6 +475,10 @@ vector<int> split_permutation(const double *D, const int full_n, const vector<in
     vector<vector<int>> odd_components;
     data_analysis(D, full_n, len, odd_components, idxs, n_edges, max_distance, sum_distance);
 
+    std::size_t dummy_edges = 0;
+    for (const auto &component : odd_components) dummy_edges += component.size();
+    const MatchingCostScale costs(D, full_n, idxs, max_distance, dummy_edges);
+
     if (sum_distance == 0.0) {
         return random_permutation(idxs, generator);
     }
@@ -420,16 +487,12 @@ vector<int> split_permutation(const double *D, const int full_n, const vector<in
     struct PerfectMatching::Options options;
     std::unique_ptr<PerfectMatching> pm(new PerfectMatching(len + odd_components.size(), n_edges));
     {
-        double factor = 1.0;
-        if (sum_distance < INT_MAX) {
-            factor = INT_MAX / sum_distance;
-        }
         for (int i = 0; i < len; i++) {
             const double *D_i = D + idxs[i] * full_n;
             for (int j = i + 1; j < len; j++) {
                 double d = D_i[idxs[j]];
                 if (!std::isinf(d)) {
-                    pm->AddEdge(i, j, (int) (d * factor));
+                    pm->AddEdge(i, j, costs(d));
                 }
             }
         }
@@ -437,7 +500,7 @@ vector<int> split_permutation(const double *D, const int full_n, const vector<in
         int dummy_node_id = len;
         for (vector<int> component: odd_components) {
             for (int idxs_index: component) {
-                pm->AddEdge(dummy_node_id, idxs_index, (int) (factor * max_distance));
+                pm->AddEdge(dummy_node_id, idxs_index, costs(max_distance));
             }
             dummy_node_id++;
         }
@@ -543,6 +606,8 @@ vector<int> dense_2n_permutation(const double *D, const int full_n, const vector
     double sum_distance = 0.0;
     dense_data_analysis(D, full_n, len, idxs, n_edges, max_distance, sum_distance);
 
+    const MatchingCostScale costs(D, full_n, idxs);
+
     if (sum_distance == 0.0) {
         return random_permutation(idxs, generator);
     }
@@ -551,16 +616,12 @@ vector<int> dense_2n_permutation(const double *D, const int full_n, const vector
     struct PerfectMatching::Options options;
     std::unique_ptr<PerfectMatching> pm(new PerfectMatching(len, n_edges));
     {
-        double factor = 1.0;
-        if (sum_distance < INT_MAX) {
-            factor = INT_MAX / sum_distance;
-        }
         for (int i = 0; i < len; i++) {
             const double *D_i = D + idxs[i] * full_n;
             for (int j = i + 1; j < len; j++) {
                 double d = D_i[idxs[j]];
                 if (!std::isinf(d)) {
-                    pm->AddEdge(i, j, (int) (d * factor));
+                    pm->AddEdge(i, j, costs(d));
                 }
             }
         }
@@ -658,4 +719,3 @@ void dense_2n_permutation_interface(const double *D, const int full_n, int *perm
         *perm++ = i;
     }
 }
-

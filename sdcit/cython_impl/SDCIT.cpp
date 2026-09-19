@@ -44,8 +44,7 @@ vector<double> penalized_distance(const vector<double> &D_Z, const int n, const 
 
 
 vector<double> shuffle_matrix(const double *mat, const int n, const vector<int> &perm) {
-    vector<double> newmat;
-    newmat.reserve(n * n);
+    vector<double> newmat(n * n);
     for (int i = 0; i < n; i++) {
         const int pin = perm[i] * n;
         const int in = i * n;
