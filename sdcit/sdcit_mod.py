@@ -8,6 +8,28 @@ from sklearn.linear_model import LinearRegression
 from sdcit.utils import K2D, p_value_of, random_seeds, cythonize
 
 
+def _validate_sdcit_inputs(Kx, Ky, Kz, Dz):
+    shape = np.shape(Kx)
+    matrices = (Ky, Kz) if Dz is None else (Ky, Kz, Dz)
+    if len(shape) != 2 or shape[0] != shape[1] or any(np.shape(matrix) != shape for matrix in matrices):
+        raise ValueError("SDCIT kernels and distances must be square matrices of the same shape.")
+    # Matching requires even full and half samples. Half samples of size 2
+    # leave no unmasked MMSD terms, so the smallest supported full sample is 8.
+    if shape[0] < 8 or shape[0] % 4 != 0:
+        raise ValueError("SDCIT sample size must be at least 8 and divisible by 4.")
+    if any(not np.isfinite(kernel).all() for kernel in (Kx, Ky, Kz)):
+        raise ValueError("SDCIT kernel matrices must contain only finite values.")
+    if Dz is not None:
+        _validate_sdcit_distances(Dz)
+
+
+def _validate_sdcit_distances(Dz):
+    if not np.isfinite(Dz).all() or np.any(Dz < 0):
+        raise ValueError("SDCIT distances must be finite and nonnegative.")
+    if np.max(Dz) > np.finfo(np.float64).max / 2:
+        raise ValueError("SDCIT distances are too large for the matching penalty.")
+
+
 def permuted(D, seed=None, dense=True):
     if seed is None:
         seed = random_seeds()
@@ -90,13 +112,13 @@ def SDCIT(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, Dz=None, size_of_null_
     Parameters
     ----------
     Kx : np.ndarray
-        N by N kernel matrix of X
+        N by N kernel matrix of X; N must be at least 8 and divisible by 4
     Ky : np.ndarray
-        N by N kernel matrix of Y
+        N by N kernel matrix of Y; all kernel matrices must contain finite values
     Kz : np.ndarray
         N by N kernel matrix of Z
     Dz : np.ndarray
-        N by N pairwise distance matrix of Z
+        N by N finite, nonnegative pairwise distance matrix of Z
     size_of_null_sample : int
         The number of samples in a null distribution
     with_null : bool
@@ -113,11 +135,13 @@ def SDCIT(Kx: np.ndarray, Ky: np.ndarray, Kz: np.ndarray, Dz=None, size_of_null_
         Lee, S., Honavar, V. (2017). Self-Discrepancy Conditional Independence Test.
         In Proceedings of the Thirty-third Conference on Uncertainty in Artificial Intelligence. Corvallis, Oregon: AUAI Press.
     """
+    _validate_sdcit_inputs(Kx, Ky, Kz, Dz)
     if seed is not None:
         np.random.seed(seed)
 
     if Dz is None:
         Dz = K2D(Kz)
+        _validate_sdcit_distances(Dz)
 
     if to_shuffle:
         Kx, Ky, Kz, Dz = shuffling(seed, Kx, Ky, Kz, Dz)  # categorical Z may yield an ordered 'block' matrix and it may harm permutation.
@@ -149,13 +173,13 @@ def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
     Parameters
     ----------
     Kx : np.ndarray
-        N by N kernel matrix of X
+        N by N kernel matrix of X; N must be at least 8 and divisible by 4
     Ky : np.ndarray
-        N by N kernel matrix of Y
+        N by N kernel matrix of Y; all kernel matrices must contain finite values
     Kz : np.ndarray
         N by N kernel matrix of Z
     Dz : np.ndarray
-        N by N pairwise distance matrix of Z
+        N by N finite, nonnegative pairwise distance matrix of Z
     size_of_null_sample : int
         The number of samples in a null distribution
     with_null : bool
@@ -175,11 +199,13 @@ def c_SDCIT(Kx, Ky, Kz, Dz=None, size_of_null_sample=1000, with_null=False, seed
         Lee, S., Honavar, V. (2017). Self-Discrepancy Conditional Independence Test.
         In Proceedings of the Thirty-third Conference on Uncertainty in Artificial Intelligence. Corvallis, Oregon: AUAI Press.
     """
+    _validate_sdcit_inputs(Kx, Ky, Kz, Dz)
     if seed is not None:
         np.random.seed(seed)
 
     if Dz is None:
         Dz = K2D(Kz)
+        _validate_sdcit_distances(Dz)
 
     if to_shuffle:
         Kx, Ky, Kz, Dz = shuffling(seed, Kx, Ky, Kz, Dz)  # categorical Z may yield an ordered 'block' matrix and it may harm permutation.

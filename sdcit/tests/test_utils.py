@@ -84,10 +84,10 @@ def test_eigdec():
 def test_p_value_of():
     data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     p = p_value_of(9.5, data)
-    assert np.isclose(p, 0.1)
+    assert np.isclose(p, 2 / 11)
     
     p2 = p_value_of(11, data)
-    assert np.isclose(p2, 0.0)
+    assert np.isclose(p2, 1 / 11)
 
 def test_rbf_kernel_median():
     X = np.random.randn(10, 2)

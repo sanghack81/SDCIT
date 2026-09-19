@@ -7,7 +7,7 @@ Overview
 -------
 `sdcit` is a package for testing conditional independence in python implementing **SDCIT** by Lee and Honavar (2017). The algorithm utilizes the notion of closeness among observations, defined by a kernel function, and conditional permutation, which allows us to yield a pseudo-null sample.
 
-This algorithm depends on [`Blossom-V`](http://pub.ist.ac.at/~vnk/software/blossom5-v2.05.src.tar.gz) (Kolmogorov 2009), which is freely available for the research purpose. To be used commercially, users must buy [commercial license](http://pub.ist.ac.at/~vnk/software.html) for `Blossom-V`.
+This algorithm depends on [`Blossom-V`](https://pub.ista.ac.at/~vnk/software/blossom5-v2.05.src.tar.gz) (Kolmogorov 2009), which is freely available for the research purpose. To be used commercially, users must buy [commercial license](https://pub.ista.ac.at/~vnk/software.html) for `Blossom-V`.
 
 
 
@@ -47,6 +47,15 @@ pytest --cov=sdcit sdcit/tests/
 
 Examples
 -----
+The SDCIT entry points require at least 8 observations and a sample size divisible
+by 4, because the current matching backend operates on even full and half samples.
+Kernel matrices must be finite square matrices of the same shape. Supplied
+distance matrices must also be finite and nonnegative. Unsupported inputs raise
+`ValueError` before native matching.
+
+Empirical upper-tail p-values include ties and use the finite simulation rule
+`(1 + count(null >= statistic)) / (number_of_null_draws + 1)`.
+
 We provide three simple examples, where kernel matrices are computed based on median heuristic.
 
 ```python
@@ -88,7 +97,7 @@ References
 
 
 > Sanghack Lee, Vasant Honavar **Self-Discrepancy Conditional Independence Test**
-> _Proceedings of the 33rd Conference on Uncertainty in Artificial Intelligence._ 2017. (to appear)
+> _Proceedings of the 33rd Conference on Uncertainty in Artificial Intelligence._ 2017. [Published paper](https://www.auai.org/uai2017/proceedings/papers/16.pdf).
 
 
 > Gary Doran, Krikamol Muandet, Kun Zhang, and Bernhard Schölkopf. **A Permutation-Based Kernel Conditional Independence Test**
@@ -97,5 +106,4 @@ References
 
 > Vladimir Kolmogorov. **Blossom V: A new implementation of a minimum cost perfect matching algorithm.**
 >        In Mathematical Programming Computation (MPC), July 2009, 1(1):43-67.
-
 

@@ -9,8 +9,8 @@ cdef extern from "KCIPT.h":
                  double *const outer_null, const int M);
 
 cdef extern from "permutation.h":
-    void split_permutation_interface(const double *D, const int full_n, int*perm, const int seed);
-    void dense_2n_permutation_interface(const double *D, const int full_n, int *perm, const int seed);
+    void split_permutation_interface(const double *D, const int full_n, int*perm, const int seed) except +
+    void dense_2n_permutation_interface(const double *D, const int full_n, int *perm, const int seed) except +
 
 cdef extern from "SDCIT.h":
     void c_sdcit(const double * const K_XZ, const double * const K_Y, const double * const K_Z, const double * const D_Z_, const int n,
@@ -19,6 +19,19 @@ cdef extern from "SDCIT.h":
 
 cdef extern from "HSIC.h":
     void c_hsic(const double *const K_X, const double *const K_Y, const int n, const int b, const int seed, const int n_threads, double *const test_statistic, double *const null);
+
+
+cdef void _validate_worker_distances(double[:, ::1] D_Z, bint sdcit=False) except *:
+    # Worker-thread exceptions cannot be translated by the calling Python
+    # thread. Reject invalid costs before spawning native workers; +inf remains
+    # available to KCIPT's split matcher as the absent-edge representation.
+    if D_Z is not None and not np.all(np.asarray(D_Z) >= 0):
+        raise ValueError("Distances must be nonnegative and must not contain NaN.")
+    if sdcit:
+        if D_Z is None or not np.isfinite(np.asarray(D_Z)).all():
+            raise ValueError("SDCIT distances must be finite and nonnegative.")
+        if np.max(np.asarray(D_Z)) > np.finfo(np.float64).max / 2:
+            raise ValueError("SDCIT distances are too large for the matching penalty.")
 
 
 @cython.boundscheck(False)
@@ -39,6 +52,7 @@ def cy_kcipt(double[:, ::1] K_X,
     cdef int ll
     ll = K_X.shape[0]
 
+    _validate_worker_distances(D_Z)
     c_kcipt(&K_X[0, 0], &K_Y[0, 0], &K_Z[0, 0], &D_Z[0, 0] if D_Z is not None else NULL, ll, B, b, &inner_null[0, 0], &mmds[0], seed, n_threads, &outer_null[0], how_many)
 
 @cython.boundscheck(False)
@@ -80,6 +94,7 @@ def cy_sdcit(double[:, ::1] K_XZ,
     cdef int ll
     ll = K_XZ.shape[0]
 
+    _validate_worker_distances(D_Z, sdcit=True)
     c_sdcit(&K_XZ[0, 0], &K_Y[0, 0], &K_Z[0, 0], &D_Z[0, 0] if D_Z is not None else NULL, ll, b, seed, n_threads, &mmsd[0], &error_mmsd[0], &null[0], &error_null[0])
 
 
