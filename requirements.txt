@@ -4,7 +4,7 @@ setuptools
 cython
 numpy
 # Runtime dependencies
-scipy>=1.5
+scipy>=1.15.3
 scikit-learn
 # Dev / examples / tests
 pandas
